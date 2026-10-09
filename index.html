@@ -780,6 +780,9 @@ html, body {
 .pp-intro-row.on .pp-intro-ico { animation: pp-throb 1s ease-in-out infinite; }
 @keyframes pp-intro-in { from{ opacity:0; transform:translate(-50%,-46%) scale(.95);} to{ opacity:1; transform:translate(-50%,-50%) scale(1);} }
 @keyframes pp-intro-away { to{ opacity:0; transform:translate(-50%,-54%) scale(.96);} }
+.tier-dots { display:inline-flex; gap:4px; margin-right:4px; vertical-align:middle; }
+.tier-dot { width:9px; height:9px; border-radius:50%; border:1.5px solid rgba(255,255,255,.35); background:transparent; }
+.tier-dot.on.t1 { background:#cd7f32; border-color:#cd7f32; } .tier-dot.on.t2 { background:#c9d3e0; border-color:#c9d3e0; } .tier-dot.on.t3 { background:#ffd166; border-color:#ffd166; box-shadow:0 0 6px rgba(255,209,102,.7); }
 .pp-encourage { text-align: center; font-family: var(--ff-body); font-size: 0.85rem; color: var(--white); min-height: 22px; margin-top: 10px; }
 .pp-countdown-overlay {
   position: absolute; inset: 0; z-index: 40;
@@ -6229,6 +6232,11 @@ function ppCatchStar(star, playArea, wordObj) {
   const p = getProgress();
   p.planetPatrol = p.planetPatrol || { totalCaught: 0, perfectRounds: 0, worldsPlayed: [], bestByWorld: {} };
   p.planetPatrol.totalCaught++;
+  if (ppCurrentLevel) {
+    p.planetPatrol.byWorld = p.planetPatrol.byWorld || {};
+    const bw = p.planetPatrol.byWorld[ppCurrentLevel.id] = p.planetPatrol.byWorld[ppCurrentLevel.id] || { caught: 0, perfect: 0, heart: 0 };
+    bw.caught++;
+  }
   saveProgress(p);
   const enc = document.getElementById('pp-encourage');
   if (enc) enc.textContent = ['Great catch! ⭐', 'Nice one!', 'You got it!', 'Sparkling!'][Math.floor(Math.random() * 4)];
@@ -6269,6 +6277,12 @@ function ppShowResults() {
   p.planetPatrol = p.planetPatrol || { totalCaught: 0, perfectRounds: 0, worldsPlayed: [], bestByWorld: {} };
   if (ppCaught === PP_TARGET_COUNT) p.planetPatrol.perfectRounds++;
   if (ppCaught === PP_TARGET_COUNT && ppLives === ppMaxLives) p.planetPatrol.heartRounds = (p.planetPatrol.heartRounds || 0) + 1;
+  if (ppCurrentLevel) {
+    p.planetPatrol.byWorld = p.planetPatrol.byWorld || {};
+    const bw2 = p.planetPatrol.byWorld[ppCurrentLevel.id] = p.planetPatrol.byWorld[ppCurrentLevel.id] || { caught: 0, perfect: 0, heart: 0 };
+    if (ppCaught === PP_TARGET_COUNT) bw2.perfect++;
+    if (ppCaught === PP_TARGET_COUNT && ppLives === ppMaxLives) bw2.heart++;
+  }
   if (ppCurrentLevel && !p.planetPatrol.worldsPlayed.includes(ppCurrentLevel.id)) {
     p.planetPatrol.worldsPlayed.push(ppCurrentLevel.id);
   }
@@ -6424,8 +6438,8 @@ function buildBadgesScreen() {
 
     gamesAch.forEach((a, i) => {
       if (a.unlocked) totalEarned++;
-      const subText = a.unlocked ? '✓ Unlocked!' : `${a.current} / ${a.target}`;
-      const node = addStation(a.icon, a.name, a.unlocked, subText, gColour);
+      const subText = achSubText(a);
+      const node = addStation(a.icon, a.name, a.unlocked, subText, achRingColour(a, gColour).replace('rgba(255,255,255,0.25)', gColour));
       node.addEventListener('click', e => {
         burstStar(e.clientX, e.clientY);
         if (a.unlocked) speak(a.name + ' — unlocked! Great playing!', null, 0.9);
@@ -6543,9 +6557,40 @@ function achievementStats() {
     ppTotalCaught: pp.totalCaught || 0,
     ppPerfectRounds: pp.perfectRounds || 0,
     ppHeartRounds: pp.heartRounds || 0,
+    ppByWorld: pp.byWorld || {},
     ppWorldsPlayed: (pp.worldsPlayed || []).length,
     chLevelWorldsCount: chLevelWorlds.length
   };
+}
+
+/* ── Tiered badges: one badge, three levels (bronze / silver / gold) ── */
+const TIER_COLOURS = ['', '#cd7f32', '#c9d3e0', '#ffd166'];
+const TIER_NAMES = ['', 'Bronze', 'Silver', 'Gold'];
+function makeTiered(category, icon, name, tiers, value) {
+  let tier = 0;
+  tiers.forEach((t, i) => { if (value >= t) tier = i + 1; });
+  const nextTarget = tier < tiers.length ? tiers[tier] : tiers[tiers.length - 1];
+  return { category, icon, name, tiers, tier, unlocked: tier >= 1, current: Math.min(value, nextTarget), target: nextTarget };
+}
+function achievementKeys(list) {
+  const keys = [];
+  list.forEach(a => {
+    if (a.tiers) { for (let t = 1; t <= a.tier; t++) keys.push(a.name + '|T' + t); }
+    else if (a.unlocked) keys.push(a.name);
+  });
+  return keys;
+}
+function achTierDots(a) {
+  if (!a.tiers) return '';
+  return '<span class="tier-dots">' + a.tiers.map((_, i) => '<span class="tier-dot' + (i < a.tier ? ' on t' + (i + 1) : '') + '"></span>').join('') + '</span>';
+}
+function achSubText(a) {
+  if (!a.tiers) return a.unlocked ? '✓ Unlocked!' : `${a.current} / ${a.target}`;
+  return achTierDots(a) + (a.tier >= a.tiers.length ? ' Max!' : ` ${a.current} / ${a.target}`);
+}
+function achRingColour(a, fallback) {
+  if (a.tiers) return a.tier >= 1 ? TIER_COLOURS[a.tier] : 'rgba(255,255,255,0.25)';
+  return a.unlocked ? fallback : 'rgba(255,255,255,0.25)';
 }
 
 function buildAchievementsList() {
@@ -6583,12 +6628,20 @@ function buildAchievementsList() {
 
   // Games
   list.push({ category: 'Games', icon: '🚀', name: 'Planet Patrol Rookie', unlocked: s.ppTotalCaught >= 1, current: Math.min(s.ppTotalCaught,1), target: 1 });
-  list.push({ category: 'Games', icon: '💖', name: 'Heart Keeper', unlocked: s.ppHeartRounds >= 1, current: Math.min(s.ppHeartRounds,1), target: 1 });
   list.push({ category: 'Games', icon: '🛸', name: 'Perfect Patrol', unlocked: s.ppPerfectRounds >= 1, current: Math.min(s.ppPerfectRounds,1), target: 1 });
   list.push({ category: 'Games', icon: '🌌', name: 'Galaxy Explorer', unlocked: s.ppWorldsPlayed >= 4, current: Math.min(s.ppWorldsPlayed,4), target: 4 });
   list.push({ category: 'Games', icon: '🪐', name: '100 Planets Caught', unlocked: s.ppTotalCaught >= 100, current: Math.min(s.ppTotalCaught,100), target: 100 });
   list.push({ category: 'Games', icon: '🎖️', name: '5 Perfect Dictation Rounds', unlocked: s.perfectDictationRounds >= 5, current: Math.min(s.perfectDictationRounds,5), target: 5 });
   list.push({ category: 'Games', icon: '👑', name: 'World Champion', unlocked: s.chLevelWorldsCount >= 1, current: Math.min(s.chLevelWorldsCount,1), target: 1 });
+
+  // Per-world Planet Patrol badges (each has bronze / silver / gold)
+  LEVELS.forEach(lv => {
+    const bw = (s.ppByWorld || {})[lv.id] || { caught: 0, perfect: 0, heart: 0 };
+    const label = (WORLD_EMOJI[lv.id] || '') + ' ' + lv.name + ' · ';
+    list.push(makeTiered('Games', '🔭', label + 'Planet Catcher', [10, 50, 150], bw.caught));
+    list.push(makeTiered('Games', '👂', label + 'Sharp Ears', [1, 3, 7], bw.perfect));
+    list.push(makeTiered('Games', '💖', label + 'Heart Keeper', [1, 3, 7], bw.heart));
+  });
 
   return list;
 }
@@ -6609,10 +6662,17 @@ function checkForNewAchievements() {
   const p = getProgress();
   const seen = new Set(p.seenAchievements || []);
   const list = buildAchievementsList();
-  const newlyUnlocked = list.filter(a => a.unlocked && !seen.has(a.name));
+  const newlyUnlocked = [];
+  list.forEach(a => {
+    if (a.tiers) {
+      for (let t = 1; t <= a.tier; t++) {
+        if (!seen.has(a.name + '|T' + t)) newlyUnlocked.push(Object.assign({}, a, { popupName: a.name + ' · ' + TIER_NAMES[t], popupTier: t }));
+      }
+    } else if (a.unlocked && !seen.has(a.name)) newlyUnlocked.push(a);
+  });
   if (newlyUnlocked.length) {
     const p2 = getProgress();
-    p2.seenAchievements = list.filter(a => a.unlocked).map(a => a.name);
+    p2.seenAchievements = achievementKeys(list);
     saveProgress(p2);
     showAchievementPopup(newlyUnlocked, 0);
   }
@@ -6621,7 +6681,9 @@ function checkForNewAchievements() {
 function showAchievementPopup(newAchievements, index) {
   if (index >= newAchievements.length) return;
   const a = newAchievements[index];
-  const colours = ACH_CATEGORY_COLOURS[a.category] || { colour: 'var(--gold)', glow: 'rgba(255,209,102,0.55)' };
+  const colours = a.popupTier
+    ? { colour: TIER_COLOURS[a.popupTier], glow: TIER_COLOURS[a.popupTier] + '99' }
+    : (ACH_CATEGORY_COLOURS[a.category] || { colour: 'var(--gold)', glow: 'rgba(255,209,102,0.55)' });
 
   const overlay = document.createElement('div');
   overlay.className = 'ach-popup-overlay';
@@ -6629,7 +6691,7 @@ function showAchievementPopup(newAchievements, index) {
     <div class="ach-popup-card" id="ach-popup-card">
       <div class="ach-popup-label">🎉 Sticker Unlocked!</div>
       <div class="ach-popup-sticker" style="--cat-colour:${colours.colour}; --cat-glow:${colours.glow};">${a.icon}</div>
-      <div class="ach-popup-name">${a.name}</div>
+      <div class="ach-popup-name">${a.popupName || a.name}</div>
       <div class="ach-popup-tap">Tap the sticker to see your collection</div>
     </div>`;
   document.body.appendChild(overlay);
@@ -6695,14 +6757,14 @@ function openAchievements() {
 
       const planetEl = document.createElement('div');
       planetEl.className = 'station-planet';
-      planetEl.style.setProperty('border-color', a.unlocked ? colours.colour : 'rgba(255,255,255,0.25)');
+      planetEl.style.setProperty('border-color', achRingColour(a, colours.colour));
       planetEl.style.setProperty('background', a.unlocked ? 'rgba(255,255,255,0.04)' : 'var(--navy2)');
       planetEl.innerHTML = `${a.unlocked ? a.icon : '🔒'}`;
 
       const infoEl = document.createElement('div');
       infoEl.className = 'station-info';
       const tagClass = a.unlocked ? 'tag-done' : 'tag-locked';
-      const tagText  = a.unlocked ? '✓ Unlocked!' : `${a.current} / ${a.target}`;
+      const tagText  = achSubText(a);
       infoEl.innerHTML = `
         <div class="si-name">${a.name}</div>
         <span class="si-tag ${tagClass}">${tagText}</span>
@@ -7398,7 +7460,7 @@ function runAchievementAudit() {
   // re-derive achievements fresh from (now-cleaned) data, and drop any
   // "already shown" record that no longer actually qualifies
   const freshList = buildAchievementsList();
-  const trulyUnlocked = new Set(freshList.filter(a => a.unlocked).map(a => a.name));
+  const trulyUnlocked = new Set(achievementKeys(freshList));
   const p2 = getProgress();
   if (p2.seenAchievements) {
     const cleanedSeen = p2.seenAchievements.filter(name => trulyUnlocked.has(name));
