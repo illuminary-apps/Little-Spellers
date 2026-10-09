@@ -283,7 +283,8 @@ html, body {
 .expanding  .cc-progress-bar { background: var(--teal); }
 .mastery    .cc-progress-bar { background: var(--lavender); }
 
-.cc-stars {
+.cc-stars { display: none !important; }
+.cc-stars-unused {
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
@@ -1624,7 +1625,9 @@ html, body {
 .ach-progress { font-size: 0.6rem; color: var(--gold); margin-top: 2px; }
 .ach-card.locked .ach-progress { color: #7a9cc0; }
 
-#ach-rocket-inner { font-size: 2.1rem; line-height: 1; text-align: center; filter: drop-shadow(0 0 10px rgba(6,214,160,0.5)); }
+#ach-rocket, #badges-rocket { width: 84px; right: 0; }
+#badges-rocket-inner { font-size: 3.8rem; line-height: 1; text-align: center; filter: drop-shadow(0 0 10px rgba(6,214,160,0.5)); }
+#ach-rocket-inner { font-size: 3.8rem; line-height: 1; text-align: center; filter: drop-shadow(0 0 10px rgba(6,214,160,0.5)); }
 .ach-category-divider {
   position: relative; z-index: 2; margin: 1.4rem 0 0.8rem 44px;
   display: inline-flex; align-items: center; gap: 6px;
@@ -3641,6 +3644,23 @@ function cloneJourneyUFO() {
   inner.appendChild(img);
 }
 
+
+/* World-themed icons, shared by the kids' journey map and the parent views */
+const WORLD_ICONS = {
+    foundation: ['☁️','⛅','🪁','🪂','🎈','🌩️','🌈','🛰️','🌤️','🌦️','🌬️','🌥️'],
+    building:   ['🌒','🌓','🌔','🌕','🌖','🌗','🌘','🌙','🌛','🌜','🌝','🌕'],
+    expanding:  ['🌍','🪐','🌠','☄️','💫','💥','🛰️','🌏','🌎','🌠','☄️','🪐'],
+    mastery:    ['🌌','⭐','🔭','🌟','🌀','✨','💠','🪐','🌠','🔆','💫','🌌'],
+  };
+const WORLD_EMOJI = { foundation:'☁️', building:'🌙', expanding:'✨', mastery:'💫' };
+function lessonThemeIcon(lesson) {
+  for (const lv of LEVELS) {
+    const idx = lv.lessons.findIndex(l => l.id === lesson.id);
+    if (idx >= 0) { const arr = WORLD_ICONS[lv.id] || ['🌟']; return arr[idx % arr.length]; }
+  }
+  return lesson.icon || '⭐';
+}
+
 function openLevel(levelId) {
   currentLevel = LEVELS.find(l => l.id === levelId);
   if (!currentLevel) return;
@@ -3662,13 +3682,8 @@ function buildJourneyMap() {
   const p = getProgress();
   const lessons = currentLevel.lessons;
 
-  // Planet visuals per level
-  const PLANETS = {
-    foundation: ['☁️','⛅','🪁','🪂','🎈','🌩️','🌈','🛰️','🌤️','🌦️','🌬️','🌥️'],
-    building:   ['🌒','🌓','🌔','🌕','🌖','🌗','🌘','🌙','🌛','🌜','🌝','🌕'],
-    expanding:  ['🌍','🪐','🌠','☄️','💫','💥','🛰️','🌏','🌎','🌠','☄️','🪐'],
-    mastery:    ['🌌','⭐','🔭','🌟','🌀','✨','💠','🪐','🌠','🔆','💫','🌌'],
-  };
+  // Planet visuals per level (shared WORLD_ICONS)
+  const PLANETS = WORLD_ICONS;
   const planets = PLANETS[currentLevel.id] || ['🌟'];
 
   // Figure out which lesson is "current"
@@ -6677,7 +6692,7 @@ function buildSpellingSecretsList() {
         if (!lesson.rule) return;
         const row = document.createElement('div');
         row.className = 'ch-lesson-row';
-        row.innerHTML = `<span class="ch-lesson-status">${lesson.icon || '📖'}</span><span class="ch-lesson-name">${lesson.name}</span><span class="ch-level-arrow">›</span>`;
+        row.innerHTML = `<span class="ch-lesson-status">${lessonThemeIcon(lesson)}</span><span class="ch-lesson-name">${lesson.name}</span><span class="ch-level-arrow">›</span>`;
         row.addEventListener('click', () => openSecretLesson(level, lesson));
         lessonsWrap.appendChild(row);
       });
@@ -6710,7 +6725,7 @@ function openNextSecret(currentLesson) {
 function openSecretLesson(level, lesson) {
   const body = document.getElementById('spelling-secrets-body');
   body.innerHTML = '';
-  document.querySelector('#spelling-secrets-screen .lm-title').textContent = (lesson.icon || '📖') + ' ' + lesson.name;
+  document.querySelector('#spelling-secrets-screen .lm-title').textContent = lessonThemeIcon(lesson) + ' ' + lesson.name;
   document.getElementById('ss-back-btn').onclick = openSpellingSecrets;
 
   const ruleCard = document.createElement('div');
@@ -7110,7 +7125,7 @@ function buildParentDashboard() {
       </div>
       <div class="plc-bar-wrap"><div class="plc-bar" style="width:${pct}%;background:${colour};"></div></div>
       <div class="pd-lesson-detail-row" style="display:${isOpen?'grid':'none'}">
-        <span class="pdl-name">${level.name} Overview</span>
+        <span class="pdl-name">${WORLD_EMOJI[level.id] || ''} ${level.name} Overview</span>
         <span>Lessons<br>${done}/${total}</span>
         <span>Stars<br>${level.lessons.reduce((a,l)=>a+(p[l.id]?.score||0),0)}/${level.lessons.reduce((a,l)=>a+l.quizzes.length,0)}</span>
         <span>Dictation<br>${masteredWords}/${challengeWords.length||0}</span>
@@ -7139,7 +7154,7 @@ function buildParentDashboard() {
         const row = document.createElement('div');
         row.className = 'plc-lesson-row';
         row.innerHTML = `
-          <span class="plr-icon">${lesson.icon}</span>
+          <span class="plr-icon">${lessonThemeIcon(lesson)}</span>
           <span class="plr-name">${lesson.name}</span>
           ${isDone
             ? `<span class="plr-score">${score}/${qTotal} ${stars}</span><span class="plr-done">✓</span>`
@@ -7172,7 +7187,7 @@ function buildParentDashboard() {
     strengths.forEach(s => {
       const row = document.createElement('div');
       row.className = 'pd-strength-row';
-      row.innerHTML = `<span class="pd-sr-icon">${s.lesson.icon||'⭐'}</span><div><div class="pd-sr-name">Great with ${s.name}!</div><div class="pd-sr-sub">Accuracy: ${s.acc}%</div></div>`;
+      row.innerHTML = `<span class="pd-sr-icon">${lessonThemeIcon(s.lesson)}</span><div><div class="pd-sr-name">Great with ${s.name}!</div><div class="pd-sr-sub">Accuracy: ${s.acc}%</div></div>`;
       strengthsCard.appendChild(row);
     });
   } else {
@@ -7190,7 +7205,7 @@ function buildParentDashboard() {
       row.className = 'pd-revisit-row';
       row.innerHTML = `
         <div>
-          <div class="pd-sr-name">${s.lesson.icon||''} ${s.name}</div>
+          <div class="pd-sr-name">${lessonThemeIcon(s.lesson)} ${s.name}</div>
           <div class="pd-revisit-acc">Accuracy ${s.acc}%</div>
           <div class="pd-revisit-reason">Practice recommended to build confidence.</div>
         </div>
