@@ -1846,6 +1846,12 @@ html, body {
 .ch-footprint { font-size: 1.3rem; opacity: 0.25; transition: opacity 0.3s; }
 .ch-footprint.lit { opacity: 1; }
 .ch-cat { font-size: 1.6rem; transition: transform 0.3s; }
+.ch-moonstep { display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:50%; font-size:1.25rem; line-height:1; opacity:.55;
+  background: radial-gradient(circle, rgba(255,236,170,.20) 0%, rgba(255,236,170,.08) 55%, rgba(255,236,170,0) 72%);
+  box-shadow: 0 0 10px 3px rgba(255,236,170,.22); }
+.ch-moonstep.lit { opacity:1; box-shadow: 0 0 14px 5px rgba(255,236,170,.45); }
+.ch-moonstep.current { opacity:1; animation: ch-moon-pulse 1.6s ease-in-out infinite; }
+@keyframes ch-moon-pulse { 0%,100%{ box-shadow: 0 0 10px 3px rgba(255,236,170,.30); transform:scale(1);} 50%{ box-shadow: 0 0 20px 8px rgba(255,236,170,.65); transform:scale(1.18);} }
 .ch-cat.jump { animation: ch-cat-jump 0.7s ease; }
 @keyframes ch-cat-jump {
   0%   { transform: translateY(0); }
@@ -7656,27 +7662,16 @@ function chRenderCatPath(container, levelId, lessonName) {
   const path = document.createElement('div');
   path.className = 'ch-catpath';
 
+  const MOON_STEPS = ['🌑','🌘','🌘','🌗','🌗','🌖','🌖','🌕'];
   for (let i = 0; i < CH_FOOTPRINT_COUNT; i++) {
-    if (i === position && !complete) {
-      const cat = document.createElement('span');
-      cat.className = 'ch-cat';
-      cat.textContent = '🛸';
-      path.appendChild(cat);
-    }
     const fp = document.createElement('span');
-    fp.className = 'ch-footprint' + (i < position ? ' lit' : '');
-    fp.textContent = '✨';
+    fp.className = 'ch-footprint ch-moonstep' + (i < position || complete ? ' lit' : '') + (i === position && !complete ? ' current' : '');
+    fp.textContent = MOON_STEPS[Math.min(i, MOON_STEPS.length - 1)];
     path.appendChild(fp);
   }
   const dest = document.createElement('span');
   dest.className = 'ch-destination' + (complete ? ' glow' : '');
   dest.textContent = CH_ICONS[levelId] || '⭐';
-  if (complete) {
-    const cat = document.createElement('span');
-    cat.className = 'ch-cat jump';
-    cat.textContent = '🛸';
-    path.appendChild(cat);
-  }
   path.appendChild(dest);
   wrap.appendChild(path);
 
