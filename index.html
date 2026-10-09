@@ -764,6 +764,10 @@ html, body {
 .pp-heart.lost { animation:none; opacity:.45; filter:none; }
 .pp-heart.pop { animation: pp-heart-pop .38s ease-out forwards; }
 .pp-heart-bit { position:absolute; font-size:.7rem; transform:translate(-50%,-50%); animation: pp-heart-bit .6s ease-out forwards; pointer-events:none; }
+.pp-heart.pp-spare { filter: drop-shadow(0 0 8px rgba(255,214,102,.9)); }
+.pp-heart.pp-spare::after { content:'✨'; position:absolute; top:-7px; right:-6px; font-size:.6rem; }
+.spare-tag { font-size:.8em; margin-left:4px; opacity:.95; }
+.pp-spare-mini { margin-left:2px; }
 .pp-results-hearts { font-size:1.6rem; margin-top:8px; letter-spacing:4px; }
 @keyframes pp-throb { 0%,100%{ transform:scale(1);} 40%{ transform:scale(1.18);} 60%{ transform:scale(1.05);} }
 @keyframes pp-heart-pop { 0%{ transform:scale(1); } 45%{ transform:scale(1.7) rotate(-8deg); filter:drop-shadow(0 0 12px rgba(255,150,190,.9)); } 100%{ transform:scale(.9); opacity:.6; } }
@@ -5883,7 +5887,13 @@ let ppSpawnInterval = null;
 let ppWordPool = [];
 let ppCurrentLevel = null;
 let ppRoundWords = [];
-let ppLives = 0, ppMaxLives = 0, ppEnded = false, ppGameToken = 0;
+let ppLives = 0, ppMaxLives = 0, ppEnded = false, ppGameToken = 0, ppSpare = 0;
+const PP_SPARE_CAP = 3;
+function ppSpareFor(worldId) {
+  const bw = (getProgress().planetPatrol || {}).byWorld || {};
+  const w = bw[worldId] || { heart: 0, spent: 0 };
+  return Math.max(0, Math.min(PP_SPARE_CAP, Math.floor((w.heart || 0) / 3) - (w.spent || 0)));
+}
 const PP_EASY_WORLDS = ['foundation', 'building']; // 5 hearts; later worlds get 3
 let ppMissedWorking = [];
 
@@ -5973,14 +5983,15 @@ function openPlanetPatrol(level) {
   ppCaught = 0;
   ppActiveStars = 0;
   ppMaxLives = PP_EASY_WORLDS.includes(level.id) ? 5 : 3;
-  ppLives = ppMaxLives;
+  ppSpare = ppSpareFor(level.id);
+  ppLives = ppMaxLives + ppSpare;
   ppEnded = false;
   if (ppSpawnInterval) clearInterval(ppSpawnInterval);
 
   showScreen('planetpatrol-screen');
   const body = document.getElementById('pp-body');
   body.classList.remove('ch-grid');
-  body.innerHTML = '<div class="pp-play-area" id="pp-play-area"><div class="pp-hearts" id="pp-hearts"><span class="pp-lives-label">Lives</span>' + Array.from({length: ppMaxLives}, () => '<span class="pp-heart">🩷</span>').join('') + '</div><div class="pp-countdown-overlay" id="pp-countdown-overlay"></div></div><div class="pp-encourage" id="pp-encourage"></div>';
+  body.innerHTML = '<div class="pp-play-area" id="pp-play-area"><div class="pp-hearts" id="pp-hearts"><span class="pp-lives-label">Lives</span>' + Array.from({length: ppMaxLives}, () => '<span class="pp-heart">🩷</span>').join('') + Array.from({length: ppSpare}, () => '<span class="pp-heart pp-spare">🩷</span>').join('') + '</div><div class="pp-countdown-overlay" id="pp-countdown-overlay"></div></div><div class="pp-encourage" id="pp-encourage"></div>';
 
   const myGame = ++ppGameToken;
   ppRunIntro(myGame, () => { if (myGame === ppGameToken) ppRunCountdown(); });
@@ -6007,14 +6018,14 @@ function ppRunIntro(myGame, done) {
     <div class="pp-intro-title">How to play</div>
     <div class="pp-intro-row" data-i="0"><span class="pp-intro-ico">👆</span><span>Tap the planets with the words you hear<br><b>⭐ Collect points!</b></span></div>
     <div class="pp-intro-row" data-i="1"><span class="pp-intro-ico">🪐</span><span>Watch out for the sneaky planets!</span></div>
-    <div class="pp-intro-row" data-i="2"><span class="pp-intro-ico">🩷</span><span>A wrong tap costs a life<br><b>${hearts}</b></span></div>`;
+    <div class="pp-intro-row" data-i="2"><span class="pp-intro-ico">🩷</span><span>A wrong tap costs a life<br><b>${hearts}${'<span class="pp-spare-mini">🩷✨</span>'.repeat(ppSpare)}</b></span></div>`;
   playArea.appendChild(card);
   const rows = card.querySelectorAll('.pp-intro-row');
 
   const lines = [
     'Tap the planets with the words you hear, and collect points!',
     'But watch out for the sneaky planets!',
-    'A wrong tap costs a life, and you have ' + livesWord + ' lives!'
+    'A wrong tap costs a life, and you have ' + livesWord + ' lives' + (ppSpare > 0 ? ', plus a spare heart!' : '!')
   ];
   let finished = false;
   const finish = () => {
@@ -6183,8 +6194,10 @@ function ppBuzzWrong(star, wordSpan) {
 function ppLoseLife() {
   if (ppEnded || ppLives <= 0) return;
   ppLives--;
-  const hearts = document.querySelectorAll('#pp-hearts .pp-heart');
-  const heart = hearts[ppLives];
+  const normalEls = document.querySelectorAll('#pp-hearts .pp-heart:not(.pp-spare)');
+  const spareEls = document.querySelectorAll('#pp-hearts .pp-heart.pp-spare');
+  // normal hearts go first; the spare is only spent once those are all gone
+  const heart = ppLives >= ppSpare ? normalEls[ppLives - ppSpare] : spareEls[ppLives];
   if (heart) {
     heart.classList.add('pop');
     const box = heart.getBoundingClientRect();
@@ -6277,12 +6290,14 @@ function ppShowResults() {
   const p = getProgress();
   p.planetPatrol = p.planetPatrol || { totalCaught: 0, perfectRounds: 0, worldsPlayed: [], bestByWorld: {} };
   if (ppCaught === PP_TARGET_COUNT) p.planetPatrol.perfectRounds++;
-  if (ppCaught === PP_TARGET_COUNT && ppLives === ppMaxLives) p.planetPatrol.heartRounds = (p.planetPatrol.heartRounds || 0) + 1;
+  const ppClean = ppCaught === PP_TARGET_COUNT && ppLives === ppMaxLives + ppSpare;
+  if (ppClean) p.planetPatrol.heartRounds = (p.planetPatrol.heartRounds || 0) + 1;
   if (ppCurrentLevel) {
     p.planetPatrol.byWorld = p.planetPatrol.byWorld || {};
     const bw2 = p.planetPatrol.byWorld[ppCurrentLevel.id] = p.planetPatrol.byWorld[ppCurrentLevel.id] || { caught: 0, perfect: 0, heart: 0 };
     if (ppCaught === PP_TARGET_COUNT) bw2.perfect++;
-    if (ppCaught === PP_TARGET_COUNT && ppLives === ppMaxLives) bw2.heart++;
+    if (ppClean) bw2.heart++;
+    bw2.spent = (bw2.spent || 0) + Math.max(0, ppSpare - Math.max(0, ppLives));
   }
   if (ppCurrentLevel && !p.planetPatrol.worldsPlayed.includes(ppCurrentLevel.id)) {
     p.planetPatrol.worldsPlayed.push(ppCurrentLevel.id);
@@ -6303,7 +6318,8 @@ function ppShowResults() {
     ${isNewBest && prevBest > 0 ? '<div class="pp-best-banner">🎉 New Best!</div>' : ''}
     <div class="pp-results-score">${ppCaught} / ${PP_TARGET_COUNT}</div>
     <div class="pp-results-label">${star}</div>
-    <div class="pp-results-hearts">${'🩷'.repeat(ppLives)}${'🤍'.repeat(ppMaxLives - ppLives)}</div>
+    <div class="pp-results-hearts">${'🩷'.repeat(Math.min(ppLives, ppMaxLives))}${'🤍'.repeat(Math.max(0, ppMaxLives - ppLives))}${ppSpare > 0 ? (ppLives > ppMaxLives ? '<span title="spare">🩷✨</span>'.repeat(ppLives - ppMaxLives) : '') : ''}</div>
+    ${ppSpare > 0 && ppLives < ppMaxLives + ppSpare ? '<div class="pp-results-label" style="margin-top:4px;">Your spare heart helped you! 🩷✨</div>' : ''}
     ${ppLives <= 0 ? '<div class="pp-results-label" style="margin-top:6px;">Great flying! Listen closely and try again 🩷</div>' : ''}
   `;
   body.appendChild(wrap);
@@ -6593,8 +6609,9 @@ function achievementKeys(list) {
   return keys;
 }
 function achSubText(a) {
+  const spareTag = (a.spare > 0) ? ` <span class="spare-tag">🩷+${a.spare}</span>` : '';
   if (!a.per) return a.unlocked ? '✓ Unlocked!' : `${a.current} / ${a.target}`;
-  return (a.count >= 1 ? `<span class="earn-count">×${a.count}</span> ` : '') + `${a.current} / ${a.target}` + (a.count >= 1 ? ' next' : '');
+  return (a.count >= 1 ? `<span class="earn-count">×${a.count}</span> ` : '') + `${a.current} / ${a.target}` + (a.count >= 1 ? ' next' : '') + spareTag;
 }
 function achRingColour(a, fallback) {
   return a.unlocked ? fallback : 'rgba(255,255,255,0.25)';
@@ -6646,7 +6663,9 @@ function buildAchievementsList() {
     const bw = (s.ppByWorld || {})[lv.id] || { caught: 0, perfect: 0, heart: 0 };
     list.push(makeRepeat('Games', '🔭', 'pp-' + lv.id + '-catch', lv.id, 'Planet Catcher', 30, bw.caught));
     list.push(makeRepeat('Games', '👂', 'pp-' + lv.id + '-ears', lv.id, 'Sharp Ears', 3, bw.perfect));
-    list.push(makeRepeat('Games', '💖', 'pp-' + lv.id + '-heart', lv.id, 'Heart Keeper', 3, bw.heart));
+    const hk = makeRepeat('Games', '💖', 'pp-' + lv.id + '-heart', lv.id, 'Heart Keeper', 3, bw.heart);
+    hk.spare = Math.max(0, Math.min(PP_SPARE_CAP, hk.count - (bw.spent || 0)));
+    list.push(hk);
   });
 
   return list;
