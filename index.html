@@ -6654,6 +6654,18 @@ function achievementStats() {
     ppPerfectRounds: pp.perfectRounds || 0,
     ppHeartRounds: pp.heartRounds || 0,
     ppByWorld: pp.byWorld || {},
+    spByWorld: (p.spellathon && p.spellathon.byWorld) || {},
+    masteredByWorld: (() => {
+      const out = {};
+      LEVELS.forEach(l => { out[l.id] = 0; });
+      Object.keys(challengeProg).forEach(id => {
+        if ((challengeProg[id].mastery || 0) >= 2) {
+          const lv = LEVELS.find(l => WB_LEVEL_LABEL[l.id] === id.split('::')[0]);
+          if (lv) out[lv.id]++;
+        }
+      });
+      return out;
+    })(),
     ppWorldsPlayed: (pp.worldsPlayed || []).length,
     chLevelWorldsCount: chLevelWorlds.length
   };
@@ -6732,6 +6744,13 @@ function buildAchievementsList() {
     const hk = makeRepeat('Games', '💖', 'pp-' + lv.id + '-heart', lv.id, 'Heart Keeper', 3, bw.heart);
     hk.spare = Math.max(0, Math.min(PP_SPARE_CAP, hk.count - (bw.spent || 0)));
     list.push(hk);
+  });
+  // Per-world Spell-a-thon badges
+  LEVELS.forEach(lv => {
+    const sw = (s.spByWorld || {})[lv.id] || { perfect: 0, comeback: 0 };
+    list.push(makeRepeat('Games', '💎', 'sp-' + lv.id + '-collect', lv.id, 'Word Collector', 10, (s.masteredByWorld || {})[lv.id] || 0));
+    list.push(makeRepeat('Games', '🎯', 'sp-' + lv.id + '-perfect', lv.id, 'Perfect Speller', 3, sw.perfect));
+    list.push(makeRepeat('Games', '🦸', 'sp-' + lv.id + '-comeback', lv.id, 'Comeback Kid', 5, sw.comeback));
   });
 
   return list;
@@ -7870,6 +7889,17 @@ function chSubmitAnswer(wordObj, typed, encourageEl) {
     mastery = Math.min(2, mastery + 1);
     chSessionCorrect.add(id);
   }
+  if (isCorrect && rec.needsReview) {
+    // a word she once got wrong, now right: a comeback
+    const pc = getProgress();
+    pc.spellathon = pc.spellathon || { byWorld: {} };
+    const wid = (LEVELS.find(l => WB_LEVEL_LABEL[l.id] === wordObj.level) || {}).id;
+    if (wid) {
+      const sw = pc.spellathon.byWorld[wid] = pc.spellathon.byWorld[wid] || { perfect: 0, comeback: 0 };
+      sw.comeback++;
+      saveProgress(pc);
+    }
+  }
   saveChallengeWordProgress(id, {
     mastery,
     needsReview: !isCorrect,
@@ -7893,6 +7923,11 @@ function chRenderReview() {
   if (chRoundResults.length && chRoundResults.every(r => r.correct)) {
     const p = getProgress();
     p.perfectDictationRounds = (p.perfectDictationRounds || 0) + 1;
+    if (chCurrentLevel) {
+      p.spellathon = p.spellathon || { byWorld: {} };
+      const sw = p.spellathon.byWorld[chCurrentLevel.id] = p.spellathon.byWorld[chCurrentLevel.id] || { perfect: 0, comeback: 0 };
+      sw.perfect++;
+    }
     saveProgress(p);
   }
 
