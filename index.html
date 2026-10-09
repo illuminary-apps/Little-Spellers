@@ -757,6 +757,16 @@ html, body {
   0%   { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
   100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.25); opacity: 0; }
 }
+.pp-hearts { position:absolute; top:6px; left:0; right:0; z-index:20; display:flex; justify-content:center; gap:10px; pointer-events:none; }
+.pp-heart { position:relative; font-size:1.7rem; line-height:1; display:inline-block; animation: pp-throb 1.1s ease-in-out infinite; filter: drop-shadow(0 0 6px rgba(255,90,120,.55)); }
+.pp-heart:nth-child(2n) { animation-delay: .18s; } .pp-heart:nth-child(3n) { animation-delay: .36s; }
+.pp-heart.lost { animation:none; opacity:.45; filter:none; }
+.pp-heart.pop { animation: pp-heart-pop .38s ease-out forwards; }
+.pp-heart-bit { position:absolute; font-size:.7rem; transform:translate(-50%,-50%); animation: pp-heart-bit .6s ease-out forwards; pointer-events:none; }
+.pp-results-hearts { font-size:1.6rem; margin-top:8px; letter-spacing:4px; }
+@keyframes pp-throb { 0%,100%{ transform:scale(1);} 40%{ transform:scale(1.18);} 60%{ transform:scale(1.05);} }
+@keyframes pp-heart-pop { 0%{ transform:scale(1); } 45%{ transform:scale(1.7) rotate(-8deg); filter:drop-shadow(0 0 12px rgba(255,120,150,.9)); } 100%{ transform:scale(.9); opacity:.6; } }
+@keyframes pp-heart-bit { 0%{ opacity:1; transform:translate(-50%,-50%) scale(.6);} 100%{ opacity:0; transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.1);} }
 .pp-encourage { text-align: center; font-family: var(--ff-body); font-size: 0.85rem; color: var(--white); min-height: 22px; margin-top: 10px; }
 .pp-countdown-overlay {
   position: absolute; inset: 0; z-index: 40;
@@ -5843,6 +5853,8 @@ let ppSpawnInterval = null;
 let ppWordPool = [];
 let ppCurrentLevel = null;
 let ppRoundWords = [];
+let ppLives = 0, ppMaxLives = 0, ppEnded = false;
+const PP_EASY_WORLDS = ['foundation', 'building']; // 5 hearts; later worlds get 3
 let ppMissedWorking = [];
 
 function ppLoadMissed(levelId) {
@@ -5929,12 +5941,15 @@ function openPlanetPatrol(level) {
   ppSpawnIndex = 0;
   ppCaught = 0;
   ppActiveStars = 0;
+  ppMaxLives = PP_EASY_WORLDS.includes(level.id) ? 5 : 3;
+  ppLives = ppMaxLives;
+  ppEnded = false;
   if (ppSpawnInterval) clearInterval(ppSpawnInterval);
 
   showScreen('planetpatrol-screen');
   const body = document.getElementById('pp-body');
   body.classList.remove('ch-grid');
-  body.innerHTML = '<div class="pp-play-area" id="pp-play-area"><div class="pp-countdown-overlay" id="pp-countdown-overlay"></div></div><div class="pp-encourage" id="pp-encourage"></div>';
+  body.innerHTML = '<div class="pp-play-area" id="pp-play-area"><div class="pp-hearts" id="pp-hearts">' + Array.from({length: ppMaxLives}, () => '<span class="pp-heart">❤️</span>').join('') + '</div><div class="pp-countdown-overlay" id="pp-countdown-overlay"></div></div><div class="pp-encourage" id="pp-encourage"></div>';
 
   speak('Tap the planets with the words you hear, and collect points!', null, 0.95);
   setTimeout(ppRunCountdown, 900);
@@ -6050,7 +6065,11 @@ function ppSpawnStar() {
       ppCatchStar(star, playArea, wordObj);
     });
   } else {
-    star.addEventListener('click', () => ppBuzzWrong(star, wordSpan));
+    let penalised = false;
+    star.addEventListener('click', () => {
+      ppBuzzWrong(star, wordSpan);
+      if (!penalised) { penalised = true; ppLoseLife(); }
+    });
   }
   star.addEventListener('animationend', () => {
     if (resolved) return;
@@ -6073,6 +6092,44 @@ function ppBuzzWrong(star, wordSpan) {
     star.classList.remove('pp-wrong-flash');
     wordSpan.classList.remove('pp-buzz');
   }, 420);
+}
+
+function ppLoseLife() {
+  if (ppEnded || ppLives <= 0) return;
+  ppLives--;
+  const hearts = document.querySelectorAll('#pp-hearts .pp-heart');
+  const heart = hearts[ppLives];
+  if (heart) {
+    heart.classList.add('pop');
+    const box = heart.getBoundingClientRect();
+    const host = document.getElementById('pp-hearts');
+    const hb = host.getBoundingClientRect();
+    const cx = box.left - hb.left + box.width / 2, cy = box.top - hb.top + box.height / 2;
+    for (let i = 0; i < 6; i++) {
+      const a = (Math.PI * 2 * i) / 6 + Math.random() * 0.5, d = 22 + Math.random() * 14;
+      const p = document.createElement('span');
+      p.className = 'pp-heart-bit';
+      p.textContent = '💗';
+      p.style.left = cx + 'px'; p.style.top = cy + 'px';
+      p.style.setProperty('--dx', Math.cos(a) * d + 'px');
+      p.style.setProperty('--dy', Math.sin(a) * d + 'px');
+      host.appendChild(p);
+      setTimeout(() => p.remove(), 650);
+    }
+    setTimeout(() => { heart.textContent = '🤍'; heart.classList.remove('pop'); heart.classList.add('lost'); }, 380);
+  }
+  const enc = document.getElementById('pp-encourage');
+  if (enc) enc.textContent = ppLives > 0 ? 'Oops! Listen closely 💗' : 'Good try!';
+  if (ppLives <= 0) {
+    ppEnded = true;
+    if (ppSpawnInterval) { clearInterval(ppSpawnInterval); ppSpawnInterval = null; }
+    setTimeout(() => {
+      document.querySelectorAll('#pp-play-area .pp-planet').forEach(el => el.remove());
+      ppActiveStars = 0;
+      if (ppCurrentLevel) ppSaveMissed(ppCurrentLevel.id, ppMissedWorking);
+      ppShowResults();
+    }, 900);
+  }
 }
 
 function ppCatchStar(star, playArea, wordObj) {
@@ -6129,6 +6186,7 @@ function ppShowResults() {
   const p = getProgress();
   p.planetPatrol = p.planetPatrol || { totalCaught: 0, perfectRounds: 0, worldsPlayed: [], bestByWorld: {} };
   if (ppCaught === PP_TARGET_COUNT) p.planetPatrol.perfectRounds++;
+  if (ppCaught === PP_TARGET_COUNT && ppLives === ppMaxLives) p.planetPatrol.heartRounds = (p.planetPatrol.heartRounds || 0) + 1;
   if (ppCurrentLevel && !p.planetPatrol.worldsPlayed.includes(ppCurrentLevel.id)) {
     p.planetPatrol.worldsPlayed.push(ppCurrentLevel.id);
   }
@@ -6148,11 +6206,13 @@ function ppShowResults() {
     ${isNewBest && prevBest > 0 ? '<div class="pp-best-banner">🎉 New Best!</div>' : ''}
     <div class="pp-results-score">${ppCaught} / ${PP_TARGET_COUNT}</div>
     <div class="pp-results-label">${star}</div>
+    <div class="pp-results-hearts">${'❤️'.repeat(ppLives)}${'🤍'.repeat(ppMaxLives - ppLives)}</div>
+    ${ppLives <= 0 ? '<div class="pp-results-label" style="margin-top:6px;">Great flying! Listen closely and try again 💗</div>' : ''}
   `;
   body.appendChild(wrap);
 
-  if (ppCaught === PP_TARGET_COUNT) confetti();
-  speak(ppCaught === PP_TARGET_COUNT ? 'Perfect! You are a Planet Patrol champion!' : 'Well done! Want to play again?', null, 0.9);
+  if (ppCaught === PP_TARGET_COUNT && ppLives > 0) confetti();
+  speak(ppLives <= 0 ? 'Great flying! Let us try again.' : ppCaught === PP_TARGET_COUNT ? 'Perfect! You are a Planet Patrol champion!' : 'Well done! Want to play again?', null, 0.9);
 
   const againBtn = document.createElement('button');
   againBtn.className = 'action-btn primary';
@@ -6400,6 +6460,7 @@ function achievementStats() {
     lessonMastered,
     ppTotalCaught: pp.totalCaught || 0,
     ppPerfectRounds: pp.perfectRounds || 0,
+    ppHeartRounds: pp.heartRounds || 0,
     ppWorldsPlayed: (pp.worldsPlayed || []).length,
     chLevelWorldsCount: chLevelWorlds.length
   };
@@ -6440,6 +6501,7 @@ function buildAchievementsList() {
 
   // Games
   list.push({ category: 'Games', icon: '🚀', name: 'Planet Patrol Rookie', unlocked: s.ppTotalCaught >= 1, current: Math.min(s.ppTotalCaught,1), target: 1 });
+  list.push({ category: 'Games', icon: '💖', name: 'Heart Keeper', unlocked: s.ppHeartRounds >= 1, current: Math.min(s.ppHeartRounds,1), target: 1 });
   list.push({ category: 'Games', icon: '🛸', name: 'Perfect Patrol', unlocked: s.ppPerfectRounds >= 1, current: Math.min(s.ppPerfectRounds,1), target: 1 });
   list.push({ category: 'Games', icon: '🌌', name: 'Galaxy Explorer', unlocked: s.ppWorldsPlayed >= 4, current: Math.min(s.ppWorldsPlayed,4), target: 4 });
   list.push({ category: 'Games', icon: '🪐', name: '100 Planets Caught', unlocked: s.ppTotalCaught >= 100, current: Math.min(s.ppTotalCaught,100), target: 100 });
