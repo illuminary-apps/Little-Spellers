@@ -3720,7 +3720,7 @@ function buildJourneyMap() {
     const tagClass = done ? 'tag-done' : isCurr ? 'tag-current' : 'tag-locked';
     const tagText  = done ? `✓ ${score}/${qTotal} stars` : isCurr ? '← next stop!' : 'locked';
     infoEl.innerHTML = `
-      <div class="si-name">${lesson.icon} ${lesson.name}</div>
+      <div class="si-name">${lessonThemeIcon(lesson)} ${lesson.name}</div>
       <div class="si-desc">${lesson.desc}</div>
       <span class="si-tag ${tagClass}">${tagText}</span>
     `;
@@ -5772,7 +5772,7 @@ function renderComplete(body) {
     </div>
 
     <div class="badge-earned">
-      <span class="badge-earned-icon">${l.icon}</span>
+      <span class="badge-earned-icon">${lessonThemeIcon(l)}</span>
       <div class="badge-earned-name">🏅 "${l.name}" unlocked!</div>
     </div>
   `;
@@ -6256,7 +6256,7 @@ function buildBadgesScreen() {
         ? ((score === total ? '⭐⭐⭐' : score >= total*0.6 ? '⭐⭐' : '⭐') + ' Unlocked!')
         : `${score} / ${total}`;
 
-      const node = addStation(lesson.icon, lesson.name, done, subText, colour);
+      const node = addStation(lessonThemeIcon(lesson), lesson.name, done, subText, colour);
       node.addEventListener('click', e => {
         burstStar(e.clientX, e.clientY);
         if (done) speak(lesson.name + ' — completed! You earned ' + score + ' out of ' + total + ' stars.', null, 0.9);
@@ -7413,7 +7413,7 @@ function chOpenLevel(level) {
     row.className = 'ch-lesson-row';
     const frac = st.mastered / st.total;
     const icon = st.mastered === st.total ? '🌕' : frac >= 2/3 ? '🌖' : frac >= 1/3 ? '🌗' : (st.attempted > 0 ? '🌘' : '🌑');
-    row.innerHTML = `<span class="ch-lesson-status ch-moon${st.mastered === st.total ? ' full' : ''}">${icon}</span><span class="ch-lesson-name">${lesson.icon || ''} ${lesson.name} Spell-a-thon</span><span class="ch-level-arrow">›</span>`;
+    row.innerHTML = `<span class="ch-lesson-status ch-moon${st.mastered === st.total ? ' full' : ''}">${icon}</span><span class="ch-lesson-name">${lessonThemeIcon(lesson)} ${lesson.name} Spell-a-thon</span><span class="ch-level-arrow">›</span>`;
     row.addEventListener('click', () => chStartChallenge(level, lesson.name));
     body.appendChild(row);
   });
