@@ -768,6 +768,18 @@ html, body {
 @keyframes pp-throb { 0%,100%{ transform:scale(1);} 40%{ transform:scale(1.18);} 60%{ transform:scale(1.05);} }
 @keyframes pp-heart-pop { 0%{ transform:scale(1); } 45%{ transform:scale(1.7) rotate(-8deg); filter:drop-shadow(0 0 12px rgba(255,150,190,.9)); } 100%{ transform:scale(.9); opacity:.6; } }
 @keyframes pp-heart-bit { 0%{ opacity:1; transform:translate(-50%,-50%) scale(.6);} 100%{ opacity:0; transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.1);} }
+.pp-deco { cursor:default; pointer-events:none; opacity:.5; animation: pp-deco-bob 4.5s ease-in-out infinite alternate !important; }
+@keyframes pp-deco-bob { from{ transform:translate(0,0) scale(1);} to{ transform:translate(10px,-16px) scale(1.08);} }
+.pp-intro { position:absolute; left:50%; top:46%; transform:translate(-50%,-50%); width:min(86%,330px); z-index:30; display:flex; flex-direction:column; gap:10px; padding:16px 14px; border-radius:22px; background:rgba(14,19,52,.82); border:1px solid rgba(255,255,255,.12); box-shadow:0 0 28px rgba(199,125,255,.25); animation: pp-intro-in .5s ease-out both; }
+.pp-intro-out { animation: pp-intro-away .45s ease-in forwards; }
+.pp-intro-title { text-align:center; font-family:var(--ff-head); font-size:1.15rem; color:var(--gold); }
+.pp-intro-row { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:16px; background:rgba(255,255,255,.04); color:var(--white); font-family:var(--ff-body); font-size:.95rem; line-height:1.35; opacity:.35; transform:scale(.97); transition:all .35s ease; }
+.pp-intro-row.seen { opacity:.7; transform:scale(1); }
+.pp-intro-row.on { opacity:1; transform:scale(1.03); background:rgba(255,209,102,.14); box-shadow:0 0 16px rgba(255,209,102,.3); }
+.pp-intro-ico { font-size:1.7rem; line-height:1; flex-shrink:0; }
+.pp-intro-row.on .pp-intro-ico { animation: pp-throb 1s ease-in-out infinite; }
+@keyframes pp-intro-in { from{ opacity:0; transform:translate(-50%,-46%) scale(.95);} to{ opacity:1; transform:translate(-50%,-50%) scale(1);} }
+@keyframes pp-intro-away { to{ opacity:0; transform:translate(-50%,-54%) scale(.96);} }
 .pp-encourage { text-align: center; font-family: var(--ff-body); font-size: 0.85rem; color: var(--white); min-height: 22px; margin-top: 10px; }
 .pp-countdown-overlay {
   position: absolute; inset: 0; z-index: 40;
@@ -3637,9 +3649,22 @@ let quizScore      = 0;
 let wordsHeard     = 0;
 
 function showScreen(id) {
+  // Leaving a screen silences whatever was being read out on it
+  try { if (synth) synth.cancel(); } catch (e) {}
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
+/* True only while an element is still on the screen the child is looking at.
+   Story/game timers use this so they stop (and stay silent) once she leaves. */
+function sceneAlive(el) {
+  if (!el || !el.isConnected) return false;
+  const sc = el.closest('.screen');
+  return !sc || sc.classList.contains('active');
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { try { if (synth) synth.cancel(); } catch (e) {} }
+});
+window.addEventListener('pagehide', () => { try { if (synth) synth.cancel(); } catch (e) {} });
 
 function goHome() {
   showScreen('home');
@@ -3956,7 +3981,7 @@ function renderSpellingStory(container, lesson, onDone, finalLabel) {
     ];
 
     function showBeat() {
-      if (!scene.isConnected) return;
+      if (!sceneAlive(scene)) return;
       const beat = beats[beatIdx];
       caption.textContent = beat.text;
       beat.onEnter();
@@ -4048,7 +4073,7 @@ function renderPrefixStory(container, lesson, onDone, finalLabel) {
     ];
 
     function showBeat() {
-      if (!scene.isConnected) return;
+      if (!sceneAlive(scene)) return;
       const beat = beats[beatIdx];
       caption.textContent = beat.text;
       beat.onEnter();
@@ -4139,7 +4164,7 @@ function renderVowelTeamStory(container, lesson, onDone, finalLabel) {
     ];
 
     function showBeat() {
-      if (!scene.isConnected) return;
+      if (!sceneAlive(scene)) return;
       const beat = beats[beatIdx];
       caption.textContent = beat.text;
       beat.onEnter();
@@ -4249,7 +4274,7 @@ function renderRevealStory(container, lesson, onDone, finalLabel) {
     ];
 
     function showBeat() {
-      if (!scene.isConnected) return;
+      if (!sceneAlive(scene)) return;
       const beat = beats[beatIdx];
       caption.textContent = beat.text;
       beat.onEnter();
@@ -4340,7 +4365,7 @@ function renderDecisionStory(container, lesson, onDone, finalLabel) {
     ];
 
     function showBeat() {
-      if (!scene.isConnected) return;
+      if (!sceneAlive(scene)) return;
       const beat = beats[beatIdx];
       caption.textContent = beat.text;
       beat.onEnter();
@@ -4451,7 +4476,7 @@ function renderSuffixStory(container, lesson, onDone, finalLabel) {
       : coreBeats;
 
     function showBeat() {
-      if (!scene.isConnected) return;
+      if (!sceneAlive(scene)) return;
       const beat = beats[beatIdx];
       caption.textContent = beat.text;
       beat.onEnter();
@@ -4622,7 +4647,7 @@ function renderSoundOutStory(container, lesson, onDone, finalLabel) {
   function playSequence(parts, onAllDone) {
     let i = 0;
     function step() {
-      if (!scene.isConnected) return;
+      if (!sceneAlive(scene)) return;
       if (i >= parts.length) { onAllDone(); return; }
       const part = parts[i];
       const utt = part.text ? speak(part.text) : null;
@@ -4634,7 +4659,7 @@ function renderSoundOutStory(container, lesson, onDone, finalLabel) {
 
   let beatIdx = 0;
   function showBeat() {
-    if (!scene.isConnected) return;
+    if (!sceneAlive(scene)) return;
     const beat = beats[beatIdx];
     if (beat.heading) label.textContent = beat.heading;
     caption.textContent = beat.caption;
@@ -4791,7 +4816,7 @@ function renderBlendStory(container, lesson, onDone, finalLabel) {
   function playSequence(parts, onAllDone) {
     let i = 0;
     function step() {
-      if (!scene.isConnected) return;
+      if (!sceneAlive(scene)) return;
       if (i >= parts.length) { onAllDone(); return; }
       const part = parts[i];
       const utt = part.text ? speak(part.text) : null;
@@ -4805,7 +4830,7 @@ function renderBlendStory(container, lesson, onDone, finalLabel) {
   const doneText = `Now you know how ${lesson.name} work!`;
   let beatIdx = 0;
   function showBeat() {
-    if (!scene.isConnected) return;
+    if (!sceneAlive(scene)) return;
     const beat = beats[beatIdx];
     if (beat.heading) label.textContent = beat.heading;
     caption.textContent = beat.caption;
@@ -4910,7 +4935,7 @@ function renderSoundChoiceStory(container, lesson, onDone, finalLabel) {
   function playSequence(parts, onAllDone) {
     let i = 0;
     function step() {
-      if (!scene.isConnected) return;
+      if (!sceneAlive(scene)) return;
       if (i >= parts.length) { onAllDone(); return; }
       const part = parts[i];
       const utt = part.text ? speak(part.text) : null;
@@ -4922,7 +4947,7 @@ function renderSoundChoiceStory(container, lesson, onDone, finalLabel) {
 
   let beatIdx = 0;
   function showBeat() {
-    if (!scene.isConnected) return;
+    if (!sceneAlive(scene)) return;
     const beat = beats[beatIdx];
     if (beat.heading) label.textContent = beat.heading;
     caption.textContent = beat.caption;
@@ -5021,7 +5046,7 @@ function renderSightWordStory(container, lesson, onDone, finalLabel) {
   function playSequence(parts, onAllDone) {
     let i = 0;
     function step() {
-      if (!scene.isConnected) return;
+      if (!sceneAlive(scene)) return;
       if (i >= parts.length) { onAllDone(); return; }
       const part = parts[i];
       const utt = part.text ? speak(part.text) : null;
@@ -5033,7 +5058,7 @@ function renderSightWordStory(container, lesson, onDone, finalLabel) {
 
   let beatIdx = 0;
   function showBeat() {
-    if (!scene.isConnected) return;
+    if (!sceneAlive(scene)) return;
     const beat = beats[beatIdx];
     if (beat.heading) label.textContent = beat.heading;
     caption.textContent = beat.caption;
@@ -5131,7 +5156,7 @@ function renderWordPartStory(container, lesson, onDone, finalLabel) {
   function playSequence(parts2, onAllDone) {
     let i = 0;
     function step() {
-      if (!scene.isConnected) return;
+      if (!sceneAlive(scene)) return;
       if (i >= parts2.length) { onAllDone(); return; }
       const part = parts2[i];
       const utt = part.text ? speak(part.text) : null;
@@ -5143,7 +5168,7 @@ function renderWordPartStory(container, lesson, onDone, finalLabel) {
 
   let beatIdx = 0;
   function showBeat() {
-    if (!scene.isConnected) return;
+    if (!sceneAlive(scene)) return;
     const beat = beats[beatIdx];
     if (beat.heading) label.textContent = beat.heading;
     caption.textContent = beat.caption;
@@ -5231,7 +5256,7 @@ function renderHomophoneStory(container, lesson, onDone, finalLabel) {
   function playSequence(parts, onAllDone) {
     let i = 0;
     function step() {
-      if (!scene.isConnected) return;
+      if (!sceneAlive(scene)) return;
       if (i >= parts.length) { onAllDone(); return; }
       const part = parts[i];
       const utt = part.text ? speak(part.text) : null;
@@ -5243,7 +5268,7 @@ function renderHomophoneStory(container, lesson, onDone, finalLabel) {
 
   let beatIdx = 0;
   function showBeat() {
-    if (!scene.isConnected) return;
+    if (!sceneAlive(scene)) return;
     const beat = beats[beatIdx];
     if (beat.heading) label.textContent = beat.heading;
     caption.textContent = beat.caption;
@@ -5953,13 +5978,61 @@ function openPlanetPatrol(level) {
   body.classList.remove('ch-grid');
   body.innerHTML = '<div class="pp-play-area" id="pp-play-area"><div class="pp-hearts" id="pp-hearts"><span class="pp-lives-label">Lives</span>' + Array.from({length: ppMaxLives}, () => '<span class="pp-heart">🩷</span>').join('') + '</div><div class="pp-countdown-overlay" id="pp-countdown-overlay"></div></div><div class="pp-encourage" id="pp-encourage"></div>';
 
-  const livesWord = ppMaxLives === 5 ? 'five' : 'three';
-  const intro = 'Tap the planets with the words you hear, and collect points! But watch out for the sneaky planets. A wrong tap costs a life, and you have ' + livesWord + ' lives!';
   const myGame = ++ppGameToken;
-  let started = false;
-  const go = () => { if (started || myGame !== ppGameToken) return; started = true; setTimeout(() => { if (myGame === ppGameToken) ppRunCountdown(); }, 500); };
-  const utt = speak(intro, null, 0.95);
-  if (utt) { utt.onend = go; utt.onerror = go; setTimeout(go, 16000); } else { setTimeout(go, 900); }
+  ppRunIntro(myGame, () => { if (myGame === ppGameToken) ppRunCountdown(); });
+}
+
+function ppRunIntro(myGame, done) {
+  const playArea = document.getElementById('pp-play-area');
+  if (!playArea) { done(); return; }
+  const livesWord = ppMaxLives === 5 ? 'five' : 'three';
+  const hearts = '🩷'.repeat(ppMaxLives);
+
+  // Gentle drifting planets so the screen is alive while the rules are read
+  const deco = [['p1', 14, 62, 54], ['p2', 72, 20, 70], ['p3', 80, 66, 48], ['p4', 10, 14, 44]];
+  deco.forEach(([cls, x, y, size], i) => {
+    const d = document.createElement('div');
+    d.className = 'pp-planet pp-deco ' + cls;
+    d.style.cssText = 'left:' + x + '%;top:' + y + '%;width:' + size + 'px;height:' + size + 'px;animation-delay:' + (i * 0.7) + 's';
+    playArea.appendChild(d);
+  });
+
+  const card = document.createElement('div');
+  card.className = 'pp-intro';
+  card.innerHTML = `
+    <div class="pp-intro-title">How to play</div>
+    <div class="pp-intro-row" data-i="0"><span class="pp-intro-ico">👆</span><span>Tap the planets with the words you hear<br><b>⭐ Collect points!</b></span></div>
+    <div class="pp-intro-row" data-i="1"><span class="pp-intro-ico">🪐</span><span>Watch out for the sneaky planets!</span></div>
+    <div class="pp-intro-row" data-i="2"><span class="pp-intro-ico">🩷</span><span>A wrong tap costs a life<br><b>${hearts}</b></span></div>`;
+  playArea.appendChild(card);
+  const rows = card.querySelectorAll('.pp-intro-row');
+
+  const lines = [
+    'Tap the planets with the words you hear, and collect points!',
+    'But watch out for the sneaky planets!',
+    'A wrong tap costs a life, and you have ' + livesWord + ' lives!'
+  ];
+  let finished = false;
+  const finish = () => {
+    if (finished) return; finished = true;
+    card.classList.add('pp-intro-out');
+    setTimeout(() => {
+      card.remove();
+      playArea.querySelectorAll('.pp-deco').forEach(el => el.remove());
+      if (myGame === ppGameToken) done();
+    }, 450);
+  };
+  const playLine = (i) => {
+    if (finished || myGame !== ppGameToken || !sceneAlive(card)) return;
+    if (i >= lines.length) { setTimeout(finish, 500); return; }
+    rows.forEach((r, k) => { r.classList.toggle('on', k === i); if (k < i) r.classList.add('seen'); });
+    const utt = speak(lines[i], null, 0.95);
+    let advanced = false;
+    const next = () => { if (advanced) return; advanced = true; setTimeout(() => playLine(i + 1), 350); };
+    if (utt) { utt.onend = next; utt.onerror = next; setTimeout(next, 9000); }
+    else setTimeout(next, 1800);
+  };
+  setTimeout(() => playLine(0), 400);
 }
 
 function ppRunCountdown() {
@@ -5968,6 +6041,7 @@ function ppRunCountdown() {
   const steps = ['3', '2', '1', 'Go!'];
   let i = 0;
   function showStep() {
+    if (!sceneAlive(overlay)) return;
     if (i >= steps.length) { overlay.remove(); ppBeginRound(); return; }
     overlay.textContent = steps[i];
     overlay.classList.remove('pp-countdown-pop');
@@ -5982,6 +6056,7 @@ function ppRunCountdown() {
 function ppBeginRound() {
   ppSpawnStar();
   ppSpawnInterval = setInterval(() => {
+    if (!sceneAlive(document.getElementById('pp-play-area'))) { clearInterval(ppSpawnInterval); ppSpawnInterval = null; return; }
     if (ppSpawnIndex >= ppRoundWords.length) { clearInterval(ppSpawnInterval); ppSpawnInterval = null; return; }
     ppSpawnStar();
   }, PP_SPAWN_GAP_MS);
@@ -6012,7 +6087,7 @@ function ppScheduleSpeak(star, wordObj, size) {
   const maxWait = 9000; // don't withhold forever if the screen stays sparse near round's end
 
   const trySpeak = () => {
-    if (!star.isConnected) return;
+    if (!sceneAlive(star)) return;
     const othersFloating = ppActiveStars - 1;
     if (othersFloating < 2 && Date.now() - startedAt < maxWait) {
       setTimeout(trySpeak, 350);
