@@ -788,6 +788,22 @@ html, body {
 .tier-dots { display:inline-flex; gap:4px; margin-right:4px; vertical-align:middle; }
 .tier-dot { width:9px; height:9px; border-radius:50%; border:1.5px solid rgba(255,255,255,.35); background:transparent; }
 .tier-dot.on.t1 { background:#cd7f32; border-color:#cd7f32; } .tier-dot.on.t2 { background:#c9d3e0; border-color:#c9d3e0; } .tier-dot.on.t3 { background:#ffd166; border-color:#ffd166; box-shadow:0 0 6px rgba(255,209,102,.7); }
+.ws-wrap { max-width: 520px; margin: 0 auto; padding: 28px 18px 40px; text-align: center; }
+.ws-star { font-size: 2.6rem; filter: drop-shadow(0 0 14px rgba(255,209,102,.8)); animation: wbob 2.8s ease-in-out infinite; }
+.ws-title { font-family: var(--ff-head); color: var(--gold); font-size: 1.5rem; margin: 6px 0 8px; }
+.ws-sub { color: #9ab8d6; font-size: .9rem; line-height: 1.5; margin-bottom: 18px; }
+.ws-list { display: flex; flex-direction: column; gap: 12px; text-align: left; }
+.ws-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 20px; background: rgba(255,255,255,.05); border: 1.5px solid var(--ws-c, rgba(255,255,255,.15)); color: var(--white); cursor: pointer; transition: transform .15s, box-shadow .2s; font-family: var(--ff-body); }
+.ws-card:active { transform: scale(.98); }
+.ws-card:hover { box-shadow: 0 0 22px var(--ws-g, rgba(255,255,255,.2)); }
+.ws-card.current { box-shadow: 0 0 22px var(--ws-g, rgba(255,255,255,.3)); }
+.ws-icon { font-size: 2rem; flex-shrink: 0; }
+.ws-name { font-family: var(--ff-head); font-size: 1.1rem; }
+.ws-desc { font-size: .8rem; color: #9ab8d6; margin-top: 2px; }
+.constellation-card.recommended { box-shadow: 0 0 0 1.5px rgba(255,226,140,.35), 0 0 34px 8px rgba(255,214,102,.30); animation: start-breathe 3.4s ease-in-out infinite; }
+@keyframes start-breathe { 0%,100% { box-shadow: 0 0 0 1.5px rgba(255,226,140,.30), 0 0 26px 5px rgba(255,214,102,.22); } 50% { box-shadow: 0 0 0 1.5px rgba(255,226,140,.5), 0 0 44px 12px rgba(255,214,102,.38); } }
+.cc-start-tag { display:none; font-family: var(--ff-head); font-size:.62rem; letter-spacing:.08em; color: var(--gold); margin-left:6px; }
+.constellation-card.recommended .cc-start-tag { display:inline; }
 .pp-encourage { text-align: center; font-family: var(--ff-body); font-size: 0.85rem; color: var(--white); min-height: 22px; margin-top: 10px; }
 .pp-countdown-overlay {
   position: absolute; inset: 0; z-index: 40;
@@ -2161,7 +2177,7 @@ html, body {
     <div class="constellation-card foundation" onclick="openLevel('foundation')">
       <span class="cc-stars" id="stars-foundation">0 ⭐</span>
       <span class="cc-icon">☁️</span>
-      <div class="cc-level">Level 1</div>
+      <div class="cc-level">Level 1<span class="cc-start-tag">· START HERE</span></div>
       <div class="cc-name">Cloud Haven</div>
       <div class="cc-desc">First sounds, short vowels, blends &amp; digraphs, sight words</div>
       <div class="cc-progress"><div class="cc-progress-bar" id="prog-foundation"></div></div>
@@ -2170,7 +2186,7 @@ html, body {
     <div class="constellation-card building" onclick="openLevel('building')">
       <span class="cc-stars" id="stars-building">0 ⭐</span>
       <span class="cc-icon">🌙</span>
-      <div class="cc-level">Level 2</div>
+      <div class="cc-level">Level 2<span class="cc-start-tag">· START HERE</span></div>
       <div class="cc-name">Moonlight</div>
       <div class="cc-desc">Long vowels, Magic E, vowel teams, Bossy R, sight words</div>
       <div class="cc-progress"><div class="cc-progress-bar" id="prog-building"></div></div>
@@ -2179,7 +2195,7 @@ html, body {
     <div class="constellation-card expanding" onclick="openLevel('expanding')">
       <span class="cc-stars" id="stars-expanding">0 ⭐</span>
       <span class="cc-icon">✨</span>
-      <div class="cc-level">Level 3</div>
+      <div class="cc-level">Level 3<span class="cc-start-tag">· START HERE</span></div>
       <div class="cc-name">Stardust</div>
       <div class="cc-desc">Silent letters, OO sounds, prefixes &amp; suffixes, sight words</div>
       <div class="cc-progress"><div class="cc-progress-bar" id="prog-expanding"></div></div>
@@ -2188,7 +2204,7 @@ html, body {
     <div class="constellation-card mastery" onclick="openLevel('mastery')">
       <span class="cc-stars" id="stars-mastery">0 ⭐</span>
       <span class="cc-icon">💫</span>
-      <div class="cc-level">Level 4</div>
+      <div class="cc-level">Level 4<span class="cc-start-tag">· START HERE</span></div>
       <div class="cc-name">Cosmic Glow</div>
       <div class="cc-desc">Greek roots, complex endings, word origins, sight words</div>
       <div class="cc-progress"><div class="cc-progress-bar" id="prog-mastery"></div></div>
@@ -2389,6 +2405,15 @@ html, body {
 <!-- ══════════════════════════════════
      SETTINGS
 ══════════════════════════════════ -->
+<div id="welcome-setup" class="screen">
+  <div class="ws-wrap">
+    <div class="ws-star">⭐</div>
+    <h2 class="ws-title">Welcome to Little Spellers</h2>
+    <p class="ws-sub">A quick one-time question for the grown-up: where should your child start?<br>They can still explore every world, and you can change this later in Settings.</p>
+    <div class="ws-list" id="ws-list"></div>
+  </div>
+</div>
+
 <div id="settings-screen" class="screen">
   <div class="lm-header">
     <button class="back-btn" onclick="openParentHub()">←</button>
@@ -2643,6 +2668,7 @@ function sumByLessonRange(entries) {
 }
 
 function updateHomeProgress() {
+  if (typeof applyStartGlow === 'function') applyStartGlow();
   LEVELS.forEach(level => {
     const total    = level.lessons.length;
     const done     = level.lessons.filter(l => isComplete(l.id)).length;
@@ -3673,6 +3699,46 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden) { try { if (synth) synth.cancel(); } catch (e) {} }
 });
 window.addEventListener('pagehide', () => { try { if (synth) synth.cancel(); } catch (e) {} });
+
+const WORLD_SETUP = [
+  { id: 'foundation', desc: 'Just starting out: letter sounds, short vowels, first words' },
+  { id: 'building',   desc: 'Reads simple words: long vowels, Magic E, vowel teams' },
+  { id: 'expanding',  desc: 'Reading short sentences: silent letters, prefixes and suffixes' },
+  { id: 'mastery',    desc: 'Confident reader: Greek roots, complex endings, word origins' }
+];
+function buildWorldPicker(container, onPick) {
+  const cur = getProgress().startWorld;
+  container.innerHTML = '';
+  const COL = { foundation: ['#ff6b6b', 'rgba(255,107,107,.45)'], building: ['#ffd166', 'rgba(255,209,102,.45)'], expanding: ['#06d6a0', 'rgba(6,214,160,.45)'], mastery: ['#c77dff', 'rgba(199,125,255,.45)'] };
+  WORLD_SETUP.forEach((w, i) => {
+    const lv = LEVELS.find(l => l.id === w.id);
+    const c = document.createElement('div');
+    c.className = 'ws-card' + (cur === w.id ? ' current' : '');
+    c.style.setProperty('--ws-c', COL[w.id][0]);
+    c.style.setProperty('--ws-g', COL[w.id][1]);
+    c.innerHTML = `<span class="ws-icon">${WORLD_EMOJI[w.id]}</span><div><div class="ws-name">Level ${i + 1} · ${lv.name}${cur === w.id ? ' ✓' : ''}</div><div class="ws-desc">${w.desc}</div></div>`;
+    c.addEventListener('click', () => onPick(w.id));
+    container.appendChild(c);
+  });
+}
+function setStartWorld(id) {
+  const p = getProgress();
+  p.startWorld = id;
+  p.setupDone = true;
+  saveProgress(p);
+}
+function maybeShowWelcome() {
+  if (getProgress().setupDone) return;
+  buildWorldPicker(document.getElementById('ws-list'), id => { setStartWorld(id); goHome(); });
+  showScreen('welcome-setup');
+}
+function applyStartGlow() {
+  const sw = getProgress().startWorld;
+  document.querySelectorAll('.constellation-card').forEach(c => {
+    const isStart = !!sw && c.classList.contains(sw);
+    c.classList.toggle('recommended', isStart);
+  });
+}
 
 function goHome() {
   showScreen('home');
@@ -7105,6 +7171,13 @@ function buildSettings() {
   });
   body.appendChild(profileCard);
 
+  // Starting world
+  const swCard = document.createElement('div');
+  swCard.className = 'pd-section-card';
+  swCard.innerHTML = '<div class="pd-section-title">🌍 Starting World</div><div style="font-size:0.72rem; color:#7a9cc0; margin-bottom:10px;">The world that glows on the home screen. Your child can still open any world.</div><div class="ws-list" id="set-ws-list"></div>';
+  body.appendChild(swCard);
+  buildWorldPicker(swCard.querySelector('#set-ws-list'), id => { setStartWorld(id); buildSettings(); });
+
   // Parent PIN
   const pinCard = document.createElement('div');
   pinCard.className = 'pd-section-card';
@@ -8337,6 +8410,7 @@ function wbSpeak(q, onDone) {
 ════════════════════════════════════════════ */
 runAchievementAudit();
 updateHomeProgress();
+maybeShowWelcome();
 
 </script>
 <script>
