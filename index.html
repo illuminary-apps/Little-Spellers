@@ -1838,20 +1838,20 @@ html, body {
 }
 
 /* cat progress path */
-.ch-catpath-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 18px 10px 8px; }
+.ch-catpath-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 22px 10px 12px; overflow: visible; background: none; }
 .ch-catpath {
   display: flex; align-items: center; justify-content: center; gap: 4px;
-  width: 100%; overflow-x: auto; padding: 6px 4px;
+  width: 100%; overflow: visible; padding: 10px 4px; background: none;
 }
 .ch-footprint { font-size: 1.3rem; opacity: 0.25; transition: opacity 0.3s; }
 .ch-footprint.lit { opacity: 1; }
 .ch-cat { font-size: 1.6rem; transition: transform 0.3s; }
-.ch-moonstep { display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:50%; font-size:1.25rem; line-height:1; opacity:.55;
-  background: radial-gradient(circle, rgba(255,236,170,.20) 0%, rgba(255,236,170,.08) 55%, rgba(255,236,170,0) 72%);
-  box-shadow: 0 0 10px 3px rgba(255,236,170,.22); }
-.ch-moonstep.lit { opacity:1; box-shadow: 0 0 14px 5px rgba(255,236,170,.45); }
+.ch-moonstep { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; margin:0 6px; border-radius:50%; font-size:1.5rem; line-height:1; opacity:.6;
+  background: radial-gradient(circle, rgba(255,236,170,.16) 0%, rgba(255,236,170,.06) 60%, rgba(255,236,170,0) 75%);
+  box-shadow: 0 0 6px 1px rgba(255,236,170,.18); }
+.ch-moonstep.lit { opacity:1; box-shadow: 0 0 8px 2px rgba(255,236,170,.38); }
 .ch-moonstep.current { opacity:1; animation: ch-moon-pulse 1.6s ease-in-out infinite; }
-@keyframes ch-moon-pulse { 0%,100%{ box-shadow: 0 0 10px 3px rgba(255,236,170,.30); transform:scale(1);} 50%{ box-shadow: 0 0 20px 8px rgba(255,236,170,.65); transform:scale(1.18);} }
+@keyframes ch-moon-pulse { 0%,100%{ box-shadow: 0 0 6px 1px rgba(255,236,170,.28); transform:scale(1);} 50%{ box-shadow: 0 0 11px 3px rgba(255,236,170,.55); transform:scale(1.14);} }
 .ch-cat.jump { animation: ch-cat-jump 0.7s ease; }
 @keyframes ch-cat-jump {
   0%   { transform: translateY(0); }
@@ -7273,7 +7273,7 @@ function resetProgress() {
    (mastery activity — separate from the lesson flow)
 ════════════════════════════════════════════ */
 const CH_ICONS = { foundation: '☁️', building: '🌙', expanding: '✨', mastery: '💫' };
-const CH_FOOTPRINT_COUNT = 8;
+const CH_FOOTPRINT_COUNT = 5;
 const CH_ROUND_SIZE = 5;
 
 let chCurrentLevel   = null;   // level object from LEVELS
@@ -7662,17 +7662,14 @@ function chRenderCatPath(container, levelId, lessonName) {
   const path = document.createElement('div');
   path.className = 'ch-catpath';
 
-  const MOON_STEPS = ['🌑','🌘','🌘','🌗','🌗','🌖','🌖','🌕'];
+  const MOON_STEPS = ['🌑','🌘','🌗','🌖','🌕'];
   for (let i = 0; i < CH_FOOTPRINT_COUNT; i++) {
     const fp = document.createElement('span');
     fp.className = 'ch-footprint ch-moonstep' + (i < position || complete ? ' lit' : '') + (i === position && !complete ? ' current' : '');
     fp.textContent = MOON_STEPS[Math.min(i, MOON_STEPS.length - 1)];
     path.appendChild(fp);
   }
-  const dest = document.createElement('span');
-  dest.className = 'ch-destination' + (complete ? ' glow' : '');
-  dest.textContent = CH_ICONS[levelId] || '⭐';
-  path.appendChild(dest);
+
   wrap.appendChild(path);
 
   if (complete) {
