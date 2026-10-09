@@ -6412,7 +6412,7 @@ function buildAchievementsList() {
   list.push({ category: 'Accuracy', icon: '💫', name: '5 Perfect Lessons', unlocked: s.perfectLessons >= 5, current: Math.min(s.perfectLessons,5), target: 5 });
 
   // Exploration
-  const explorationMeta = { foundation: ['☁️','🌩️','🪁','⛅','🛰️','🪂','🌈','🎈','🌤️','🌦️','🌬️','🌥️'], building: ['🌙','Moonlight'], expanding: ['✨','Stardust'], mastery: ['💫','Cosmic Glow'] };
+  const explorationMeta = { foundation: ['☁️','Cloud Haven'], building: ['🌙','Moonlight'], expanding: ['✨','Stardust'], mastery: ['💫','Cosmic Glow'] };
   Object.keys(explorationMeta).forEach(levelId => {
     const [icon, name] = explorationMeta[levelId];
     list.push({ category: 'Exploration', icon, name: name + ' Complete', unlocked: !!s.levelComplete[levelId], current: s.levelComplete[levelId]?1:0, target: 1 });
