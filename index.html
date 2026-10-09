@@ -757,15 +757,16 @@ html, body {
   0%   { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
   100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.25); opacity: 0; }
 }
-.pp-hearts { position:absolute; top:6px; left:0; right:0; z-index:20; display:flex; justify-content:center; gap:10px; pointer-events:none; }
-.pp-heart { position:relative; font-size:1.7rem; line-height:1; display:inline-block; animation: pp-throb 1.1s ease-in-out infinite; filter: drop-shadow(0 0 6px rgba(255,90,120,.55)); }
+.pp-hearts { position:absolute; top:8px; right:10px; z-index:20; display:flex; align-items:center; gap:4px; pointer-events:none; padding:3px 8px; border-radius:14px; background:rgba(10,14,39,.45); }
+.pp-lives-label { font-family:var(--ff-head); font-size:.7rem; letter-spacing:.06em; color:#ffc2d6; margin-right:3px; text-transform:uppercase; }
+.pp-heart { position:relative; font-size:1.25rem; line-height:1; display:inline-block; animation: pp-throb 1.1s ease-in-out infinite; filter: drop-shadow(0 0 6px rgba(255,140,180,.6)); }
 .pp-heart:nth-child(2n) { animation-delay: .18s; } .pp-heart:nth-child(3n) { animation-delay: .36s; }
 .pp-heart.lost { animation:none; opacity:.45; filter:none; }
 .pp-heart.pop { animation: pp-heart-pop .38s ease-out forwards; }
 .pp-heart-bit { position:absolute; font-size:.7rem; transform:translate(-50%,-50%); animation: pp-heart-bit .6s ease-out forwards; pointer-events:none; }
 .pp-results-hearts { font-size:1.6rem; margin-top:8px; letter-spacing:4px; }
 @keyframes pp-throb { 0%,100%{ transform:scale(1);} 40%{ transform:scale(1.18);} 60%{ transform:scale(1.05);} }
-@keyframes pp-heart-pop { 0%{ transform:scale(1); } 45%{ transform:scale(1.7) rotate(-8deg); filter:drop-shadow(0 0 12px rgba(255,120,150,.9)); } 100%{ transform:scale(.9); opacity:.6; } }
+@keyframes pp-heart-pop { 0%{ transform:scale(1); } 45%{ transform:scale(1.7) rotate(-8deg); filter:drop-shadow(0 0 12px rgba(255,150,190,.9)); } 100%{ transform:scale(.9); opacity:.6; } }
 @keyframes pp-heart-bit { 0%{ opacity:1; transform:translate(-50%,-50%) scale(.6);} 100%{ opacity:0; transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.1);} }
 .pp-encourage { text-align: center; font-family: var(--ff-body); font-size: 0.85rem; color: var(--white); min-height: 22px; margin-top: 10px; }
 .pp-countdown-overlay {
@@ -5853,7 +5854,7 @@ let ppSpawnInterval = null;
 let ppWordPool = [];
 let ppCurrentLevel = null;
 let ppRoundWords = [];
-let ppLives = 0, ppMaxLives = 0, ppEnded = false;
+let ppLives = 0, ppMaxLives = 0, ppEnded = false, ppGameToken = 0;
 const PP_EASY_WORLDS = ['foundation', 'building']; // 5 hearts; later worlds get 3
 let ppMissedWorking = [];
 
@@ -5870,6 +5871,7 @@ function ppSaveMissed(levelId, missedWords) {
 }
 
 function ppExitGame() {
+  ppGameToken++;
   if (ppSpawnInterval) { clearInterval(ppSpawnInterval); ppSpawnInterval = null; }
   openChallenges();
 }
@@ -5949,10 +5951,15 @@ function openPlanetPatrol(level) {
   showScreen('planetpatrol-screen');
   const body = document.getElementById('pp-body');
   body.classList.remove('ch-grid');
-  body.innerHTML = '<div class="pp-play-area" id="pp-play-area"><div class="pp-hearts" id="pp-hearts">' + Array.from({length: ppMaxLives}, () => '<span class="pp-heart">❤️</span>').join('') + '</div><div class="pp-countdown-overlay" id="pp-countdown-overlay"></div></div><div class="pp-encourage" id="pp-encourage"></div>';
+  body.innerHTML = '<div class="pp-play-area" id="pp-play-area"><div class="pp-hearts" id="pp-hearts"><span class="pp-lives-label">Lives</span>' + Array.from({length: ppMaxLives}, () => '<span class="pp-heart">🩷</span>').join('') + '</div><div class="pp-countdown-overlay" id="pp-countdown-overlay"></div></div><div class="pp-encourage" id="pp-encourage"></div>';
 
-  speak('Tap the planets with the words you hear, and collect points!', null, 0.95);
-  setTimeout(ppRunCountdown, 900);
+  const livesWord = ppMaxLives === 5 ? 'five' : 'three';
+  const intro = 'Tap the planets with the words you hear, and collect points! But watch out for the sneaky planets. A wrong tap costs a life, and you have ' + livesWord + ' lives!';
+  const myGame = ++ppGameToken;
+  let started = false;
+  const go = () => { if (started || myGame !== ppGameToken) return; started = true; setTimeout(() => { if (myGame === ppGameToken) ppRunCountdown(); }, 500); };
+  const utt = speak(intro, null, 0.95);
+  if (utt) { utt.onend = go; utt.onerror = go; setTimeout(go, 16000); } else { setTimeout(go, 900); }
 }
 
 function ppRunCountdown() {
@@ -6109,7 +6116,7 @@ function ppLoseLife() {
       const a = (Math.PI * 2 * i) / 6 + Math.random() * 0.5, d = 22 + Math.random() * 14;
       const p = document.createElement('span');
       p.className = 'pp-heart-bit';
-      p.textContent = '💗';
+      p.textContent = '🩷';
       p.style.left = cx + 'px'; p.style.top = cy + 'px';
       p.style.setProperty('--dx', Math.cos(a) * d + 'px');
       p.style.setProperty('--dy', Math.sin(a) * d + 'px');
@@ -6119,7 +6126,7 @@ function ppLoseLife() {
     setTimeout(() => { heart.textContent = '🤍'; heart.classList.remove('pop'); heart.classList.add('lost'); }, 380);
   }
   const enc = document.getElementById('pp-encourage');
-  if (enc) enc.textContent = ppLives > 0 ? 'Oops! Listen closely 💗' : 'Good try!';
+  if (enc) enc.textContent = ppLives > 0 ? 'Oops! Listen closely 🩷' : 'Good try!';
   if (ppLives <= 0) {
     ppEnded = true;
     if (ppSpawnInterval) { clearInterval(ppSpawnInterval); ppSpawnInterval = null; }
@@ -6206,8 +6213,8 @@ function ppShowResults() {
     ${isNewBest && prevBest > 0 ? '<div class="pp-best-banner">🎉 New Best!</div>' : ''}
     <div class="pp-results-score">${ppCaught} / ${PP_TARGET_COUNT}</div>
     <div class="pp-results-label">${star}</div>
-    <div class="pp-results-hearts">${'❤️'.repeat(ppLives)}${'🤍'.repeat(ppMaxLives - ppLives)}</div>
-    ${ppLives <= 0 ? '<div class="pp-results-label" style="margin-top:6px;">Great flying! Listen closely and try again 💗</div>' : ''}
+    <div class="pp-results-hearts">${'🩷'.repeat(ppLives)}${'🤍'.repeat(ppMaxLives - ppLives)}</div>
+    ${ppLives <= 0 ? '<div class="pp-results-label" style="margin-top:6px;">Great flying! Listen closely and try again 🩷</div>' : ''}
   `;
   body.appendChild(wrap);
 
