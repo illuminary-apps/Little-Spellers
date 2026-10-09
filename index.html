@@ -3720,7 +3720,7 @@ function buildJourneyMap() {
     const tagClass = done ? 'tag-done' : isCurr ? 'tag-current' : 'tag-locked';
     const tagText  = done ? `✓ ${score}/${qTotal} stars` : isCurr ? '← next stop!' : 'locked';
     infoEl.innerHTML = `
-      <div class="si-name">${lessonThemeIcon(lesson)} ${lesson.name}</div>
+      <div class="si-name">${lesson.name}</div>
       <div class="si-desc">${lesson.desc}</div>
       <span class="si-tag ${tagClass}">${tagText}</span>
     `;
