@@ -8532,12 +8532,8 @@ if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.ad
   </div>
 <style>
 .install-slot{margin:18px 0 6px}
-.install-btn{display:flex;align-items:center;gap:14px;width:100%;max-width:420px;margin:0 auto;text-align:left;background:rgba(20,26,69,.55);border:1.5px solid rgba(255,209,102,.5);border-radius:22px;padding:12px 16px;color:#fff;cursor:pointer;animation:ibglow 3s ease-in-out infinite;-webkit-tap-highlight-color:transparent}
-.install-btn:active{transform:scale(.97)}
-.ib-icon{width:52px;height:52px;border-radius:14px;flex:none;box-shadow:0 0 14px rgba(255,209,102,.4)}
-.ib-text{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
-.ib-title{font-family:var(--ff-head);font-size:1rem;color:#ffd166}
-.ib-sub{font-size:.8rem;color:#9fb4cf}
+.install-btn{border-color:rgba(255,209,102,.5)!important;animation:ibglow 3s ease-in-out infinite}
+.ib-icon{width:2.1rem;height:2.1rem;margin:-3px 0;border-radius:8px;flex-shrink:0;box-shadow:0 0 10px rgba(255,209,102,.4)}
 @keyframes ibglow{0%,100%{box-shadow:0 0 6px rgba(255,209,102,.15)}50%{box-shadow:0 0 22px rgba(255,209,102,.45)}}
 @media (prefers-reduced-motion:reduce){.install-btn{animation:none}}
 .install-modal{position:fixed;inset:0;background:rgba(5,8,25,.78);z-index:9999;display:flex;align-items:flex-end;justify-content:center}
@@ -8554,7 +8550,7 @@ var _installEvt=null;
 function _isStandalone(){return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true;}
 function _isIOS(){var u=navigator.userAgent;return /iPad|iPhone|iPod/.test(u)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);}
 function _isIOSSafari(){var u=navigator.userAgent;return _isIOS()&&/Safari/.test(u)&&!/CriOS|FxiOS|EdgiOS|OPiOS|GSA|FBAN|FBAV|Instagram/.test(u);}
-var _CARD='<button class="install-btn" onclick="installApp()"><img class="ib-icon" src="icons/icon-192.png" alt=""><span class="ib-text"><span class="ib-title">Install</span><span class="ib-sub">Add Little Spellers app to your phone</span></span></button>';
+var _CARD='<div class="ch-level-card install-btn" onclick="installApp()" role="button"><img class="ib-icon" src="icons/icon-192.png" alt=""><div class="ch-level-info"><div class="ch-level-name">Install</div><div class="ch-level-sub">Add Little Spellers app to your phone</div></div></div>';
 function _installedFlag(){try{return localStorage.getItem('ls_installed')==='1';}catch(e){return false;}}
 function _setInstalledFlag(v){try{if(v)localStorage.setItem('ls_installed','1');else localStorage.removeItem('ls_installed');}catch(e){}}
 function _paintInstall(show){document.querySelectorAll('.install-slot').forEach(function(el){el.innerHTML=show?_CARD:'';el.style.display=show?'block':'none';});}
