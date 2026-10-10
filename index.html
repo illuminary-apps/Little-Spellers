@@ -2234,22 +2234,6 @@ html, body {
     </button>
   </div>
 
-  <!-- Install app -->
-  <div class="install-wrap" id="install-wrap" style="display:none">
-    <button class="install-btn" onclick="installApp()">
-      <img class="ib-icon" src="icons/icon-192.png" alt="">
-      <span class="ib-text"><span class="ib-title">Install the app</span><span class="ib-sub">Add to your home screen</span></span>
-      <span class="ib-go">⬇</span>
-    </button>
-  </div>
-  <div class="install-modal" id="install-modal" style="display:none" onclick="if(event.target===this)closeInstall()">
-    <div class="install-card">
-      <button class="install-x" onclick="closeInstall()" aria-label="Close">✕</button>
-      <h3 id="install-title">Install Little Spellers</h3>
-      <div id="install-body"></div>
-      <button class="install-ok" onclick="closeInstall()">Got it</button>
-    </div>
-  </div>
 
 </div><!-- /home -->
 
@@ -2434,6 +2418,7 @@ html, body {
     <h2 class="ws-title">Welcome to Little Spellers</h2>
     <p class="ws-sub">A quick one-time question for the grown-up: where should your child start?<br>They can still explore every world, and you can change this later in Settings.</p>
     <div class="ws-list" id="ws-list"></div>
+    <div class="install-slot"></div>
   </div>
 </div>
 
@@ -7320,7 +7305,8 @@ function openParentHub() {
 
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
-  body.innerHTML = '';
+  body.innerHTML = '<div class="install-slot"></div>';
+  _refreshInstallBtn();
   const sections = [
     { icon: '📊', name: 'Dashboard', sub: 'Progress, streaks & activity', fn: openParent },
     { icon: '🏆', name: 'Achievements', sub: "Your child's sticker collection", fn: openAchievements },
@@ -8536,15 +8522,22 @@ maybeShowWelcome();
 <script>
 if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
 </script>
+  <div class="install-modal" id="install-modal" style="display:none" onclick="if(event.target===this)closeInstall()">
+    <div class="install-card">
+      <button class="install-x" onclick="closeInstall()" aria-label="Close">✕</button>
+      <h3 id="install-title">Install Little Spellers</h3>
+      <div id="install-body"></div>
+      <button class="install-ok" onclick="closeInstall()">Got it</button>
+    </div>
+  </div>
 <style>
-.install-wrap{text-align:center;margin:18px 16px 28px}
+.install-slot{margin:18px 0 6px}
 .install-btn{display:flex;align-items:center;gap:14px;width:100%;max-width:420px;margin:0 auto;text-align:left;background:rgba(20,26,69,.55);border:1.5px solid rgba(255,209,102,.5);border-radius:22px;padding:12px 16px;color:#fff;cursor:pointer;animation:ibglow 3s ease-in-out infinite;-webkit-tap-highlight-color:transparent}
 .install-btn:active{transform:scale(.97)}
 .ib-icon{width:52px;height:52px;border-radius:14px;flex:none;box-shadow:0 0 14px rgba(255,209,102,.4)}
 .ib-text{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
 .ib-title{font-family:var(--ff-head);font-size:1rem;color:#ffd166}
 .ib-sub{font-size:.8rem;color:#9fb4cf}
-.ib-go{flex:none;width:34px;height:34px;border-radius:50%;background:#ffd166;color:#2c2410;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700}
 @keyframes ibglow{0%,100%{box-shadow:0 0 6px rgba(255,209,102,.15)}50%{box-shadow:0 0 22px rgba(255,209,102,.45)}}
 @media (prefers-reduced-motion:reduce){.install-btn{animation:none}}
 .install-modal{position:fixed;inset:0;background:rgba(5,8,25,.78);z-index:9999;display:flex;align-items:flex-end;justify-content:center}
@@ -8561,13 +8554,24 @@ var _installEvt=null;
 function _isStandalone(){return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true;}
 function _isIOS(){var u=navigator.userAgent;return /iPad|iPhone|iPod/.test(u)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);}
 function _isIOSSafari(){var u=navigator.userAgent;return _isIOS()&&/Safari/.test(u)&&!/CriOS|FxiOS|EdgiOS|OPiOS|GSA|FBAN|FBAV|Instagram/.test(u);}
-function _refreshInstallBtn(){var w=document.getElementById('install-wrap');if(w)w.style.display=_isStandalone()?'none':'block';}
-window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();_installEvt=e;});
-window.addEventListener('appinstalled',function(){_installEvt=null;_refreshInstallBtn();});
+var _CARD='<button class="install-btn" onclick="installApp()"><img class="ib-icon" src="icons/icon-192.png" alt=""><span class="ib-text"><span class="ib-title">Install</span><span class="ib-sub">Add Little Spellers app to your phone</span></span></button>';
+function _installedFlag(){try{return localStorage.getItem('ls_installed')==='1';}catch(e){return false;}}
+function _setInstalledFlag(v){try{if(v)localStorage.setItem('ls_installed','1');else localStorage.removeItem('ls_installed');}catch(e){}}
+function _paintInstall(show){document.querySelectorAll('.install-slot').forEach(function(el){el.innerHTML=show?_CARD:'';el.style.display=show?'block':'none';});}
+function _refreshInstallBtn(){
+  if(_isStandalone()){_paintInstall(false);return;}
+  _paintInstall(!_installedFlag());
+  if(navigator.getInstalledRelatedApps){navigator.getInstalledRelatedApps().then(function(a){
+    if(a&&a.length){_setInstalledFlag(true);_paintInstall(false);}
+  }).catch(function(){});}
+}
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();_installEvt=e;_setInstalledFlag(false);_refreshInstallBtn();});
+window.addEventListener('appinstalled',function(){_installEvt=null;_setInstalledFlag(true);_refreshInstallBtn();});
+document.addEventListener('visibilitychange',function(){if(!document.hidden)_refreshInstallBtn();});
 function _showInstall(title,body){document.getElementById('install-title').textContent=title;document.getElementById('install-body').innerHTML=body;document.getElementById('install-modal').style.display='flex';}
 function closeInstall(){document.getElementById('install-modal').style.display='none';}
 function installApp(){
-  if(_installEvt){var e=_installEvt;_installEvt=null;e.prompt();if(e.userChoice)e.userChoice.then(function(){_refreshInstallBtn();});return;}
+  if(_installEvt){var e=_installEvt;_installEvt=null;e.prompt();if(e.userChoice)e.userChoice.then(function(c){if(c&&c.outcome==='accepted')_setInstalledFlag(true);_refreshInstallBtn();});return;}
   if(_isIOS()){
     var steps='';
     if(!_isIOSSafari())steps+='<li><b>Open this page in Safari</b> (the blue compass app). Copy the web address, open Safari and paste it in.</li>';
