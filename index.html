@@ -3740,26 +3740,35 @@ function showScreen(id) {
   try { if (synth) synth.cancel(); } catch (e) {}
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  _navTrapSync(id);
+  _navOnScreen(id);
 }
 /* ── Phone/browser Back button: step back inside the app instead of leaving it ──
-   Whenever the child is on any screen except Home we keep one extra history entry.
-   Back pops it; we then run that screen's own back button (or close an overlay) and
-   re-arm the entry. On Home, Back leaves the app as normal. */
-let _navTrap = false;
-function _navTrapSync(id) {
-  try { if (id !== 'home' && !_navTrap) { history.pushState({ ls: 1 }, ''); _navTrap = true; } } catch (e) {}
+   Chrome ignores history entries a page adds without a tap, so we only ever add
+   entries right after a tap, and keep a small reserve of them while the child is on
+   any screen but Home. Each Back uses one up and runs that screen's own back button
+   (or closes an overlay). Returning Home clears the reserve, so Back on Home leaves
+   the app as normal. */
+let _navDepth = 0, _navIgnore = 0;
+function _navReplenish() {
+  const a = document.querySelector('.screen.active');
+  if (!a || a.id === 'home') return;
+  if (_navIgnore > 0) { setTimeout(_navReplenish, 60); return; }
+  try { while (_navDepth < 4) { history.pushState({ ls: 1 }, ''); _navDepth++; } } catch (e) {}
 }
-function _navRearm() {
-  setTimeout(() => {
-    const a = document.querySelector('.screen.active');
-    if (a) _navTrapSync(a.id);
-  }, 0);
+function _navOnScreen(id) {
+  if (id === 'home') {
+    if (_navDepth > 0) { const n = _navDepth; _navDepth = 0; _navIgnore++; try { history.go(-n); } catch (e) { _navIgnore--; } }
+  } else setTimeout(_navReplenish, 0);
 }
+document.addEventListener('click', () => setTimeout(_navReplenish, 0), true);
 window.addEventListener('popstate', () => {
-  _navTrap = false;
+  if (_navIgnore > 0) { _navIgnore--; return; }
+  if (_navDepth > 0) _navDepth--;
   const active = document.querySelector('.screen.active');
-  if (!active || active.id === 'home') { try { history.back(); } catch (e) {} return; }  // Home: leave
+  if (!active || active.id === 'home') {
+    if (_navDepth > 0) { const n = _navDepth; _navDepth = 0; _navIgnore++; try { history.go(-n); } catch (e) { _navIgnore--; } }
+    return;
+  }
   try {
     const modal = document.getElementById('install-modal');
     if (modal && modal.style.display === 'flex') { closeInstall(); }
@@ -3769,7 +3778,6 @@ window.addEventListener('popstate', () => {
       if (back) back.click(); else if (active.id !== 'welcome-setup') goHome();
     }
   } catch (e) { try { goHome(); } catch (e2) {} }
-  _navRearm();
 });
 /* True only while an element is still on the screen the child is looking at.
    Story/game timers use this so they stop (and stay silent) once she leaves. */
