@@ -3748,19 +3748,29 @@ function showScreen(id) {
    tap made while the child is away from Home. Each Back pops one entry and runs that
    screen's own back button (or closes an overlay). Reaching Home clears any leftovers,
    so Back on Home leaves the app as normal. */
-let _navDepth = 0, _navIgnore = 0;
-let _navTap = 0, _navPushedFor = 0;
+let _navDepth = 0, _navIgnore = 0, _navTap = 0, _navPushedFor = 0;
+function _navToast(msg) {
+  let t = document.getElementById('nav-toast');
+  if (!t) {
+    t = document.createElement('div'); t.id = 'nav-toast';
+    t.style.cssText = 'position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:rgba(20,26,69,.95);color:#fff;border:1px solid rgba(255,209,102,.5);border-radius:999px;padding:10px 20px;font:600 .95rem sans-serif;z-index:99999;transition:opacity .3s;pointer-events:none;white-space:nowrap';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._h); t._h = setTimeout(() => { t.style.opacity = '0'; }, 2500);
+}
 function _navPush(tapId) {
   if (tapId !== _navTap || _navPushedFor === tapId) return;   // one entry per tap
   if (_navIgnore > 0) { setTimeout(() => _navPush(tapId), 60); return; }
   const a = document.querySelector('.screen.active');
-  if (!a || a.id === 'home' || _navDepth >= 30) return;
+  const home = !a || a.id === 'home';
+  if (home ? _navDepth >= 1 : _navDepth >= 30) return;        // Home keeps one "press again to exit" entry
   try { history.pushState({ ls: 1 }, ''); _navDepth++; _navPushedFor = tapId; } catch (e) {}
 }
-function _navClear() {
-  if (_navDepth > 0) { const n = _navDepth; _navDepth = 0; _navIgnore++; try { history.go(-n); } catch (e) { _navIgnore--; } }
+function _navTrimHome() {
+  if (_navDepth > 1) { const n = _navDepth - 1; _navDepth = 1; _navIgnore++; try { history.go(-n); } catch (e) { _navIgnore--; } }
 }
-function _navOnScreen(id) { if (id === 'home') _navClear(); }
+function _navOnScreen(id) { if (id === 'home') _navTrimHome(); }
 document.addEventListener('click', e => {
   if (!e.isTrusted) return;
   const id = ++_navTap;
@@ -3771,7 +3781,7 @@ window.addEventListener('popstate', () => {
   if (_navIgnore > 0) { _navIgnore--; return; }
   if (_navDepth > 0) _navDepth--;
   const active = document.querySelector('.screen.active');
-  if (!active || active.id === 'home') { _navClear(); return; }
+  if (!active || active.id === 'home') { _navToast('Press Back again to exit'); return; }
   try {
     const modal = document.getElementById('install-modal');
     if (modal && modal.style.display === 'flex') { closeInstall(); }
@@ -7395,7 +7405,7 @@ function buildSettings() {
 function openParentHub() {
   requireParentPin(() => {
     buildParentHub();
-    const _v = document.createElement('div'); _v.style.cssText = 'text-align:center;opacity:.4;font-size:.75rem;margin:18px 0'; _v.textContent = 'App version 33'; document.getElementById('parent-hub-body').appendChild(_v);
+    const _v = document.createElement('div'); _v.style.cssText = 'text-align:center;opacity:.4;font-size:.75rem;margin:18px 0'; _v.textContent = 'App version 34'; document.getElementById('parent-hub-body').appendChild(_v);
     showScreen('parent-hub-screen');
   });
 }
