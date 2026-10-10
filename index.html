@@ -2234,6 +2234,19 @@ html, body {
     </button>
   </div>
 
+  <!-- Install app -->
+  <div class="install-wrap" id="install-wrap" style="display:none">
+    <button class="install-btn" onclick="installApp()"><span>📲</span> Install Little Spellers</button>
+  </div>
+  <div class="install-modal" id="install-modal" style="display:none" onclick="if(event.target===this)closeInstall()">
+    <div class="install-card">
+      <button class="install-x" onclick="closeInstall()" aria-label="Close">✕</button>
+      <h3 id="install-title">Install Little Spellers</h3>
+      <div id="install-body"></div>
+      <button class="install-ok" onclick="closeInstall()">Got it</button>
+    </div>
+  </div>
+
 </div><!-- /home -->
 
 <!-- ══════════════════════════════════
@@ -8518,6 +8531,44 @@ maybeShowWelcome();
 </script>
 <script>
 if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
+</script>
+<style>
+.install-wrap{text-align:center;margin:18px 16px 28px}
+.install-btn{background:linear-gradient(135deg,#ffd166,#f4a637);color:#2c2410;border:0;border-radius:999px;padding:13px 26px;font:700 1rem inherit;font-family:inherit;box-shadow:0 0 18px rgba(255,209,102,.45);cursor:pointer}
+.install-btn span{margin-right:6px}
+.install-modal{position:fixed;inset:0;background:rgba(5,8,25,.78);z-index:9999;display:flex;align-items:flex-end;justify-content:center}
+.install-card{position:relative;background:#141a45;color:#fff;border:1px solid rgba(255,209,102,.35);border-radius:22px 22px 0 0;padding:22px 22px 26px;width:100%;max-width:460px;box-shadow:0 -6px 30px rgba(0,0,0,.5)}
+.install-card h3{margin:0 28px 12px 0;color:#ffd166}
+.install-card ol{margin:0 0 14px;padding-left:22px;line-height:1.6;font-size:.98rem}
+.install-card li{margin-bottom:6px}
+.install-card p{margin:0 0 12px;font-size:.95rem;line-height:1.5}
+.install-x{position:absolute;right:14px;top:12px;background:none;border:0;color:#fff;font-size:1.2rem;cursor:pointer}
+.install-ok{display:block;margin:6px auto 0;background:#ffd166;color:#2c2410;border:0;border-radius:999px;padding:10px 28px;font:700 1rem inherit;font-family:inherit;cursor:pointer}
+</style>
+<script>
+var _installEvt=null;
+function _isStandalone(){return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true;}
+function _isIOS(){var u=navigator.userAgent;return /iPad|iPhone|iPod/.test(u)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);}
+function _isIOSSafari(){var u=navigator.userAgent;return _isIOS()&&/Safari/.test(u)&&!/CriOS|FxiOS|EdgiOS|OPiOS|GSA|FBAN|FBAV|Instagram/.test(u);}
+function _refreshInstallBtn(){var w=document.getElementById('install-wrap');if(w)w.style.display=_isStandalone()?'none':'block';}
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();_installEvt=e;});
+window.addEventListener('appinstalled',function(){_installEvt=null;_refreshInstallBtn();});
+function _showInstall(title,body){document.getElementById('install-title').textContent=title;document.getElementById('install-body').innerHTML=body;document.getElementById('install-modal').style.display='flex';}
+function closeInstall(){document.getElementById('install-modal').style.display='none';}
+function installApp(){
+  if(_installEvt){var e=_installEvt;_installEvt=null;e.prompt();if(e.userChoice)e.userChoice.then(function(){_refreshInstallBtn();});return;}
+  if(_isIOS()){
+    var steps='';
+    if(!_isIOSSafari())steps+='<li><b>Open this page in Safari</b> (the blue compass app). Copy the web address, open Safari and paste it in.</li>';
+    steps+='<li>Tap the <b>Share</b> button <span style="font-size:1.1em">⬆️</span> (the square with an arrow, at the bottom or top of Safari).</li>'
+      +'<li>Scroll down and tap <b>Add to Home Screen</b> ➕.</li>'
+      +'<li>Tap <b>Add</b> in the top corner.</li>';
+    _showInstall('Install on iPhone / iPad','<ol>'+steps+'</ol><p>Little Spellers will appear on your home screen like any other app. ⭐</p>');
+    return;
+  }
+  _showInstall('Install Little Spellers','<ol><li>Open this page in <b>Chrome</b>.</li><li>Tap the <b>⋮</b> menu at the top right.</li><li>Tap <b>Install app</b> (or <b>Add to Home screen</b>).</li></ol><p>If you do not see it, the app may already be installed. ⭐</p>');
+}
+_refreshInstallBtn();
 </script>
 </body>
 </html>
