@@ -3748,7 +3748,13 @@ function showScreen(id) {
    tap made while the child is away from Home. Each Back pops one entry and runs that
    screen's own back button (or closes an overlay). Reaching Home clears any leftovers,
    so Back on Home leaves the app as normal. */
-let _navDepth = 0, _navIgnore = 0, _navTap = 0, _navPushedFor = 0;
+let _navDepth = 0, _navIgnore = 0;
+const _navLog = [];
+function _nl(msg) {
+  const a = document.querySelector('.screen.active');
+  _navLog.push((new Date().toTimeString().slice(0, 8)) + ' ' + msg + ' [' + (a ? a.id : '?') + ' depth=' + _navDepth + ' len=' + history.length + ']');
+  if (_navLog.length > 40) _navLog.shift();
+}
 function _navToast(msg) {
   let t = document.getElementById('nav-toast');
   if (!t) {
@@ -3759,29 +3765,25 @@ function _navToast(msg) {
   t.textContent = msg; t.style.opacity = '1';
   clearTimeout(t._h); t._h = setTimeout(() => { t.style.opacity = '0'; }, 2500);
 }
-function _navPush(tapId) {
-  if (tapId !== _navTap || _navPushedFor === tapId) return;   // one entry per tap
-  if (_navIgnore > 0) { setTimeout(() => _navPush(tapId), 60); return; }
-  const a = document.querySelector('.screen.active');
-  const home = !a || a.id === 'home';
-  if (home ? _navDepth >= 1 : _navDepth >= 30) return;        // Home keeps one "press again to exit" entry
-  try { history.pushState({ ls: 1 }, ''); _navDepth++; _navPushedFor = tapId; } catch (e) {}
+function _navClear() {
+  if (_navDepth > 0) { const n = _navDepth; _navDepth = 0; _navIgnore++; try { history.go(-n); } catch (e) { _navIgnore--; } }
 }
 function _navTrimHome() {
   if (_navDepth > 1) { const n = _navDepth - 1; _navDepth = 1; _navIgnore++; try { history.go(-n); } catch (e) { _navIgnore--; } }
 }
-function _navOnScreen(id) { if (id === 'home') _navTrimHome(); }
+function _navOnScreen(id) { _nl('show ' + id); if (id === 'home') _navTrimHome(); }
+/* One history entry per tap, added synchronously inside the tap itself so Chrome treats it as
+   user-made (entries added any later are skipped by Back). */
 document.addEventListener('click', e => {
-  if (!e.isTrusted) return;
-  const id = ++_navTap;
-  setTimeout(() => _navPush(id), 0);
-  setTimeout(() => _navPush(id), 700);   // taps that open a screen after a short delay
+  if (!e.isTrusted || _navDepth >= 40 || _navIgnore > 0) return;
+  try { history.pushState({ ls: 1 }, ''); _navDepth++; _nl('push'); } catch (err) { _nl('push failed'); }
 }, true);
 window.addEventListener('popstate', () => {
-  if (_navIgnore > 0) { _navIgnore--; return; }
+  if (_navIgnore > 0) { _navIgnore--; _nl('pop(ignored)'); return; }
   if (_navDepth > 0) _navDepth--;
+  _nl('pop');
   const active = document.querySelector('.screen.active');
-  if (!active || active.id === 'home') { _navToast('Press Back again to exit'); return; }
+  if (!active || active.id === 'home') { _navClear(); _navToast('Press Back again to exit'); return; }
   try {
     const modal = document.getElementById('install-modal');
     if (modal && modal.style.display === 'flex') { closeInstall(); }
@@ -3792,6 +3794,7 @@ window.addEventListener('popstate', () => {
     }
   } catch (e) { try { goHome(); } catch (e2) {} }
 });
+window.addEventListener('pagehide', () => { try { localStorage.setItem('ls_navlog', _navLog.join('\n')); } catch (e) {} });
 /* True only while an element is still on the screen the child is looking at.
    Story/game timers use this so they stop (and stay silent) once she leaves. */
 function sceneAlive(el) {
@@ -7405,7 +7408,7 @@ function buildSettings() {
 function openParentHub() {
   requireParentPin(() => {
     buildParentHub();
-    const _v = document.createElement('div'); _v.style.cssText = 'text-align:center;opacity:.4;font-size:.75rem;margin:18px 0'; _v.textContent = 'App version 34'; document.getElementById('parent-hub-body').appendChild(_v);
+    const _v = document.createElement('div'); _v.style.cssText = 'text-align:center;opacity:.4;font-size:.75rem;margin:18px 0'; _v.textContent = 'App version 35'; _v.onclick = () => { let last = ''; try { last = localStorage.getItem('ls_navlog') || ''; } catch (e) {} alert('Navigation log (newest last):\n' + _navLog.join('\n') + (last ? '\n\n--- last session ---\n' + last : '')); }; document.getElementById('parent-hub-body').appendChild(_v);
     showScreen('parent-hub-screen');
   });
 }
