@@ -1924,6 +1924,12 @@ html, body {
 /* spelling round */
 .ch-round-wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 20px 10px; }
 .ch-round-count { font-family: var(--ff-body); font-size: 0.8rem; color: var(--white); opacity: 0.6; }
+.ch-hear-row { display:flex; align-items:center; justify-content:center; gap:18px; }
+.ch-hint-btn { position:relative; width:58px; height:58px; border-radius:50%; font-size:1.6rem; line-height:1; cursor:pointer; border:2px solid rgba(255,209,102,.7); background:rgba(255,209,102,.12); color:#fff; box-shadow:0 0 16px rgba(255,209,102,.4); animation: pp-throb 2.4s ease-in-out infinite; }
+.ch-hint-btn.empty { opacity:.4; box-shadow:none; animation:none; border-color:rgba(255,255,255,.3); }
+.ch-hint-btn.used { transform:scale(1.2); }
+.ch-hint-count { position:absolute; right:-4px; bottom:-4px; min-width:20px; height:20px; border-radius:10px; padding:0 5px; background:var(--gold,#ffd166); color:#0a0e27; font-size:.72rem; font-family:var(--ff-head); display:flex; align-items:center; justify-content:center; }
+.ch-hint-line { text-align:center; min-height:30px; margin:10px 0 2px; font-family:var(--ff-head); font-size:1.5rem; letter-spacing:.08em; color:var(--gold,#ffd166); text-shadow:0 0 12px rgba(255,209,102,.5); }
 .ch-hear-btn {
   background: rgba(255,209,102,0.15); border: 2px solid var(--gold);
   border-radius: 50%; width: 72px; height: 72px; font-size: 1.8rem;
@@ -7814,6 +7820,33 @@ function chStartChallenge(level, lessonName) {
   chRenderWordPrompt();
 }
 
+/* ── Hints: every Spell-a-thon badge earned in a world = 3 hints for that world ── */
+let chHintUsedForWord = false;
+function chHintsAvailable(worldId) {
+  const earned = 3 * buildAchievementsList()
+    .filter(a => a.world === worldId && a.id && a.id.indexOf('sp-') === 0)
+    .reduce((n, a) => n + a.count, 0);
+  const bw = ((getProgress().spellathon || {}).byWorld || {})[worldId] || {};
+  return Math.max(0, earned - (bw.hintsSpent || 0));
+}
+function chSpendHint(worldId) {
+  const p = getProgress();
+  p.spellathon = p.spellathon || { byWorld: {} };
+  const bw = p.spellathon.byWorld[worldId] = p.spellathon.byWorld[worldId] || { perfect: 0, comeback: 0 };
+  bw.hintsSpent = (bw.hintsSpent || 0) + 1;
+  saveProgress(p);
+}
+function chSoundOut(wordObj, anchor) {
+  const parts = (wordObj.blocks && wordObj.blocks.length ? wordObj.blocks : [wordObj.word]).concat([wordObj.word]);
+  let i = 0;
+  const next = () => {
+    if (i >= parts.length || !sceneAlive(anchor)) return;
+    const u = speak(parts[i++], null, 0.6);
+    if (u) { u.onend = () => setTimeout(next, 350); u.onerror = () => setTimeout(next, 350); }
+  };
+  next();
+}
+
 /* ── one word at a time: hear it, spell it, no options ── */
 function chRenderWordPrompt() {
   if (chRoundIndex >= chRoundWords.length) { chRenderReview(); return; }
@@ -7837,7 +7870,42 @@ function chRenderWordPrompt() {
     hearBtn.classList.add('playing');
     speak(wordObj.word, hearBtn, 0.75);
   });
-  wrap.appendChild(hearBtn);
+  const hearRow = document.createElement('div');
+  hearRow.className = 'ch-hear-row';
+  hearRow.appendChild(hearBtn);
+
+  const worldId = chCurrentLevel.id;
+  chHintUsedForWord = false;
+  let hintStep = 0;
+  const hintBtn = document.createElement('button');
+  hintBtn.className = 'ch-hint-btn';
+  const hintLine = document.createElement('div');
+  hintLine.className = 'ch-hint-line';
+  const refreshHintBtn = () => {
+    const n = chHintsAvailable(worldId);
+    hintBtn.innerHTML = '💡<span class="ch-hint-count">' + n + '</span>';
+    hintBtn.classList.toggle('empty', n <= 0);
+  };
+  refreshHintBtn();
+  hearRow.appendChild(hintBtn);
+  wrap.appendChild(hearRow);
+  wrap.appendChild(hintLine);
+
+  const maskWord = (shown) => wordObj.word.split('').map((c, i) => shown(i) ? c : '_').join(' ');
+  hintBtn.addEventListener('click', () => {
+    const encourageEl = wrap.querySelector('.ch-encourage');
+    if (chHintsAvailable(worldId) <= 0) { if (encourageEl) encourageEl.textContent = 'Earn Spell-a-thon badges to get hints! 💡'; return; }
+    if (hintStep >= 3) { if (encourageEl) encourageEl.textContent = 'That is all the hints for this word!'; return; }
+    hintStep++;
+    chSpendHint(worldId);
+    chHintUsedForWord = true;
+    const last = wordObj.word.length - 1;
+    if (hintStep === 1) hintLine.textContent = maskWord(i => i === 0);
+    else if (hintStep === 2) hintLine.textContent = maskWord(i => i === 0 || i === last);
+    else { chSoundOut(wordObj, hintBtn); }
+    hintBtn.classList.add('used'); setTimeout(() => hintBtn.classList.remove('used'), 400);
+    refreshHintBtn();
+  });
 
   const input = document.createElement('input');
   input.className = 'ch-spell-input';
@@ -7885,7 +7953,7 @@ function chSubmitAnswer(wordObj, typed, encourageEl) {
   const prog = loadChallengeProgress();
   const rec  = prog[id] || { mastery: 0, needsReview: false, lastAttempted: null };
   let mastery = rec.mastery;
-  if (isCorrect && !chSessionCorrect.has(id)) {
+  if (isCorrect && !chSessionCorrect.has(id) && !chHintUsedForWord) {
     mastery = Math.min(2, mastery + 1);
     chSessionCorrect.add(id);
   }
