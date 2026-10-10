@@ -3771,7 +3771,7 @@ function _navClear() {
 function _navTrimHome() {
   if (_navDepth > 1) { const n = _navDepth - 1; _navDepth = 1; _navIgnore++; try { history.go(-n); } catch (e) { _navIgnore--; } }
 }
-function _navOnScreen(id) { _nl('show ' + id); if (id === 'home') _navTrimHome(); }
+function _navOnScreen(id) { _nl('show ' + id); if (id === 'home') { _navTrimHome(); if (window.__pendingReload) { window.__pendingReload = false; setTimeout(() => location.reload(), 50); } } }
 /* One history entry per tap, added synchronously inside the tap itself so Chrome treats it as
    user-made (entries added any later are skipped by Back). */
 document.addEventListener('click', e => {
@@ -7408,7 +7408,8 @@ function buildSettings() {
 function openParentHub() {
   requireParentPin(() => {
     buildParentHub();
-    const _v = document.createElement('div'); _v.style.cssText = 'text-align:center;opacity:.4;font-size:.75rem;margin:18px 0'; _v.textContent = 'App version 35'; _v.onclick = () => { let last = ''; try { last = localStorage.getItem('ls_navlog') || ''; } catch (e) {} alert('Navigation log (newest last):\n' + _navLog.join('\n') + (last ? '\n\n--- last session ---\n' + last : '')); }; document.getElementById('parent-hub-body').appendChild(_v);
+    const _v = document.createElement('div'); _v.style.cssText = 'text-align:center;opacity:.4;font-size:.75rem;margin:18px 0'; _v.textContent = 'App version 36'; _v.onclick = () => { let last = ''; try { last = localStorage.getItem('ls_navlog') || ''; } catch (e) {} alert('Navigation log (newest last):\n' + _navLog.join('\n') + (last ? '\n\n--- last session ---\n' + last : '')); }; document.getElementById('parent-hub-body').appendChild(_v);
+    const _u = document.createElement('button'); _u.className = 'action-btn secondary'; _u.style.cssText = 'display:block;margin:0 auto 24px'; _u.textContent = '🔄 Refresh app'; _u.onclick = checkForUpdates; document.getElementById('parent-hub-body').appendChild(_u);
     showScreen('parent-hub-screen');
   });
 }
@@ -8630,7 +8631,23 @@ maybeShowWelcome();
 
 </script>
 <script>
-if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
+if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
+  var _hadSW=!!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange',function(){
+    if(!_hadSW){_hadSW=true;return;}
+    var a=document.querySelector('.screen.active');
+    if(!a||a.id==='home')location.reload(); else window.__pendingReload=true;   // refresh as soon as the child is back on Home
+  });
+  window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').then(function(r){
+    document.addEventListener('visibilitychange',function(){if(!document.hidden)r.update().catch(function(){});});
+    r.update().catch(function(){});
+  }).catch(function(){});});
+}
+function checkForUpdates(){
+  var go=function(){location.reload();};
+  var p=('serviceWorker' in navigator)?navigator.serviceWorker.getRegistrations().then(function(rs){return Promise.all(rs.map(function(r){return r.unregister();}));}):Promise.resolve();
+  p.then(function(){return window.caches?caches.keys().then(function(ks){return Promise.all(ks.map(function(k){return caches.delete(k);}));}):0;}).then(go,go);
+}
 </script>
   <div class="install-modal" id="install-modal" style="display:none" onclick="if(event.target===this)closeInstall()">
     <div class="install-card">
