@@ -2150,7 +2150,9 @@ html, body {
 
     <!-- Hero UFO + Cat -->
     <div class="cat-moon-wrap" id="home-ufo-wrap">
+    <div class="rb-hero" id="rb-hero" onclick="openBadges()" role="button" aria-label="Open my badges"><svg class="rb-arc" id="rb-arc" viewBox="0 0 340 190" width="340" height="190"></svg>
       <div class="wondle" id="hero-star" aria-label="Smiling star"><i style="left:8%;top:40px;animation-delay:0s;width:6px;height:6px"></i><i style="left:88%;top:60px;animation-delay:0.7s;width:5px;height:5px"></i><i style="left:20%;top:150px;animation-delay:1.4s;width:4px;height:4px"></i><i style="left:78%;top:150px;animation-delay:2.1s;width:6px;height:6px"></i><i style="left:50%;top:10px;animation-delay:2.8s;width:4px;height:4px"></i><i style="left:94%;top:110px;animation-delay:3.5s;width:4px;height:4px"></i><i style="left:2%;top:100px;animation-delay:1.1s;width:5px;height:5px"></i><svg class="wondle-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M92.6,37.9 Q100.0,20.0 107.4,37.9 L116.1,59.2 Q123.0,76.0 141.0,76.0 L163.8,76.0 Q183.0,76.0 167.6,87.5 L149.4,101.2 Q135.0,112.0 140.4,129.4 L147.2,151.4 Q153.0,170.0 136.0,158.8 L115.9,145.5 Q100.0,135.0 84.1,145.5 L64.0,158.8 Q47.0,170.0 52.8,151.4 L59.6,129.4 Q65.0,112.0 50.6,101.2 L32.4,87.5 Q17.0,76.0 36.2,76.0 L59.0,76.0 Q77.0,76.0 83.9,59.2 Z" fill="#ffd166" stroke="#f4a637" stroke-width="4" stroke-linejoin="round"/><g class="w-eyes"><ellipse cx="82" cy="98" rx="7" ry="7" fill="#2c2410"/><ellipse cx="118" cy="98" rx="7" ry="7" fill="#2c2410"/><circle cx="84.5" cy="95.5" r="2.5" fill="#fff8e8"/><circle cx="120.5" cy="95.5" r="2.5" fill="#fff8e8"/></g><path d="M85 115 Q100 128 115 115" fill="none" stroke="#2c2410" stroke-width="4" stroke-linecap="round"/><ellipse cx="68" cy="112" rx="7" ry="4.5" fill="#ff9aa2" opacity=".55"/><ellipse cx="132" cy="112" rx="7" ry="4.5" fill="#ff9aa2" opacity=".55"/></svg></div>
+</div>
 <style>
 .wondle{position:relative;width:230px;height:230px;margin:0 auto;display:flex;align-items:center;justify-content:center}
 .wondle-svg{width:190px;height:190px;overflow:visible;animation:wbob 2.8s ease-in-out infinite,wglow 2.8s ease-in-out infinite;transform-origin:50% 60%}
@@ -2167,13 +2169,7 @@ html, body {
     <p class="home-byline">by Illuminary</p>
     <p class="home-subtitle">Your adventure begins here 🚀</p>
 
-    <!-- Language picker -->
-    <div class="lang-row">
-      <button class="lang-btn active" data-lang="en-GB" onclick="setLang(this)">British</button>
-      <button class="lang-btn" data-lang="en-US" onclick="setLang(this)">American</button>
-      <button class="lang-btn" data-lang="en-AU" onclick="setLang(this)">Australian</button>
-      <button class="lang-btn" data-lang="en-IN" onclick="setLang(this)">Indian</button>
-    </div>
+
   </div>
 
   <p class="constellation-label">Choose your World</p>
@@ -2323,14 +2319,12 @@ html, body {
     <span class="lm-badge badge-mastery">⭐ Collection</span>
   </div>
   <div class="badges-body" id="badges-body">
-    <div class="badge-summary-banner" id="badges-summary"></div>
-    <div class="journey-wrap" id="badges-trail-wrap">
-      <div class="journey-trail"></div>
-      <div class="journey-trail-done" id="badges-trail-done" style="height:0"></div>
-      <div class="journey-ufo" id="badges-rocket"><div id="badges-rocket-inner">🚀</div></div>
-      <div id="badges-stations"></div>
-    </div>
+    <svg class="rb-arc rb-arc-sm" id="bg-arc" viewBox="0 0 340 190" width="300" height="168"></svg>
+    <div class="bg-total" id="bg-total"></div>
+    <div id="bg-sections"></div>
   </div>
+  <div class="bg-sheet-dim" id="bg-dim" onclick="closeBadgeSheet()"></div>
+  <div class="bg-sheet" id="bg-sheet"></div>
 </div>
 
 <!-- ══════════════════════════════════
@@ -2492,7 +2486,7 @@ html, body {
 const synth = window.speechSynthesis;
 let voices = [];
 let selectedVoice = null;
-let preferredLang = 'en-GB';
+let preferredLang = (navigator.language || 'en-US');
 let currentSpeakEl = null;
 
 const FEMALE_NAMES = [
@@ -2517,7 +2511,7 @@ function loadVoices() {
   voices = synth.getVoices().filter(v => v.lang.toLowerCase().startsWith('en'));
   if (!voices.length) return;
   voices.sort((a, b) => rankVoice(a) - rankVoice(b));
-  selectedVoice = voices[0];
+  selectedVoice = null; // use the browser's own default voice
 }
 
 if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices;
@@ -2702,7 +2696,7 @@ function getDailyLogRange(days) {
 }
 
 function sumDailyLog(entries) {
-  const totals = { lessonsCompleted: 0, wordsPractised: 0, starsEarned: 0, quizCorrect: 0, quizTotal: 0, dictCorrect: 0, dictTotal: 0 };
+  const totals = { lessonsCompleted: 0, wordsPractised: 0, starsEarned: 0, quizCorrect: 0, quizTotal: 0, dictCorrect: 0, dictTotal: 0, ppCorrect: 0, ppTotal: 0 };
   entries.forEach(e => { Object.keys(totals).forEach(k => totals[k] += (e[k] || 0)); });
   return totals;
 }
@@ -3841,7 +3835,7 @@ function setStartWorld(id) {
 }
 function maybeShowWelcome() {
   if (getProgress().setupDone) return;
-  buildWorldPicker(document.getElementById('ws-list'), id => { setStartWorld(id); goHome(); });
+  buildWorldPicker(document.getElementById('ws-list'), id => { setStartWorld(id); goHome(); autoScrollToStart(1400); });
   showScreen('welcome-setup');
 }
 function applyStartGlow() {
@@ -6351,12 +6345,13 @@ function ppSpawnStar() {
     let penalised = false;
     star.addEventListener('click', () => {
       ppBuzzWrong(star, wordSpan);
-      if (!penalised) { penalised = true; ppLoseLife(); }
+      if (!penalised) { penalised = true; bumpDailyLog({ ppTotal: 1 }); ppLoseLife(); }
     });
   }
   star.addEventListener('animationend', () => {
     if (resolved) return;
     resolved = true;
+    if (wordObj.isTarget) { bumpDailyLog({ ppTotal: 1 }); const _q = getProgress(); _q.ppTried = _q.ppTried || {}; _q.ppTried[wordObj.word.toLowerCase()] = 1; saveProgress(_q); }
     if (wordObj.isTarget && !ppMissedWorking.includes(wordObj.word)) {
       ppMissedWorking.push(wordObj.word);
     }
@@ -6428,10 +6423,11 @@ function ppCatchStar(star, playArea, wordObj) {
   ppCaught++;
   const idx = ppMissedWorking.indexOf(wordObj.word);
   if (idx !== -1) ppMissedWorking.splice(idx, 1);
-  bumpDailyLog({ wordsPractised: 1 });
+  bumpDailyLog({ wordsPractised: 1, ppCorrect: 1, ppTotal: 1 });
   const p = getProgress();
   p.planetPatrol = p.planetPatrol || { totalCaught: 0, perfectRounds: 0, worldsPlayed: [], bestByWorld: {} };
   p.planetPatrol.totalCaught++;
+  p.ppTried = p.ppTried || {}; p.ppTried[wordObj.word.toLowerCase()] = 1;
   if (ppCurrentLevel) {
     p.planetPatrol.byWorld = p.planetPatrol.byWorld || {};
     const bw = p.planetPatrol.byWorld[ppCurrentLevel.id] = p.planetPatrol.byWorld[ppCurrentLevel.id] || { caught: 0, perfect: 0, heart: 0 };
@@ -7225,6 +7221,48 @@ function lessonById(id) {
   return null;
 }
 
+
+var NP_MIN_TRIED=10, NP_LIMIT=30;
+function needsPracticeStats(p){
+  var mast=p.challengeMastery||{}, tried=p.ppTried||{}, out=[];
+  LEVELS.forEach(function(lv){
+    var pm={};(((p.ppMissed||{})[lv.id])||[]).forEach(function(w){pm[w.toLowerCase()]=1});
+    lv.lessons.forEach(function(les){
+      var seen={},t=0,weak=[];
+      chWordsFor(lv.id,les.name).forEach(function(w){
+        var k=w.word.toLowerCase(); if(seen[k])return; seen[k]=1;
+        var r=mast[chWordId(w.level,w.lesson,w.word)]||{};
+        var isTried=!!(r.lastAttempted||r.mastery>0||tried[k]||pm[k]);
+        if(!isTried)return; t++;
+        if(r.needsReview||pm[k])weak.push(w.word);
+      });
+      var qr=p[les.id],qT=0,qW=0;
+      if(qr&&les.quizzes&&les.quizzes.length){qT=les.quizzes.length;qW=Math.max(0,qT-(qr.score||0));}
+      var all=t+qT,miss=weak.length+qW;
+      if(all>=NP_MIN_TRIED)out.push({level:lv,lesson:les,tried:t,weak:weak,qT:qT,qW:qW,all:all,miss:miss,pct:Math.round(miss/all*100)});
+    });
+  });
+  return out;
+}
+function renderNeedsPractice(host,p){
+  var st=needsPracticeStats(p), flagged=st.filter(function(x){x.qpct=x.qT?Math.round(x.qW/x.qT*100):0;x.lowQ=x.qpct>=NP_LIMIT;return x.pct>=NP_LIMIT||x.lowQ}).sort(function(a,b){return Math.max(b.pct,b.qpct)-Math.max(a.pct,a.qpct)});
+  var ok=st.length-flagged.length;
+  var card=document.createElement('div');card.className='pd-section-card';
+  var h='<div class="pd-section-title">🎯 Needs Practice</div><div class="np-sub">For each lesson we compare the words your child missed (Spell-a-thon and Planet Patrol) and the quiz answers they got wrong with everything they have tried. Under '+NP_LIMIT+'% missed is fine. '+NP_LIMIT+'% or more means it is worth doing the lesson again. A quiz with '+NP_LIMIT+'% or more wrong is flagged on its own, even if the overall figure is lower.</div>';
+  if(!st.length){h+='<div class="pd-sr-sub">Not enough practice yet. This appears once a lesson has at least '+NP_MIN_TRIED+' answers to look at (words tried or quiz questions).</div>';}
+  else{
+    flagged.forEach(function(x,i){
+      var chips=x.weak.slice(0,5).map(function(w){return '<span class="np-chip">'+w+'</span>'}).join('');
+      var more=x.weak.length>5?'<span class="np-more">+'+(x.weak.length-5)+' more</span>':'';
+      h+='<div class="np-row"><div class="np-top"><span class="np-ic">'+lessonThemeIcon(x.lesson)+'</span><div class="np-info"><div class="np-name">'+x.lesson.name+'</div><div class="np-fig">'+(x.tried?'Words: '+x.weak.length+' of '+x.tried+' missed':'')+(x.tried&&x.qT?' · ':'')+(x.qT?'Quiz: '+x.qW+' of '+x.qT+' wrong ('+x.qpct+'%)':'')+'</div></div><div class="np-pct">'+x.pct+'%</div></div>'+(x.lowQ?'<div class="np-flag">⚠️ Low quiz score</div>':'')+'<div class="np-chips">'+chips+more+'</div><button class="pd-practice-btn np-btn" data-i="'+i+'">Redo this lesson</button></div>';
+    });
+    if(!flagged.length)h+='<div class="pd-sr-sub">Nothing to redo. Every lesson is under '+NP_LIMIT+'% missed. 🎉</div>';
+    if(ok)h+='<div class="np-ok">✅ '+ok+' lesson'+(ok===1?'':'s')+' on track (under '+NP_LIMIT+'% missed)</div>';
+  }
+  card.innerHTML=h;
+  card.querySelectorAll('.np-btn').forEach(function(b){b.addEventListener('click',function(){var x=flagged[+b.dataset.i];goHome();openLevel(x.level.id);});});
+  host.appendChild(card);
+}
 function buildTimeline() {
   const body = document.getElementById('timeline-body');
   body.innerHTML = '';
@@ -7234,10 +7272,10 @@ function buildTimeline() {
   const lastWeekEntries = Object.entries((p.dailyLog||{})).filter(([d]) => d >= daysAgoStr(13) && d < daysAgoStr(6)).map(([,v])=>v);
   const lastWeek = sumDailyLog(lastWeekEntries);
 
-  const thisAccDen = thisWeek.quizTotal + thisWeek.dictTotal;
-  const thisAcc = thisAccDen ? Math.round(((thisWeek.quizCorrect+thisWeek.dictCorrect)/thisAccDen)*100) : null;
-  const lastAccDen = lastWeek.quizTotal + lastWeek.dictTotal;
-  const lastAcc = lastAccDen ? Math.round(((lastWeek.quizCorrect+lastWeek.dictCorrect)/lastAccDen)*100) : null;
+  const thisAccDen = thisWeek.quizTotal + thisWeek.dictTotal + (thisWeek.ppTotal||0);
+  const thisAcc = thisAccDen ? Math.round(((thisWeek.quizCorrect + thisWeek.dictCorrect + (thisWeek.ppCorrect||0))/thisAccDen)*100) : null;
+  const lastAccDen = lastWeek.quizTotal + lastWeek.dictTotal + (lastWeek.ppTotal||0);
+  const lastAcc = lastAccDen ? Math.round(((lastWeek.quizCorrect + lastWeek.dictCorrect + (lastWeek.ppCorrect||0))/lastAccDen)*100) : null;
 
   const wordsDelta = thisWeek.wordsPractised - lastWeek.wordsPractised;
   const accDelta = (thisAcc !== null && lastAcc !== null) ? thisAcc - lastAcc : null;
@@ -7262,18 +7300,15 @@ function buildTimeline() {
   const card = document.createElement('div');
   card.className = 'pd-section-card';
   card.innerHTML = `
-    <div class="pd-section-title">📈 This Week's Story</div>
+    <div class="pd-section-title">📈 Compared With Last Week</div>
     <div style="display:flex; flex-direction:column; gap:10px; font-size:0.82rem; color:var(--white);">
-      <div>📖 <strong>${thisWeek.wordsPractised} words practised</strong> this week
-        ${wordsDelta !== 0 ? `<span style="color:${wordsDelta>0?'var(--teal)':'var(--coral)'}">(${wordsDelta>0?'+':''}${wordsDelta} from last week)</span>` : ''}</div>
-      <div>🎯 <strong>Average accuracy: ${thisAcc===null?'—':thisAcc+'%'}</strong>
-        ${accDelta!==null && accDelta!==0 ? `<span style="color:${accDelta>0?'var(--teal)':'var(--coral)'}">(${accDelta>0?'up':'down'} from ${lastAcc}% last week)</span>` : ''}</div>
-      <div>🔥 <strong>Longest streak: ${longestStreak} day${longestStreak===1?'':'s'}</strong></div>
+      <div>📖 <strong>Words practised:</strong> ${wordsDelta===0 ? 'same as last week' : `<span style="color:${wordsDelta>0?'var(--teal)':'var(--coral)'}">${wordsDelta>0?wordsDelta+' more':(-wordsDelta)+' fewer'} than last week</span>`}</div>
+      <div>🎯 <strong>Accuracy:</strong> ${accDelta===null ? 'Not enough data yet' : accDelta===0 ? 'same as last week' : `<span style="color:${accDelta>0?'var(--teal)':'var(--coral)'}">${accDelta>0?'up':'down'} ${Math.abs(accDelta)}% from ${lastAcc}% last week</span>`}</div>
       <div>🌱 <strong>Most improved skill:</strong> ${mostImproved ? `${mostImproved.name} (${mostImproved.delta>0?'+':''}${mostImproved.delta}%)` : 'Not enough data yet'}</div>
-      <div>💡 <strong>Needs attention:</strong> ${needsAttention ? needsAttention.name : 'Nothing flagged this week'}</div>
     </div>
   `;
   body.appendChild(card);
+  renderNeedsPractice(body, p);
 
   const note = document.createElement('div');
   note.className = 'pd-sr-sub';
@@ -7346,19 +7381,7 @@ function buildSettings() {
   });
   body.appendChild(pinCard);
 
-  // Voice Selection
-  const voiceCard = document.createElement('div');
-  voiceCard.className = 'pd-section-card';
-  voiceCard.innerHTML = `
-    <div class="pd-section-title">🔊 Voice Selection</div>
-    <div class="lang-selector" style="display:flex; flex-wrap:wrap; gap:6px;">
-      <button class="lang-btn${preferredLang==='en-GB'?' active':''}" data-lang="en-GB" onclick="setLang(this)">British</button>
-      <button class="lang-btn${preferredLang==='en-US'?' active':''}" data-lang="en-US" onclick="setLang(this)">American</button>
-      <button class="lang-btn${preferredLang==='en-AU'?' active':''}" data-lang="en-AU" onclick="setLang(this)">Australian</button>
-      <button class="lang-btn${preferredLang==='en-IN'?' active':''}" data-lang="en-IN" onclick="setLang(this)">Indian</button>
-    </div>
-  `;
-  body.appendChild(voiceCard);
+
 
   // Sound
   const soundCard = document.createElement('div');
@@ -7413,8 +7436,8 @@ function buildSettings() {
 function openParentHub() {
   requireParentPin(() => {
     buildParentHub();
-    const _v = document.createElement('div'); _v.style.cssText = 'text-align:center;opacity:.4;font-size:.75rem;margin:18px 0'; _v.textContent = 'App version 37'; _v.onclick = () => { let last = ''; try { last = localStorage.getItem('ls_navlog') || ''; } catch (e) {} alert('Navigation log (newest last):\n' + _navLog.slice(-45).join('\n')); }; document.getElementById('parent-hub-body').appendChild(_v);
-    const _u = document.createElement('button'); _u.className = 'action-btn secondary'; _u.style.cssText = 'display:block;margin:0 auto 24px'; _u.textContent = '🔄 Refresh app'; _u.onclick = checkForUpdates; document.getElementById('parent-hub-body').appendChild(_u);
+    const _v = document.createElement('div'); _v.style.cssText = 'text-align:center;opacity:.4;font-size:.75rem;margin:18px 0'; _v.textContent = 'App version 38'; _v.onclick = () => { let last = ''; try { last = localStorage.getItem('ls_navlog') || ''; } catch (e) {} alert('Navigation log (newest last):\n' + _navLog.slice(-45).join('\n')); }; document.getElementById('parent-hub-body').appendChild(_v);
+    const _u = document.createElement('div'); _u.className='ch-level-card'; _u.style.margin='0 0 24px'; _u.innerHTML='<span class="ch-level-icon">🔄</span><div class="ch-level-info"><div class="ch-level-name">Refresh app</div><div class="ch-level-sub">Get the latest version. Your progress is kept.</div></div>'; _u.onclick = checkForUpdates; document.getElementById('parent-hub-body').appendChild(_u);
     showScreen('parent-hub-screen');
   });
 }
@@ -7425,10 +7448,9 @@ function buildParentHub() {
   _refreshInstallBtn();
   const sections = [
     { icon: '📊', name: 'Dashboard', sub: 'Progress, streaks & activity', fn: openParent },
-    { icon: '🏆', name: 'Achievements', sub: "Your child's sticker collection", fn: openAchievements },
-    { icon: '📚', name: 'Spelling Secrets', sub: 'Every rule, explained', fn: openSpellingSecrets },
     { icon: '📈', name: 'Learning Timeline', sub: "This week's story", fn: openTimeline },
-    { icon: '⚙️', name: 'Settings', sub: 'Profile, PIN, voice & sound', fn: openSettings },
+    { icon: '📚', name: 'Spelling Secrets', sub: 'Every rule, explained', fn: openSpellingSecrets },
+    { icon: '⚙️', name: 'Settings', sub: 'Profile, PIN & sound', fn: openSettings },
   ];
   sections.forEach(s => {
     const card = document.createElement('div');
@@ -7450,10 +7472,18 @@ function openParent() {
   showScreen('parent');
 }
 
+
+function uqStats(p){
+  var best={};(CHALLENGE_WORDS||[]).forEach(function(w){var r=(p.challengeMastery||{})[chWordId(w.level,w.lesson,w.word)];var k=w.word.toLowerCase();if(r&&r.mastery>=2)best[k]=1;});
+  var seen={},out={},tm=0,tt=0;
+  LEVELS.forEach(function(lv){var t=0,m=0,here={};chWordsFor(lv.id,null).forEach(function(w){var k=w.word.toLowerCase();if(seen[k]||here[k])return;here[k]=1;t++;if(best[k])m++;});
+    Object.keys(here).forEach(function(k){seen[k]=1});out[lv.id]={t:t,m:m};tm+=m;tt+=t;});
+  out.all={t:tt,m:tm};return out;}
 function buildParentDashboard() {
   const body = document.getElementById('parent-body');
   body.innerHTML = '';
   const p = getProgress();
+  const uq = uqStats(p);
 
   const filterEl  = document.getElementById('pd-date-filter');
   const filterVal = filterEl ? filterEl.value : '7';
@@ -7464,11 +7494,11 @@ function buildParentDashboard() {
     Object.entries((p.dailyLog||{})).filter(([d]) => d >= daysAgoStr(days*2-1) && d < daysAgoStr(days-1)).map(([,v])=>v)
   ) : null;
 
-  const accNum = rangeTotals.quizTotal + rangeTotals.dictTotal;
-  const accDen = rangeTotals.quizCorrect + rangeTotals.dictCorrect;
+  const accNum = rangeTotals.quizTotal + rangeTotals.dictTotal + (rangeTotals.ppTotal||0);
+  const accDen = rangeTotals.quizCorrect + rangeTotals.dictCorrect + (rangeTotals.ppCorrect||0);
   const accuracy = accNum ? Math.round((accDen/accNum)*100) : null;
-  const priorAccNum = priorTotals ? priorTotals.quizTotal + priorTotals.dictTotal : 0;
-  const priorAcc = priorTotals && priorAccNum ? Math.round(((priorTotals.quizCorrect+priorTotals.dictCorrect)/priorAccNum)*100) : null;
+  const priorAccNum = priorTotals ? priorTotals.quizTotal + priorTotals.dictTotal + (priorTotals.ppTotal||0) : 0;
+  const priorAcc = priorTotals && priorAccNum ? Math.round(((priorTotals.quizCorrect + priorTotals.dictCorrect + (priorTotals.ppCorrect||0))/priorAccNum)*100) : null;
 
   const accClass = accuracy === null ? '' : accuracy > 90 ? 'acc-green' : accuracy >= 75 ? 'acc-yellow' : 'acc-red';
   const streak = (p.streak && p.streak.current) || 0;
@@ -7480,64 +7510,39 @@ function buildParentDashboard() {
     return `<span class="pd-card-trend">${diff > 0 ? '↑' : '↓'}${Math.abs(diff)}${suffix} vs prior period</span>`;
   }
 
-  // ── 4 summary cards ──
+  // ── Summary cards (period totals + today on each card) ──
+  const todayTotals = sumDailyLog(getDailyLogRange(1));
+  const todayAccNum = todayTotals.quizTotal + todayTotals.dictTotal + (todayTotals.ppTotal||0);
+  const todayAcc = todayAccNum ? Math.round(((todayTotals.quizCorrect + todayTotals.dictCorrect + (todayTotals.ppCorrect||0))/todayAccNum)*100) : null;
+  const bestStreak = (p.streak && p.streak.longest) || 0;
   const cardsGrid = document.createElement('div');
   cardsGrid.className = 'pd-cards-grid';
-  cardsGrid.innerHTML = `
-    <div class="pd-card words">
-      <span class="pd-card-num">📖 ${rangeTotals.wordsPractised}</span>
-      <span class="pd-card-label">Words Practised</span>
-      ${trendLine(rangeTotals.wordsPractised, priorTotals?priorTotals.wordsPractised:null, '')}
-    </div>
-    <div class="pd-card ${accClass}">
-      <span class="pd-card-num">🎯 ${accuracy===null?'—':accuracy+'%'}</span>
-      <span class="pd-card-label">Accuracy</span>
-      ${accuracy!==null ? trendLine(accuracy, priorAcc, '%') : ''}
-    </div>
-    <div class="pd-card streak">
-      <span class="pd-card-num">🔥 ${streak}</span>
-      <span class="pd-card-label">Day Streak</span>
-      <span class="pd-card-trend">Keep it up!</span>
-    </div>
-    <div class="pd-card stars">
-      <span class="pd-card-num">⭐ ${rangeTotals.starsEarned}</span>
-      <span class="pd-card-label">Stars Earned</span>
-      ${trendLine(rangeTotals.starsEarned, priorTotals?priorTotals.starsEarned:null, '')}
-    </div>
-  `;
+  const tc = (icon, num, label, sub, cls) => `<div class="pd-card ${cls||''}"><span class="pd-card-num">${icon} ${num}</span><span class="pd-card-label">${label}</span><span class="pd-card-trend">${sub}</span></div>`;
+  cardsGrid.innerHTML =
+    tc('🔥', streak, 'Day Streak', bestStreak > streak ? 'Best: ' + bestStreak : 'Keep it up!', 'streak') +
+    tc('🎯', accuracy===null?'—':accuracy+'%', 'Accuracy', 'Today: ' + (todayAcc===null?'—':todayAcc+'%'), accClass) +
+    tc('📚', rangeTotals.lessonsCompleted, 'Lessons', 'Today: ' + todayTotals.lessonsCompleted, 'lessons') +
+    tc('📖', rangeTotals.wordsPractised, 'Words Practised', 'Today: ' + todayTotals.wordsPractised, 'words') +
+    tc('✅', rangeTotals.quizCorrect, 'Quiz Correct', 'Today: ' + todayTotals.quizCorrect, 'stars') +
+    tc('✏️', rangeTotals.dictCorrect, 'Spelled Right', 'Today: ' + todayTotals.dictCorrect, 'spell');
   body.appendChild(cardsGrid);
 
-  // ── Today's Activity ──
-  const todayTotals = sumDailyLog(getDailyLogRange(1));
-  const todayAccNum = todayTotals.quizTotal + todayTotals.dictTotal;
-  const todayAcc = todayAccNum ? Math.round(((todayTotals.quizCorrect+todayTotals.dictCorrect)/todayAccNum)*100) : null;
-  const todayCard = document.createElement('div');
-  todayCard.className = 'pd-section-card';
-  todayCard.innerHTML = `
-    <div class="pd-section-title">📅 Today's Activity</div>
-    <div class="pd-today-grid">
-      <div><span class="pd-today-num">${todayTotals.lessonsCompleted}</span><span class="pd-today-label">Lessons Completed</span></div>
-      <div><span class="pd-today-num">${todayTotals.wordsPractised}</span><span class="pd-today-label">Words Practised</span></div>
-      <div><span class="pd-today-num">${todayAcc===null?'—':todayAcc+'%'}</span><span class="pd-today-label">Accuracy</span></div>
-      <div><span class="pd-today-num">${todayTotals.starsEarned}</span><span class="pd-today-label">Stars Earned</span></div>
-    </div>
-  `;
-  body.appendChild(todayCard);
-
-  // ── Achievements preview (read-only stat — full list lives in the Hub) ──
-  const achList = buildAchievementsList();
-  const achUnlocked = achList.filter(a => a.unlocked).length;
-  const achCard = document.createElement('div');
-  achCard.className = 'pd-section-card';
-  achCard.innerHTML = `
-    <div class="pd-section-title">🏆 Achievements</div>
-    <div class="pd-achievements-row">
-      <span class="pd-ach-count">${achUnlocked}/${achList.length}</span>
-      <span class="pd-ach-sub">Unlocked</span>
-    </div>
-  `;
-  body.appendChild(achCard);
-
+  // ── Games (overall scores) ──
+  const _pp=p.planetPatrol||{}, _sw=(p.spellathon&&p.spellathon.byWorld)||{};
+  let _swPerfect=0,_swBack=0,_swWords=0,_swMast=0;
+  Object.values(_sw).forEach(w=>{_swPerfect+=w.perfect||0;_swBack+=w.comeback||0;});_swWords=uq.all.t;_swMast=uq.all.m;
+  
+  const gamesCard=document.createElement('div');gamesCard.className='pd-section-card';
+  gamesCard.innerHTML=`<div class="pd-section-title">🎮 Games</div>
+   <div class="pd-games">
+    <div class="pd-game"><div class="pd-game-h">🪐 Planet Patrol</div>
+      <div class="pd-game-n">${_pp.totalCaught||0}</div><div class="pd-game-l">words caught</div>
+      <div class="pd-game-s">${_pp.perfectRounds||0} perfect rounds</div></div>
+    <div class="pd-game"><div class="pd-game-h">🏆 Spell-a-thon</div>
+      <div class="pd-game-n">${_swMast}<span>/${_swWords}</span></div><div class="pd-game-l">words mastered</div>
+      <div class="pd-game-s">${_swPerfect} perfect rounds</div></div>
+   </div>`;
+  body.appendChild(gamesCard);
 
   // ── Learning Worlds ──
   const worldsCard = document.createElement('div');
@@ -7572,9 +7577,10 @@ function buildParentDashboard() {
       <div class="plc-bar-wrap"><div class="plc-bar" style="width:${pct}%;background:${colour};"></div></div>
       <div class="pd-lesson-detail-row" style="display:${isOpen?'grid':'none'}">
         <span class="pdl-name">${WORLD_EMOJI[level.id] || ''} ${level.name} Overview</span>
-        <span>Lessons<br>${done}/${total}</span>
-        <span>Stars<br>${level.lessons.reduce((a,l)=>a+(p[l.id]?.score||0),0)}/${level.lessons.reduce((a,l)=>a+l.quizzes.length,0)}</span>
-        <span>Dictation<br>${masteredWords}/${challengeWords.length||0}</span>
+        <span class="pdl-m"><b>${done}/${total}</b>Lessons</span>
+        <span class="pdl-m"><b>${level.lessons.reduce((a,l)=>a+(p[l.id]?.score||0),0)}/${level.lessons.reduce((a,l)=>a+l.quizzes.length,0)}</b>Quiz</span>
+        <span class="pdl-m"><b>${((p.planetPatrol||{}).bestByWorld||{})[level.id]||0}/10</b>Planet Patrol</span>
+        <span class="pdl-m"><b>${uq[level.id].m}/${uq[level.id].t}</b>Spell-a-thon</span>
       </div>
       <div class="plc-lessons" id="plc-${level.id}" style="display:${isOpen?'flex':'none'}; margin-top:0.5rem;"></div>
     `;
@@ -7590,7 +7596,7 @@ function buildParentDashboard() {
         const isDone  = !!p[lesson.id];
         const score   = p[lesson.id]?.score || 0;
         const qTotal  = lesson.quizzes.length;
-        const stars   = isDone ? (score===qTotal?'⭐⭐⭐':score>=qTotal*0.6?'⭐⭐':'⭐') : '';
+        
         const lessonWords = chWordsFor(level.id, lesson.name);
         const lessonMastered = lessonWords.filter(w => {
           const rec = (p.challengeMastery||{})[chWordId(w.level, w.lesson, w.word)];
@@ -7602,11 +7608,9 @@ function buildParentDashboard() {
         row.innerHTML = `
           <span class="plr-icon">${lessonThemeIcon(lesson)}</span>
           <span class="plr-name">${lesson.name}</span>
-          ${isDone
-            ? `<span class="plr-score">${score}/${qTotal} ${stars}</span><span class="plr-done">✓</span>`
-            : `<span class="plr-none">○</span>`
-          }
-          ${lessonWords.length ? `<span style="font-size:0.62rem;color:#7a9cc0;margin-left:6px;">📝${lessonMastered}/${lessonWords.length}</span>` : ''}
+          <span class="plr-score">${isDone ? score+'/'+qTotal : '–'}</span>
+          <span class="plr-st">${isDone ? '✓' : '○'}</span>
+          <span class="plr-sw">${lessonWords.length ? '🏆 '+lessonMastered+'/'+lessonWords.length : ''}</span>
         `;
         lessonsEl.appendChild(row);
       });
@@ -7689,7 +7693,7 @@ function runAchievementAudit() {
 
   // clamp any negative daily-log counters (e.g. from a corrupted save)
   if (p.dailyLog) {
-    const keys = ['lessonsCompleted','wordsPractised','starsEarned','quizCorrect','quizTotal','dictCorrect','dictTotal'];
+    const keys = ['lessonsCompleted','wordsPractised','starsEarned','quizCorrect','quizTotal','dictCorrect','dictTotal','ppCorrect','ppTotal'];
     Object.values(p.dailyLog).forEach(day => {
       keys.forEach(k => { if (typeof day[k] === 'number' && day[k] < 0) { day[k] = 0; changed = true; } });
     });
@@ -8713,5 +8717,228 @@ function installApp(){
 }
 _refreshInstallBtn();
 </script>
-</body>
+<style id="badge-polish">
+/* world colours (shared by rainbow, cards, badges) */
+:root{--wc-foundation:#ff6b6b;--wc-building:#ffd166;--wc-expanding:#06d6a0;--wc-mastery:#c77dff}
+.cat-moon-wrap#home-ufo-wrap{width:340px;max-width:100%}
+.rb-hero{position:relative;width:340px;max-width:100%;height:195px;margin:0 auto;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rb-hero:active{transform:scale(.98)}
+.rb-arc{display:block;overflow:visible}
+.rb-hero .rb-arc{position:absolute;left:50%;top:0;margin-left:-170px}
+.rb-hero .wondle{position:absolute;left:50%;bottom:-8px;margin:0;transform:translateX(-50%) scale(.56);transform-origin:50% 100%}
+.rb-hint{position:absolute;left:0;right:0;bottom:0;text-align:center;font-size:.78rem;color:#ffd166;opacity:.9}
+.rb-glow{animation:rbpulse 3.2s ease-in-out infinite}
+@keyframes rbpulse{0%,100%{opacity:.82}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.rb-glow{animation:none}}
+/* world cards: outline + glow match the rainbow */
+.constellation-card{--wc:#fff}
+.constellation-card.foundation{--wc:var(--wc-foundation)}.constellation-card.building{--wc:var(--wc-building)}
+.constellation-card.expanding{--wc:var(--wc-expanding)}.constellation-card.mastery{--wc:var(--wc-mastery)}
+.constellation-card.foundation,.constellation-card.building,.constellation-card.expanding,.constellation-card.mastery{
+  border-color:color-mix(in srgb,var(--wc) 75%,transparent);box-shadow:0 0 16px color-mix(in srgb,var(--wc) 32%,transparent)}
+.constellation-card.recommended{animation:start-breathe-wc 3.4s ease-in-out infinite!important}
+@keyframes start-breathe-wc{
+ 0%,100%{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--wc) 55%,transparent),0 0 26px 5px color-mix(in srgb,var(--wc) 32%,transparent)}
+ 50%{box-shadow:0 0 0 1.5px color-mix(in srgb,var(--wc) 85%,transparent),0 0 46px 12px color-mix(in srgb,var(--wc) 55%,transparent)}}
+.cc-start-tag{color:var(--wc)!important}
+/* My Badges */
+.badges-body{padding:6px 14px 40px;text-align:center}
+.rb-arc-sm{margin:4px auto 0}
+.bg-total{font-family:var(--ff-head);font-size:1.05rem;margin:-30px 0 8px;position:relative}
+.bg-pill{display:inline-block;padding:6px 18px;border-radius:999px;font-family:var(--ff-head);font-size:.95rem;margin:18px 0 12px;border:1.5px solid var(--c);color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);box-shadow:0 0 14px color-mix(in srgb,var(--c) 35%,transparent)}
+.bg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 6px;justify-items:center}
+.bd{position:relative;width:96px;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.bd:active{transform:scale(.94)}
+.bd-ring{position:relative;width:72px;height:72px;margin:0 auto;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.bd-ring::before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
+  background:conic-gradient(var(--c) calc(var(--p) * 1%),rgba(255,255,255,.16) 0);
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3.5px));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3.5px))}
+.bd.on .bd-ring::before{background:var(--c)}
+.bd.on .bd-ring{box-shadow:0 0 12px color-mix(in srgb,var(--c) 55%,transparent)}
+.bd-ic{position:relative;z-index:1;font-size:1.85rem;line-height:1;display:inline-block;padding:0 8px;overflow:visible;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.bd.off .bd-ic{filter:grayscale(1) brightness(.55);opacity:.7}
+.bd-lock{position:absolute;right:6px;bottom:4px;font-size:.8rem}
+.bd-nm{font-size:.72rem;margin-top:6px;line-height:1.15;color:#fff;opacity:.92}
+.bd.off .bd-nm{opacity:.55}
+.bd-x{position:absolute;top:-5px;right:8px;background:var(--c);color:#1a1200;font-weight:800;font-size:.68rem;border-radius:999px;padding:1px 7px}
+.bg-sheet-dim{position:fixed;inset:0;background:rgba(5,8,25,.6);opacity:0;pointer-events:none;transition:opacity .25s;z-index:900}
+.bg-sheet{position:fixed;left:50%;bottom:0;width:100%;max-width:460px;transform:translate(-50%,105%);transition:transform .3s cubic-bezier(.2,.9,.3,1);background:#141a45;border:1px solid color-mix(in srgb,var(--c,#ffd166) 60%,transparent);border-bottom:0;border-radius:22px 22px 0 0;padding:22px 22px 28px;text-align:center;z-index:901;box-shadow:0 -8px 30px rgba(0,0,0,.5)}
+.bg-open .bg-sheet{transform:translate(-50%,0)}.bg-open .bg-sheet-dim{opacity:1;pointer-events:auto}
+.bg-sheet .big{font-size:3.2rem;filter:drop-shadow(0 0 10px var(--c))}
+.bg-sheet .t{font-family:var(--ff-head);font-size:1.25rem;color:var(--c);margin:4px 0}
+.bg-sheet .how{opacity:.9;margin:6px 0 12px;line-height:1.4}
+.bg-sheet .pbar{height:10px;border-radius:10px;background:rgba(255,255,255,.14);overflow:hidden}.bg-sheet .pbar i{display:block;height:100%;background:var(--c);border-radius:10px}
+.bg-sheet .pt{font-size:.85rem;margin-top:6px;opacity:.85}
+.bg-sheet .rw{margin-top:10px;font-size:.88rem;color:#ffd166}
+</style>
+<script>
+/* ---------- rainbow ---------- */
+var RB_WORLDS=[['foundation','#ff6b6b'],['building','#ffd166'],['expanding','#06d6a0'],['mastery','#c77dff']];
+function worldFill(){
+  return RB_WORLDS.map(function(w){
+    var L=(LEVELS.filter(function(l){return l.id===w[0]})[0]||{lessons:[]}).lessons;
+    if(!L.length)return 0;
+    return L.filter(function(l){return isComplete(l.id)}).length/L.length;
+  });
+}
+function renderRainbow(svg,withStar){
+  if(!svg)return;
+  var fill=worldFill(),cx=170,cy=178,wd=14,gap=4,r0=158,out='';
+  RB_WORLDS.forEach(function(w,i){
+    var r=r0-i*(wd+gap),len=Math.PI*r,col=w[1];
+    var d='M'+(cx-r)+' '+cy+' A'+r+' '+r+' 0 0 1 '+(cx+r)+' '+cy;
+    out+='<path d="'+d+'" fill="none" stroke="'+col+'" stroke-opacity=".42" stroke-width="'+wd+'" stroke-linecap="round"/>';
+    if(fill[i]>0)out+='<path class="rb-glow" d="'+d+'" fill="none" stroke="'+col+'" stroke-width="'+wd+'" stroke-linecap="round" stroke-dasharray="'+(len*fill[i])+' '+len+'" style="filter:drop-shadow(0 0 6px '+col+')"/>';
+  });
+  svg.innerHTML=out;
+}
+/* ---------- badge helpers ---------- */
+var BG_WORLD_NAME={foundation:'Cloud Haven',building:'Moonlight',expanding:'Stardust',mastery:'Cosmic Glow'};
+function badgeHowTo(a){
+  var w=BG_WORLD_NAME[a.world]||'';
+  if(a.id){
+    if(/^pp-.*-catch$/.test(a.id))return 'Catch '+a.target+' planets in '+w+' Planet Patrol.';
+    if(/^pp-.*-ears$/.test(a.id))return 'Play '+a.target+' perfect rounds of Planet Patrol in '+w+' — catch every right planet!';
+    if(/^pp-.*-heart$/.test(a.id))return 'Finish '+a.target+' rounds of Planet Patrol in '+w+' without losing a heart.';
+    if(/^sp-.*-collect$/.test(a.id))return 'Master '+a.target+' words in '+w+' Spell-a-thon.';
+    if(/^sp-.*-perfect$/.test(a.id))return 'Get '+a.target+' perfect rounds in '+w+' Spell-a-thon.';
+    if(/^sp-.*-comeback$/.test(a.id))return 'Spell '+a.target+' words right that you missed before in '+w+'.';
+  }
+  var m={'Planet Patrol Rookie':'Catch your very first planet!','Perfect Patrol':'Catch every right planet in one Planet Patrol round.','Galaxy Explorer':'Play Planet Patrol in all four worlds.','100 Planets Caught':'Catch 100 planets in Planet Patrol.','5 Perfect Dictation Rounds':'Get 5 perfect Spell-a-thon rounds.','World Champion':'Finish a whole world in Spell-a-thon.'};
+  return m[a.name]||'Keep playing to earn this one!';
+}
+function badgeReward(a){
+  if(a.id&&/^sp-/.test(a.id))return 'Each one you earn gives you 3 hints 💡';
+  if(a.id&&/-heart$/.test(a.id))return 'Each one you earn gives you a spare heart 🩷 for next time';
+  return '';
+}
+var _bgSheetTimer=null;
+function openBadgeSheet(b){
+  var sh=document.getElementById('bg-sheet');
+  var pct=b.target?Math.min(100,Math.round(b.current/b.target*100)):(b.unlocked?100:0);
+  sh.style.setProperty('--c',b.colour);
+  sh.innerHTML='<div class="big">'+b.icon+'</div><div class="t">'+b.name+(b.count?' ×'+b.count:'')+'</div>'
+    +'<div class="how">'+b.how+'</div>'
+    +(b.target?'<div class="pbar"><i style="width:'+pct+'%"></i></div><div class="pt">'+(b.unlocked&&!b.per?'✓ Earned!':b.current+' of '+b.target+(b.per?(b.count?' to earn another':' to earn it'):''))+'</div>':(b.unlocked?'<div class="pt">✓ Earned!</div>':''))
+    +(b.reward?'<div class="rw">'+b.reward+'</div>':'');
+  document.getElementById('badges').classList.add('bg-open');
+  try{speak(b.name+'. '+b.how,null,0.9);}catch(e){}
+}
+function closeBadgeSheet(){var el=document.getElementById('badges');if(el)el.classList.remove('bg-open');try{if(synth)synth.cancel();}catch(e){}}
+function buildBadgesScreen(){
+  var p=getProgress();closeBadgeSheet();
+  var sec=document.getElementById('bg-sections');sec.innerHTML='';
+  var COL={foundation:'#ff6b6b',building:'#ffd166',expanding:'#06d6a0',mastery:'#c77dff'};
+  var earned=0,total=0,all=buildAchievementsList();
+  function mk(grid,b){
+    total++;if(b.unlocked)earned++;
+    var pct=b.unlocked?100:(b.target?Math.round(Math.min(b.current,b.target)/b.target*100):0);
+    var d=document.createElement('div');d.className='bd '+(b.unlocked?'on':'off');
+    d.style.setProperty('--c',b.colour);d.style.setProperty('--p',pct);
+    d.innerHTML='<div class="bd-ring"><span class="bd-ic">'+b.icon+'</span>'+(b.unlocked?'':'<span class="bd-lock">🔒</span>')+'</div><div class="bd-nm">'+b.name+'</div>'+(b.count>=1?'<span class="bd-x">×'+b.count+'</span>':'');
+    d.addEventListener('click',function(e){burstStar(e.clientX,e.clientY);openBadgeSheet(b);});
+    grid.appendChild(d);
+  }
+  LEVELS.forEach(function(level){
+    var c=COL[level.id];
+    var pill=document.createElement('div');pill.style.textAlign='center';
+    pill.innerHTML='<span class="bg-pill" style="--c:'+c+'">'+(WORLD_EMOJI[level.id]||'')+' '+level.name+'</span>';sec.appendChild(pill);
+    var grid=document.createElement('div');grid.className='bg-grid';sec.appendChild(grid);
+    level.lessons.forEach(function(lesson){
+      var done=!!p[lesson.id],score=(p[lesson.id]&&p[lesson.id].score)||0,tot=lesson.quizzes.length;
+      mk(grid,{icon:lessonThemeIcon(lesson),name:lesson.name,unlocked:done,current:score,target:tot,colour:c,
+        how:'Finish the '+lesson.name+' lesson and answer the quiz questions right to collect stars.',reward:''});
+    });
+    all.filter(function(a){return a.world===level.id;}).forEach(function(a){
+      mk(grid,{icon:a.icon,name:a.short||a.name,unlocked:a.unlocked,current:a.current,target:a.target,per:!!a.per,count:a.count||0,colour:c,how:badgeHowTo(a),reward:badgeReward(a)});
+    });
+  });
+  var ex=all.filter(function(a){return a.category==='Games'&&!a.world;});
+  if(ex.length){
+    var pill2=document.createElement('div');pill2.style.textAlign='center';
+    pill2.innerHTML='<span class="bg-pill" style="--c:#ff6ec7">🌟 Explorer Badges</span>';sec.appendChild(pill2);
+    var g2=document.createElement('div');g2.className='bg-grid';sec.appendChild(g2);
+    ex.forEach(function(a){mk(g2,{icon:a.icon,name:a.name,unlocked:a.unlocked,current:a.current,target:a.target,colour:'#ff6ec7',how:badgeHowTo(a),reward:''});});
+  }
+  document.getElementById('bg-total').textContent=earned+' of '+total+' badges';
+  renderRainbow(document.getElementById('bg-arc'));
+  if(earned===total&&total>0){confetti();speak('Amazing! You have collected all badges! You are a superstar speller!',null,0.9);}
+}
+/* ---------- landing page: rainbow + auto-scroll to the chosen world ---------- */
+(function(){
+  var _orig=updateHomeProgress;
+  updateHomeProgress=function(){_orig();renderRainbow(document.getElementById('rb-arc'));};
+  renderRainbow(document.getElementById('rb-arc'));
+})();
+var _autoScrollCancel=false;
+['touchstart','wheel','mousedown','keydown'].forEach(function(ev){window.addEventListener(ev,function(){_autoScrollCancel=true;},{passive:true,once:true});});
+function autoScrollToStart(delay){
+  _autoScrollCancel=false;
+  setTimeout(function(){
+    if(_autoScrollCancel)return;
+    var home=document.getElementById('home');if(!home||!home.classList.contains('active'))return;
+    var sw=getProgress().startWorld;if(!sw)return;
+    var card=document.querySelector('.constellation-card.'+sw);if(!card)return;
+    var r=card.getBoundingClientRect();
+    if(r.top>=0&&r.bottom<=window.innerHeight-20)return;       // already fully visible
+    card.scrollIntoView({behavior:'smooth',block:'center'});
+  },delay||1600);
+}
+autoScrollToStart(1600);
+</script>
+
+<style id="dash-polish">
+.pd-games{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pd-game{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:12px 10px;text-align:center;display:flex;flex-direction:column;gap:2px}
+.pd-game-h{font-family:var(--ff-head);font-size:.8rem;color:#fff;margin-bottom:4px}
+.pd-game-n{font-family:var(--ff-head);font-size:1.7rem;color:var(--gold);line-height:1.1}
+.pd-game-n span{font-size:.95rem;color:#7a9cc0}
+.pd-game-l{font-size:.7rem;color:#7a9cc0}
+.pd-game-s{font-size:.68rem;color:var(--teal);margin-top:4px}
+.pd-lesson-detail-row{grid-template-columns:repeat(4,1fr)!important;gap:4px!important;padding:12px 0 8px!important}
+.pd-lesson-detail-row .pdl-name{margin-bottom:6px!important}
+.pdl-m{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.62rem;color:#7a9cc0;line-height:1.2}
+.pdl-m b{font-family:var(--ff-head);font-size:1rem;color:#fff;font-weight:400}
+.plc-lesson-row{display:grid!important;grid-template-columns:1.6rem 1fr 3rem 1.4rem 4.2rem;align-items:center;gap:6px;padding:5px 0}
+.plc-lesson-row .plr-score{text-align:right}
+.plc-lesson-row .plr-st{text-align:center;color:var(--teal)}
+.plc-lesson-row .plr-sw{text-align:right;font-size:.66rem;color:#7a9cc0;white-space:nowrap}
+.plc-lessons{margin-top:6px!important}
+.pd-world-card{margin:0 0 12px!important}
+.pd-world-card .plc-bar-wrap{margin-bottom:.4rem}
+.pd-world-card:last-child{margin-bottom:0!important}
+</style>
+<script>CHALLENGE_WORDS.push(...[{"level": "Foundation", "lesson": "Short E", "word": "Greg", "blocks": ["gr", "eg"]}, {"level": "Foundation", "lesson": "Short E", "word": "Meg", "blocks": ["m", "eg"]}, {"level": "Foundation", "lesson": "Short E", "word": "nutmeg", "blocks": ["nut", "meg"]}, {"level": "Foundation", "lesson": "Short O", "word": "god", "blocks": ["g", "od"]}, {"level": "Foundation", "lesson": "Short O", "word": "sox", "blocks": ["s", "ox"]}, {"level": "Foundation", "lesson": "Short O", "word": "vox", "blocks": ["v", "ox"]}, {"level": "Foundation", "lesson": "Short O", "word": "detox", "blocks": ["de", "tox"]}, {"level": "Foundation", "lesson": "Short U", "word": "hiccup", "blocks": ["hic", "cup"]}, {"level": "Foundation", "lesson": "Short U", "word": "eggcup", "blocks": ["egg", "cup"]}, {"level": "Foundation", "lesson": "Short U", "word": "buttercup", "blocks": ["but", "ter", "cup"]}, {"level": "Foundation", "lesson": "Short U", "word": "makeup", "blocks": ["make", "up"]}, {"level": "Foundation", "lesson": "Short U", "word": "pickup", "blocks": ["pick", "up"]}, {"level": "Foundation", "lesson": "Short U", "word": "swum", "blocks": ["sw", "um"]}, {"level": "Foundation", "lesson": "⭐ Sight Words", "word": "the", "blocks": ["th", "e"]}, {"level": "Foundation", "lesson": "⭐ Sight Words", "word": "to", "blocks": ["t", "o"]}, {"level": "Foundation", "lesson": "Digraphs", "word": "whistle", "blocks": ["wh", "is", "tle"]}, {"level": "Foundation", "lesson": "Digraphs", "word": "elephant", "blocks": ["el", "e", "ph", "ant"]}, {"level": "Foundation", "lesson": "Digraphs", "word": "orphan", "blocks": ["or", "ph", "an"]}, {"level": "Advanced", "lesson": "⭐ Sight Words", "word": "mysterious", "blocks": ["mys", "te", "ri", "ous"]}, {"level": "Advanced", "lesson": "⭐ Sight Words", "word": "various", "blocks": ["var", "i", "ous"]}, {"level": "Advanced", "lesson": "⭐ Sight Words", "word": "necessary", "blocks": ["nec", "es", "sar", "y"]}, {"level": "Advanced", "lesson": "⭐ Sight Words", "word": "literature", "blocks": ["lit", "er", "a", "ture"]}, {"level": "Advanced", "lesson": "⭐ Sight Words", "word": "temperature", "blocks": ["tem", "per", "a", "ture"]}, {"level": "Advanced", "lesson": "⭐ Sight Words", "word": "straight", "blocks": ["str", "aight"]}, {"level": "Advanced", "lesson": "⭐ Sight Words", "word": "weight", "blocks": ["w", "eight"]}, {"level": "Advanced", "lesson": "⭐ Sight Words", "word": "neighbour", "blocks": ["neigh", "bour"]}, {"level": "Advanced", "lesson": "⭐ Sight Words", "word": "though", "blocks": ["th", "ough"]}, {"level": "Advanced", "lesson": "⭐ Sight Words", "word": "weigh", "blocks": ["w", "eigh"]}, {"level": "Advanced", "lesson": "⭐ Sight Words", "word": "imagine", "blocks": ["im", "ag", "ine"]}, {"level": "Advanced", "lesson": "⭐ Sight Words", "word": "remember", "blocks": ["re", "mem", "ber"]}, {"level": "Advanced", "lesson": "⭐ Sight Words", "word": "recognise", "blocks": ["rec", "og", "nise"]}, {"level": "Advanced", "lesson": "⭐ Sight Words", "word": "develop", "blocks": ["de", "vel", "op"]}, {"level": "Advanced", "lesson": "⭐ Sight Words", "word": "achieve", "blocks": ["a", "chieve"]}, {"level": "Advanced", "lesson": "Suffixes", "word": "cried", "blocks": ["cr", "ied"]}, {"level": "Advanced", "lesson": "Suffixes", "word": "tried", "blocks": ["tr", "ied"]}, {"level": "Advanced", "lesson": "Suffixes", "word": "studied", "blocks": ["stud", "ied"]}, {"level": "Advanced", "lesson": "Suffixes", "word": "carried", "blocks": ["carr", "ied"]}, {"level": "Advanced", "lesson": "Suffixes", "word": "hurried", "blocks": ["hurr", "ied"]}, {"level": "Advanced", "lesson": "Suffixes", "word": "worried", "blocks": ["worr", "ied"]}, {"level": "Advanced", "lesson": "Suffixes", "word": "married", "blocks": ["marr", "ied"]}, {"level": "Advanced", "lesson": "Suffixes", "word": "copied", "blocks": ["cop", "ied"]}, {"level": "Advanced", "lesson": "Suffixes", "word": "emptied", "blocks": ["empt", "ied"]}, {"level": "Advanced", "lesson": "Suffixes", "word": "replied", "blocks": ["repl", "ied"]}, {"level": "Mastery", "lesson": "-tion & -sion", "word": "congestion", "blocks": ["con", "ges", "tion"]}, {"level": "Mastery", "lesson": "-tion & -sion", "word": "musician", "blocks": ["mu", "si", "cian"]}, {"level": "Mastery", "lesson": "-tion & -sion", "word": "magician", "blocks": ["ma", "gi", "cian"]}, {"level": "Mastery", "lesson": "-tion & -sion", "word": "physician", "blocks": ["phy", "si", "cian"]}, {"level": "Mastery", "lesson": "-tion & -sion", "word": "politician", "blocks": ["pol", "i", "ti", "cian"]}, {"level": "Mastery", "lesson": "-tion & -sion", "word": "electrician", "blocks": ["e", "lec", "tri", "cian"]}, {"level": "Mastery", "lesson": "-tion & -sion", "word": "optician", "blocks": ["op", "ti", "cian"]}, {"level": "Mastery", "lesson": "-tion & -sion", "word": "technician", "blocks": ["tech", "ni", "cian"]}, {"level": "Mastery", "lesson": "-tion & -sion", "word": "beautician", "blocks": ["beau", "ti", "cian"]}, {"level": "Mastery", "lesson": "-tion & -sion", "word": "mathematician", "blocks": ["math", "e", "ma", "ti", "cian"]}, {"level": "Mastery", "lesson": "-tion & -sion", "word": "dietician", "blocks": ["di", "e", "ti", "cian"]}, {"level": "Mastery", "lesson": "⭐ Sight Words", "word": "vocabulary", "blocks": ["vo", "cab", "u", "lar", "y"]}, {"level": "Mastery", "lesson": "⭐ Sight Words", "word": "mathematics", "blocks": ["math", "e", "mat", "ics"]}, {"level": "Mastery", "lesson": "⭐ Sight Words", "word": "curriculum", "blocks": ["cur", "ric", "u", "lum"]}, {"level": "Mastery", "lesson": "⭐ Sight Words", "word": "biscuit", "blocks": ["bis", "cuit"]}]);</script>
+<script>(function(){
+var ITEMS=[["mastery", "Greek Roots", "bio (life)", "biome", ["bio", "me"]], ["mastery", "Greek Roots", "bio (life)", "biopsy", ["bio", "psy"]], ["mastery", "Greek Roots", "bio (life)", "biography", ["bio", "graph", "y"]], ["mastery", "Greek Roots", "geo (earth)", "geology", ["geo", "lo", "gy"]], ["mastery", "Greek Roots", "geo (earth)", "geometry", ["geo", "me", "try"]], ["mastery", "Greek Roots", "geo (earth)", "geography", ["geo", "graph", "y"]], ["mastery", "Greek Roots", "photo (light)", "photograph", ["photo", "graph"]], ["mastery", "Greek Roots", "photo (light)", "photographer", ["photo", "graph", "er"]], ["mastery", "Greek Roots", "photo (light)", "photosynthesis", ["photo", "syn", "the", "sis"]], ["mastery", "Greek Roots", "tele (far)", "television", ["tele", "vi", "sion"]], ["mastery", "Greek Roots", "tele (far)", "telescope", ["tele", "scope"]], ["mastery", "Greek Roots", "tele (far)", "telephone", ["tele", "phone"]], ["mastery", "Greek Roots", "micro (small)", "microscope", ["micro", "scope"]], ["mastery", "Greek Roots", "micro (small)", "microphone", ["micro", "phone"]], ["mastery", "Greek Roots", "micro (small)", "microwave", ["micro", "wave"]], ["mastery", "Greek Roots", "auto (self)", "automatic", ["auto", "mat", "ic"]], ["mastery", "Greek Roots", "auto (self)", "autograph", ["auto", "graph"]], ["mastery", "Greek Roots", "auto (self)", "automobile", ["auto", "mo", "bile"]], ["mastery", "Homophones", "right · write", "right", ["r", "ight"]], ["mastery", "Homophones", "right · write", "write", ["wr", "ite"]], ["mastery", "Homophones", "no · know", "no", ["n", "o"]], ["mastery", "Homophones", "no · know", "know", ["kn", "ow"]], ["mastery", "Homophones", "sun · son", "sun", ["s", "un"]], ["mastery", "Homophones", "sun · son", "son", ["s", "on"]], ["mastery", "Homophones", "one · won", "one", ["one"]], ["mastery", "Homophones", "one · won", "won", ["w", "on"]], ["mastery", "Homophones", "pair · pear", "pair", ["p", "air"]], ["mastery", "Homophones", "pair · pear", "pear", ["p", "ear"]], ["mastery", "Homophones", "road · rode", "road", ["r", "oad"]], ["mastery", "Homophones", "road · rode", "rode", ["r", "ode"]], ["mastery", "Homophones", "week · weak", "week", ["w", "eek"]], ["mastery", "Homophones", "week · weak", "weak", ["w", "eak"]], ["expanding", "⭐ Sight Words", "Nouns", "adventure", ["ad", "ven", "ture"]], ["expanding", "⭐ Sight Words", "Nouns", "mountain", ["moun", "tain"]], ["expanding", "⭐ Sight Words", "Nouns", "government", ["gov", "ern", "ment"]], ["expanding", "⭐ Sight Words", "Nouns", "environment", ["en", "vi", "ron", "ment"]], ["expanding", "-igh & -ight", "-igh words", "thigh", ["th", "igh"]], ["expanding", "-igh & -ight", "-igh words", "nigh", ["n", "igh"]], ["mastery", "-tion & -sion", "-tion (chun) words", "question", ["ques", "tion"]], ["mastery", "-tion & -sion", "-tion (chun) words", "suggestion", ["sug", "ges", "tion"]], ["mastery", "-tion & -sion", "-tion (chun) words", "digestion", ["di", "ges", "tion"]], ["mastery", "-tion & -sion", "-tion (chun) words", "exhaustion", ["ex", "haus", "tion"]], ["mastery", "⭐ Sight Words", "Spelling Quirks and Silent Letters", "separate", ["sep", "a", "rate"]], ["mastery", "⭐ Sight Words", "Spelling Quirks and Silent Letters", "definitely", ["def", "i", "nite", "ly"]], ["mastery", "⭐ Sight Words", "Spelling Quirks and Silent Letters", "receive", ["re", "ceive"]], ["mastery", "⭐ Sight Words", "Spelling Quirks and Silent Letters", "rhythm", ["rhy", "thm"]], ["mastery", "⭐ Sight Words", "Spelling Quirks and Silent Letters", "privilege", ["priv", "i", "lege"]], ["mastery", "⭐ Sight Words", "Adverbs and Adjectives", "carefully", ["care", "ful", "ly"]], ["mastery", "⭐ Sight Words", "Adverbs and Adjectives", "suddenly", ["sud", "den", "ly"]], ["mastery", "⭐ Sight Words", "Adverbs and Adjectives", "quietly", ["qui", "et", "ly"]], ["mastery", "⭐ Sight Words", "Adverbs and Adjectives", "eventually", ["e", "ven", "tu", "al", "ly"]], ["expanding", "Prefixes", "un- (not)", "unlock", ["un", "lock"]], ["expanding", "Prefixes", "un- (not)", "unfair", ["un", "fair"]], ["expanding", "Prefixes", "re- (again)", "rewrite", ["re", "write"]], ["expanding", "Prefixes", "re- (again)", "refill", ["re", "fill"]], ["expanding", "Prefixes", "pre- (before)", "preview", ["pre", "view"]], ["expanding", "Prefixes", "pre- (before)", "prepay", ["pre", "pay"]], ["expanding", "Prefixes", "dis- (not/away)", "disagree", ["dis", "a", "gree"]], ["expanding", "Prefixes", "dis- (not/away)", "dislike", ["dis", "like"]], ["expanding", "Prefixes", "mis- (wrongly)", "mislead", ["mis", "lead"]], ["expanding", "Prefixes", "mis- (wrongly)", "misplace", ["mis", "place"]], ["building", "Bossy R", "ar words", "shark", ["sh", "ark"]], ["building", "Bossy R", "ar words", "garden", ["g", "ar", "den"]], ["building", "Bossy R", "ar words", "carpet", ["car", "pet"]], ["building", "Bossy R", "or words", "north", ["n", "orth"]], ["building", "Bossy R", "or words", "horse", ["h", "orse"]], ["building", "Bossy R", "or words", "storm", ["st", "orm"]], ["building", "Bossy R", "er words", "butter", ["but", "ter"]], ["building", "Bossy R", "er words", "river", ["riv", "er"]], ["building", "Bossy R", "er words", "winter", ["win", "ter"]], ["building", "Bossy R", "ir words", "bird", ["b", "ird"]], ["building", "Bossy R", "ir words", "skirt", ["sk", "irt"]], ["building", "Bossy R", "ir words", "circle", ["cir", "cle"]], ["building", "Bossy R", "ur words", "turn", ["t", "urn"]], ["building", "Bossy R", "ur words", "burst", ["b", "urst"]], ["building", "Bossy R", "ur words", "purple", ["pur", "ple"]], ["building", "Vowel Teams", "ay words", "delay", ["de", "lay"]], ["building", "Vowel Teams", "ay words", "pray", ["pr", "ay"]], ["building", "Vowel Teams", "ee words", "green", ["gr", "een"]], ["building", "Vowel Teams", "ee words", "sleep", ["sl", "eep"]], ["building", "Magic E", "a_e words", "shade", ["sh", "ade"]], ["building", "Magic E", "a_e words", "brave", ["br", "ave"]], ["building", "Magic E", "i_e words", "smile", ["sm", "ile"]], ["building", "Magic E", "i_e words", "prize", ["pr", "ize"]], ["building", "Magic E", "o_e words", "stone", ["st", "one"]], ["building", "Magic E", "o_e words", "globe", ["gl", "obe"]], ["building", "Magic E", "u_e words", "tube", ["t", "ube"]], ["building", "Magic E", "u_e words", "flute", ["fl", "ute"]], ["building", "Diphthongs", "ou words", "mouth", ["m", "outh"]], ["building", "Diphthongs", "ou words", "scout", ["sc", "out"]], ["building", "Diphthongs", "ow words", "flower", ["fl", "ow", "er"]], ["building", "Diphthongs", "ow words", "tower", ["t", "ow", "er"]], ["building", "Diphthongs", "oi words", "noise", ["n", "oise"]], ["building", "Diphthongs", "oi words", "point", ["p", "oint"]], ["building", "Diphthongs", "oy words", "royal", ["r", "oy", "al"]], ["building", "Diphthongs", "oy words", "enjoy", ["en", "joy"]], ["expanding", "Silent Letters", "kn words", "knee", ["kn", "ee"]], ["expanding", "Silent Letters", "kn words", "knife", ["kn", "ife"]], ["expanding", "Silent Letters", "wr words", "wrist", ["wr", "ist"]], ["expanding", "Silent Letters", "wr words", "wrap", ["wr", "ap"]], ["expanding", "Silent Letters", "mb words", "thumb", ["th", "umb"]], ["expanding", "Silent Letters", "mb words", "climb", ["cl", "imb"]], ["foundation", "Digraphs", "sh words", "shrimp", ["sh", "r", "imp"]], ["foundation", "Digraphs", "sh words", "shelf", ["sh", "elf"]], ["foundation", "Digraphs", "ch words", "chimp", ["ch", "imp"]], ["foundation", "Digraphs", "ch words", "chest", ["ch", "est"]], ["foundation", "Digraphs", "th words", "thick", ["th", "ick"]], ["foundation", "Digraphs", "th words", "thank", ["th", "ank"]], ["foundation", "Digraphs", "wh words", "whisk", ["wh", "isk"]], ["building", "Vowel Teams", "ai words", "brain", ["br", "ain"]], ["building", "Vowel Teams", "ai words", "train", ["tr", "ain"]], ["building", "Vowel Teams", "ea words", "dream", ["dr", "eam"]], ["building", "Vowel Teams", "ea words", "cream", ["cr", "eam"]], ["building", "Vowel Teams", "oa · ow words", "float", ["fl", "oat"]], ["building", "Vowel Teams", "oa · ow words", "coach", ["c", "oach"]], ["building", "Vowel Teams", "oa · ow words", "snow", ["sn", "ow"]], ["building", "Vowel Teams", "oa · ow words", "yellow", ["yell", "ow"]], ["building", "Bossy R", "ar words", "barn", ["b", "arn"]], ["building", "Bossy R", "ar words", "yard", ["y", "ard"]], ["building", "Bossy R", "or words", "fork", ["f", "ork"]], ["building", "Bossy R", "er words", "sister", ["sis", "ter"]], ["building", "Bossy R", "ur words", "church", ["ch", "urch"]], ["building", "Bossy R", "ir words", "shirt", ["sh", "irt"]]], LABEL={foundation:'Foundation',building:'Beginner',expanding:'Advanced',mastery:'Mastery'};
+var seen={};LEVELS.forEach(function(lv){lv.lessons.forEach(function(l){(l.families||[]).forEach(function(f){f.words.forEach(function(w){seen[w.toLowerCase()]=1})})})});
+var n=Object.keys(seen).length,TARGET=1000;
+ITEMS.forEach(function(it){
+  if(n>=TARGET)return; var lw=it[3].toLowerCase(); if(seen[lw])return;
+  var lv=LEVELS.filter(function(x){return x.id===it[0]})[0]; if(!lv)return;
+  var les=lv.lessons.filter(function(x){return x.name===it[1]})[0]; if(!les)return;
+  var fam=(les.families||[]).filter(function(f){return f.label===it[2]})[0];
+  if(!fam){fam={label:it[2],words:[]};les.families.push(fam);}
+  fam.words.push(it[3]); seen[lw]=1; n++;
+  var dupe=CHALLENGE_WORDS.some(function(c){return c.level===LABEL[it[0]]&&c.lesson===it[1]&&c.word.toLowerCase()===lw});
+  if(!dupe)CHALLENGE_WORDS.push({level:LABEL[it[0]],lesson:it[1],word:it[3],blocks:it[4]});
+});
+window.__wordTotal=n;
+})();</script>
+<style>.pd-card.lessons{border-color:rgba(255,209,102,.4)}.pd-card.lessons .pd-card-num{color:var(--gold)}.pd-card.spell{border-color:rgba(6,214,160,.4)}.pd-card.spell .pd-card-num{color:var(--teal)}.pd-card .pd-card-trend{color:#7a9cc0}</style><style>
+.np-sub{font-size:.72rem;line-height:1.45;color:#9db4d6;margin:-4px 0 10px}
+.np-row{border-top:1px solid rgba(255,255,255,.07);padding:10px 0;display:flex;flex-direction:column;gap:8px}
+.np-top{display:flex;align-items:center;gap:10px}
+.np-ic{font-size:1.2rem;width:1.6rem;text-align:center}
+.np-info{flex:1;min-width:0}
+.np-name{font-family:var(--ff-head);font-size:.85rem;color:#fff}
+.np-fig{font-size:.7rem;color:#7a9cc0}
+.np-pct{font-family:var(--ff-head);font-size:1.25rem;color:var(--coral)}
+.np-chips{display:flex;flex-wrap:wrap;gap:6px}
+.np-chip{font-size:.72rem;padding:3px 9px;border-radius:99px;background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.35);color:#ffb3b3}
+.np-more{font-size:.7rem;color:#7a9cc0;align-self:center}
+.np-btn{align-self:flex-start}
+.np-flag{font-size:.72rem;color:#ffd166;background:rgba(255,209,102,.12);border:1px solid rgba(255,209,102,.35);border-radius:99px;padding:3px 10px;align-self:flex-start}
+.np-ok{margin-top:6px;border-top:1px solid rgba(255,255,255,.07);padding-top:10px;font-size:.78rem;color:var(--teal)}
+</style></body>
 </html>
