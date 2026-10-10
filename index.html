@@ -3743,28 +3743,33 @@ function showScreen(id) {
   _navTrapSync(id);
 }
 /* ── Phone/browser Back button: step back inside the app instead of leaving it ──
-   While the child is anywhere but Home we keep one extra history entry. Pressing
-   Back pops it, and we run the screen's own back button (or close an overlay). */
-let _navTrap = false, _navIgnorePop = 0;
+   Whenever the child is on any screen except Home we keep one extra history entry.
+   Back pops it; we then run that screen's own back button (or close an overlay) and
+   re-arm the entry. On Home, Back leaves the app as normal. */
+let _navTrap = false;
 function _navTrapSync(id) {
-  try {
-    if (id !== 'home' && !_navTrap) { history.pushState({ ls: 1 }, ''); _navTrap = true; }
-    else if (id === 'home' && _navTrap) { _navTrap = false; _navIgnorePop++; history.back(); }
-  } catch (e) {}
+  try { if (id !== 'home' && !_navTrap) { history.pushState({ ls: 1 }, ''); _navTrap = true; } } catch (e) {}
+}
+function _navRearm() {
+  setTimeout(() => {
+    const a = document.querySelector('.screen.active');
+    if (a) _navTrapSync(a.id);
+  }, 0);
 }
 window.addEventListener('popstate', () => {
-  if (_navIgnorePop > 0) { _navIgnorePop--; return; }
   _navTrap = false;
   const active = document.querySelector('.screen.active');
-  if (!active || active.id === 'home') return;           // already Home: Back leaves as normal
-  const keep = () => _navTrapSync(active.id);              // stay "inside" until we reach Home
-  const modal = document.getElementById('install-modal');
-  if (modal && modal.style.display !== 'none' && modal.style.display !== '') { closeInstall(); keep(); return; }
-  const pin = document.querySelector('.pin-overlay');
-  if (pin) { pin.remove(); keep(); return; }
-  const back = active.querySelector('.back-btn');
-  if (back) { back.click(); if (!_navTrap && document.querySelector('.screen.active').id !== 'home') keep(); }
-  else keep();                                             // e.g. first-run picker: stay put
+  if (!active || active.id === 'home') { try { history.back(); } catch (e) {} return; }  // Home: leave
+  try {
+    const modal = document.getElementById('install-modal');
+    if (modal && modal.style.display === 'flex') { closeInstall(); }
+    else if (document.querySelector('.pin-overlay')) { document.querySelector('.pin-overlay').remove(); }
+    else {
+      const back = active.querySelector('.back-btn, .wb-back-btn');
+      if (back) back.click(); else if (active.id !== 'welcome-setup') goHome();
+    }
+  } catch (e) { try { goHome(); } catch (e2) {} }
+  _navRearm();
 });
 /* True only while an element is still on the screen the child is looking at.
    Story/game timers use this so they stop (and stay silent) once she leaves. */
@@ -5673,18 +5678,18 @@ function speakQuizAudio(audioText, onDone) {
     function next() {
       if (i >= parts.length) { if (after) after(); return; }
       const part = parts[i++];
-      const after = () => { setTimeout(next, part.pauseAfter || 0); };
+      const advance = () => { setTimeout(next, part.pauseAfter || 0); };
       if (ClipAudio.has(part.text)) {
-        ClipAudio.play(part.text, after, () => {
+        ClipAudio.play(part.text, advance, () => {
           const f = new SpeechSynthesisUtterance(part.text);
-          f.lang = preferredLang; f.rate = part.rate || 0.85; f.onend = f.onerror = after; synth.speak(f);
+          f.lang = preferredLang; f.rate = part.rate || 0.85; f.onend = f.onerror = advance; synth.speak(f);
         });
         return;
       }
       const u = new SpeechSynthesisUtterance(part.text);
       u.lang = preferredLang; u.rate = part.rate || 0.85; u.pitch = 1.05;
       if (selectedVoice) u.voice = selectedVoice;
-      u.onend = u.onerror = after;
+      u.onend = u.onerror = advance;
       synth.speak(u);
     }
     next();
@@ -7017,6 +7022,8 @@ function positionAchRocket(idx) {
 
 /* ── Parent PIN gate ── */
 function requireParentPin(onSuccess) {
+  const _act = document.querySelector('.screen.active');
+  if (_act && ['parent-hub-screen','parent','achievements-screen','spelling-secrets-screen','timeline-screen','settings-screen'].indexOf(_act.id) > -1) { onSuccess(); return; }
   const p = getProgress();
   const pin = p.parentPin;
   if (!pin) { onSuccess(); return; }
@@ -7046,7 +7053,7 @@ function requireParentPin(onSuccess) {
 
 function openSpellingSecrets() {
   showScreen('spelling-secrets-screen');
-  document.getElementById('ss-back-btn').onclick = openParent;
+  document.getElementById('ss-back-btn').onclick = openParentHub;
   document.querySelector('#spelling-secrets-screen .lm-title').textContent = '📚 Spelling Secrets';
   buildSpellingSecretsList();
 }
