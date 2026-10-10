@@ -3750,10 +3750,13 @@ function showScreen(id) {
    so Back on Home leaves the app as normal. */
 let _navDepth = 0, _navIgnore = 0;
 const _navLog = [];
+try { const _old = localStorage.getItem('ls_navlog'); if (_old) { _old.split('\n').slice(-30).forEach(l => _navLog.push('(prev) ' + l)); } } catch (e) {}
 function _nl(msg) {
   const a = document.querySelector('.screen.active');
-  _navLog.push((new Date().toTimeString().slice(0, 8)) + ' ' + msg + ' [' + (a ? a.id : '?') + ' depth=' + _navDepth + ' len=' + history.length + ']');
-  if (_navLog.length > 40) _navLog.shift();
+  const ua = navigator.userActivation ? (navigator.userActivation.isActive ? 'A' : '-') + (navigator.userActivation.hasBeenActive ? 'S' : '-') : '?';
+  _navLog.push((new Date().toTimeString().slice(0, 8)) + ' ' + msg + ' [' + (a ? a.id : '?') + ' d=' + _navDepth + ' ig=' + _navIgnore + ' len=' + history.length + ' ua=' + ua + ']');
+  if (_navLog.length > 60) _navLog.shift();
+  try { localStorage.setItem('ls_navlog', _navLog.join('\n')); } catch (e) {}
 }
 function _navToast(msg) {
   let t = document.getElementById('nav-toast');
@@ -3794,7 +3797,9 @@ window.addEventListener('popstate', () => {
     }
   } catch (e) { try { goHome(); } catch (e2) {} }
 });
-window.addEventListener('pagehide', () => { try { localStorage.setItem('ls_navlog', _navLog.join('\n')); } catch (e) {} });
+window.addEventListener('pagehide', e => _nl('pagehide persisted=' + e.persisted));
+window.addEventListener('pageshow', e => _nl('pageshow persisted=' + e.persisted));
+document.addEventListener('visibilitychange', () => _nl('visibility ' + document.visibilityState));
 /* True only while an element is still on the screen the child is looking at.
    Story/game timers use this so they stop (and stay silent) once she leaves. */
 function sceneAlive(el) {
@@ -7408,7 +7413,7 @@ function buildSettings() {
 function openParentHub() {
   requireParentPin(() => {
     buildParentHub();
-    const _v = document.createElement('div'); _v.style.cssText = 'text-align:center;opacity:.4;font-size:.75rem;margin:18px 0'; _v.textContent = 'App version 36'; _v.onclick = () => { let last = ''; try { last = localStorage.getItem('ls_navlog') || ''; } catch (e) {} alert('Navigation log (newest last):\n' + _navLog.join('\n') + (last ? '\n\n--- last session ---\n' + last : '')); }; document.getElementById('parent-hub-body').appendChild(_v);
+    const _v = document.createElement('div'); _v.style.cssText = 'text-align:center;opacity:.4;font-size:.75rem;margin:18px 0'; _v.textContent = 'App version 37'; _v.onclick = () => { let last = ''; try { last = localStorage.getItem('ls_navlog') || ''; } catch (e) {} alert('Navigation log (newest last):\n' + _navLog.slice(-45).join('\n')); }; document.getElementById('parent-hub-body').appendChild(_v);
     const _u = document.createElement('button'); _u.className = 'action-btn secondary'; _u.style.cssText = 'display:block;margin:0 auto 24px'; _u.textContent = '🔄 Refresh app'; _u.onclick = checkForUpdates; document.getElementById('parent-hub-body').appendChild(_u);
     showScreen('parent-hub-screen');
   });
