@@ -3740,7 +3740,32 @@ function showScreen(id) {
   try { if (synth) synth.cancel(); } catch (e) {}
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  _navTrapSync(id);
 }
+/* ── Phone/browser Back button: step back inside the app instead of leaving it ──
+   While the child is anywhere but Home we keep one extra history entry. Pressing
+   Back pops it, and we run the screen's own back button (or close an overlay). */
+let _navTrap = false, _navIgnorePop = 0;
+function _navTrapSync(id) {
+  try {
+    if (id !== 'home' && !_navTrap) { history.pushState({ ls: 1 }, ''); _navTrap = true; }
+    else if (id === 'home' && _navTrap) { _navTrap = false; _navIgnorePop++; history.back(); }
+  } catch (e) {}
+}
+window.addEventListener('popstate', () => {
+  if (_navIgnorePop > 0) { _navIgnorePop--; return; }
+  _navTrap = false;
+  const active = document.querySelector('.screen.active');
+  if (!active || active.id === 'home') return;           // already Home: Back leaves as normal
+  const keep = () => _navTrapSync(active.id);              // stay "inside" until we reach Home
+  const modal = document.getElementById('install-modal');
+  if (modal && modal.style.display !== 'none' && modal.style.display !== '') { closeInstall(); keep(); return; }
+  const pin = document.querySelector('.pin-overlay');
+  if (pin) { pin.remove(); keep(); return; }
+  const back = active.querySelector('.back-btn');
+  if (back) { back.click(); if (!_navTrap && document.querySelector('.screen.active').id !== 'home') keep(); }
+  else keep();                                             // e.g. first-run picker: stay put
+});
 /* True only while an element is still on the screen the child is looking at.
    Story/game timers use this so they stop (and stay silent) once she leaves. */
 function sceneAlive(el) {
