@@ -1,0 +1,1930 @@
+id,text,category,used_in
+356a192b7913,1,ui,app
+da4b9237bacc,2,ui,app
+77de68daecd8,3,ui,app
+e8479db6d8a5,"A wrong tap costs a life, and you have five lives!",ui,app
+d771d4dab751,"A wrong tap costs a life, and you have five lives, plus a spare heart!",ui,app
+999bf757123c,"A wrong tap costs a life, and you have three lives!",ui,app
+69f33e195f4d,"A wrong tap costs a life, and you have three lives, plus a spare heart!",ui,app
+b0ed4e3c0b97,Amazing! You have collected all badges! You are a superstar speller!,ui,app
+19eb35ee13b0,Brilliant!,ui,app
+271801275f75,Brilliant! All correct!,ui,app
+4e66a3a3fa16,But watch out for the sneaky planets!,ui,app
+c0dff0bc4c6d,Earn Spell-a-thon badges to get hints!,ui,app
+cdab904f71d3,Go!,ui,app
+74c67fc1a5f6,Good try! Practice makes perfect!,ui,app
+83c3cd6f1ec0,Great flying! Let us try again.,ui,app
+933e3ab64b1f,Great work! Keep it up!,ui,app
+3bc5f43de286,Perfect score! You're a star!,ui,app
+8b05ab4456e3,Perfect! You are a Planet Patrol champion!,ui,app
+29820f36bd57,"Tap the planets with the words you hear, and collect points!",ui,app
+20cccb301cca,That is all the hints for this word!,ui,app
+f8e303aa5b77,the cat,ui,app
+58ecae4d9d27,Well done! Want to play again?,ui,app
+169aead974be,___ are going home.,quiz,quiz
+c7c6bb5fb2a6,___ is my best friend.,quiz,quiz
+4ff56741ea40,"action, station, nation — which word belongs with these words?",quiz,quiz
+65cc9c53b005,"After bob and mob, which word continues the pattern?",quiz,quiz
+8c356870d7fd,"After cup and pup, which word continues the pattern?",quiz,quiz
+a420372021d1,"After famous and nervous, which word continues the pattern?",quiz,quiz
+e77d6c3effdf,"After high and sigh, which word continues the pattern?",quiz,quiz
+d45c3fe156e3,"After leg and beg, which word continues the pattern?",quiz,quiz
+1549b9ab04f4,"After tap and map, which word continues the pattern?",quiz,quiz
+b36b3437af11,"After tip and dip, which word continues the pattern?",quiz,quiz
+0ff5ef1334f0,"bed, red, fed — which word belongs with these words?",quiz,quiz
+7ea5440fdd6d,"bell, fell, sell — select all words that belong with these words.",quiz,quiz
+9955a0a50afb,"big, dig, fig — which word belongs with these words?",quiz,quiz
+e4d91e55d286,"bird, girl, stir — which word belongs with these words?",quiz,quiz
+7b617e9193f9,"black, swim, clap, prom — which word belongs with these words?",quiz,quiz
+7cd1b41b5fbb,"blue, glue, clue — select all words that belong with these words.",quiz,quiz
+26281cb1e5bb,"blue, glue, clue — which word belongs with these words?",quiz,quiz
+0f66bd2d9029,"boat, coat, road — which word belongs with these words?",quiz,quiz
+a366a99d4e8e,"bob, mob, rob — which word does NOT belong with these words?",quiz,quiz
+51e6f8830768,"book, good, wood — which word belongs with these words?",quiz,quiz
+1070b2898d9a,"brick, drum, cloud, grow — which word belongs with these words?",quiz,quiz
+0d0f4cd128cc,"burn, turn, curl — which word belongs with these words?",quiz,quiz
+df9d4082e3c5,"cake, name, lane — which word belongs with these words?",quiz,quiz
+5c7835b41c66,"careless, harmless, useless — which word belongs with these words?",quiz,quiz
+ea44ed26a3c9,"cat, hat, mat — select all words that belong with these words.",quiz,quiz
+a4dca89eafc5,"chair, shell, whale, them — which word belongs with these words?",quiz,quiz
+2d960fe7cfd0,Choose the words with the same vowel team as coin.,quiz,quiz
+4c696aed9583,"clock, brush, twist, smell — which word belongs with these words?",quiz,quiz
+2acfadaf61b8,"cloud, shout, round — select all words that belong with these words.",quiz,quiz
+478295285e29,"cloud, shout, round — which word belongs with these words?",quiz,quiz
+c469bc79f351,"coin, soil, foil — which word belongs with these words?",quiz,quiz
+73326b6e78ae,"corn, fort, born — which word belongs with these words?",quiz,quiz
+ab4cbf27001d,"cried, tried, studied — which word belongs with these words?",quiz,quiz
+a30f67460a1f,"cube, cute, mute — which word belongs with these words?",quiz,quiz
+02d09278d458,"cut, but, gut — select all words that belong with these words.",quiz,quiz
+fbdea66c1fab,"dislike, disagree, disorder — which word begins with the same prefix?",quiz,quiz
+7203ec7f82a0,"dog, fog, hog — which word belongs with these words?",quiz,quiz
+adfc2d360fcd,"dream, leaf, seat — which word belongs with these words?",quiz,quiz
+ddb27f0e8a77,"famous, nervous, dangerous — select all words that belong with these words.",quiz,quiz
+45941640a67d,"famous, nervous, dangerous — which word belongs with these words?",quiz,quiz
+b7d6ba0286c2,"feet, seed, tree — select all words that belong with these words.",quiz,quiz
+49d00dc5d61d,"fern, her, verb — which word belongs with these words?",quiz,quiz
+7d618d3938a9,Fill in the blank: blank going to the park today.,quiz,quiz
+ea58074598ea,"Fill in the blank: Come blank, please.",quiz,quiz
+51410035b262,Fill in the blank: I am blank tired to run.,quiz,quiz
+ed3a81e80bcc,Fill in the blank: I can blank the birds singing.,quiz,quiz
+4864b99a1112,Fill in the blank: I can blank the music from outside.,quiz,quiz
+726ba7724621,Fill in the blank: She did very blank in the test.,quiz,quiz
+d707f36655d1,Fill in the blank: She has blank cats.,quiz,quiz
+2f5c1862157f,Fill in the blank: The blank sat on the mat.,quiz,quiz
+17d4a848e188,Fill in the blank: The blank walked through the forest.,quiz,quiz
+2512a9f2fa68,Fill in the blank: The dog wagged its blank.,quiz,quiz
+66ee5b7c77cb,Fill in the blank: The fish swam in the blank.,quiz,quiz
+2b3d2a2e176c,Fill in the blank: We are going blank school.,quiz,quiz
+a27b2b10f03d,Find ALL correctly spelled words in this list.,quiz,quiz
+0cd5738c9839,Find all words that belong with knit.,quiz,quiz
+e512d595b20e,Find all words that rhyme with bed.,quiz,quiz
+e7d50a339ff7,Find all words that rhyme with bin.,quiz,quiz
+1510acbc4978,Find all words that rhyme with bun.,quiz,quiz
+1c89a207d3b4,Find all words that rhyme with cat.,quiz,quiz
+9302f806a335,Find all words that rhyme with men.,quiz,quiz
+c1031d1be8fc,Find all words that rhyme with pop.,quiz,quiz
+c5fd55bfc690,Find all words that rhyme with ran.,quiz,quiz
+d0c0832f326a,Find the odd one out.,quiz,quiz
+33c96ead9479,Find the word you hear.,quiz,quiz
+27096013df87,"fruit, juice, suit — which word belongs with these words?",quiz,quiz
+82f9e4a1d1b8,"glad, crab, swim, clock — which word belongs with these words?",quiz,quiz
+07995df8a2e0,"gnaw, gnome, sign — which word belongs with these words?",quiz,quiz
+9e780677fdf2,"He could not ___, he was so lucky.",quiz,quiz
+b6584d9cead3,"helpful, careful, grateful — which word belongs with these words?",quiz,quiz
+fbe3c98e4221,"hen, pen, ten — which word belongs with these words?",quiz,quiz
+6cfb88b65bbd,"high, sigh, nigh — which word belongs with these words?",quiz,quiz
+9703143780fe,"home, hope, nose — which word belongs with these words?",quiz,quiz
+9950fdb3955f,"home, hope, robe — select all words that belong with these words.",quiz,quiz
+e796989e1d26,"hot, pot, dot — select all words that belong with these words.",quiz,quiz
+80eaaefff231,"howl, crown, brown — which word belongs with these words?",quiz,quiz
+58f954e6e133,I ___ happy yesterday.,quiz,quiz
+06dfd5f070c1,I ___ like to come.,quiz,quiz
+0b7fa309a2be,I ______ a loud noise.,quiz,quiz
+016df99b5018,I go to sleep ___ I am tired.,quiz,quiz
+97fa96200b42,I will ___ at the station at noon.,quiz,quiz
+6ddc8c27fca6,"jumped, played, smiled — which word belongs with these words?",quiz,quiz
+1c7385a19237,"kite, mine, vine — which word belongs with these words?",quiz,quiz
+e6b921a576d8,"knit, knee, knife — which word belongs with these words?",quiz,quiz
+38bc6788d91f,"lamb, comb, thumb — which word belongs with these words?",quiz,quiz
+c7cf40c2577b,"lamb, gnome, know — which word does not belong with these words?",quiz,quiz
+d3e0f1553d14,"lip, tip, dip — which word does NOT belong with these words?",quiz,quiz
+f73d31a2da9d,"man, pan, van — which word belongs with these words?",quiz,quiz
+8614c908f88d,"mistake, mislead, misplace — which word begins with the same prefix?",quiz,quiz
+626c3f085b9b,"moon, food, boot — which word belongs with these words?",quiz,quiz
+b2237f50c5d3,"musician, magician, physician — which word belongs with these words?",quiz,quiz
+ac5990b210af,My birthday is in ______.,quiz,quiz
+f4ef3ebbbac1,"night, light, right — which word belongs with these words?",quiz,quiz
+61183e3e47cd,"pane, pill, chin, phase — which word belongs with these words?",quiz,quiz
+277132032287,"picture, nature, creature — select all words that belong with these words.",quiz,quiz
+da93809fd209,"picture, nature, creature — which word belongs with these words?",quiz,quiz
+f075213a2d09,"pin, win, tin — which word belongs with these words?",quiz,quiz
+d17b8d67f952,"play, stay, day — which word belongs with these words?",quiz,quiz
+628cac139066,"preview, preschool, prepay — which word begins with the same prefix?",quiz,quiz
+3504de8f39a2,"question, suggestion, digestion — which word belongs with these words?",quiz,quiz
+4c4b573ccb67,"quickly, slowly, softly — which word belongs with these words?",quiz,quiz
+921a47502453,"rain, wait, mail — which word belongs with these words?",quiz,quiz
+1a7a39fb2426,Reading is ______ for learning.,quiz,quiz
+81095921a880,"redo, replay, rewrite — which word begins with the same prefix?",quiz,quiz
+c0ce05f5edfc,"rub, pub, hub — which word belongs with these words?",quiz,quiz
+c8b2e333071b,"run, sun, fun — which word belongs with these words?",quiz,quiz
+69362b416ffa,"running, jumping, clapping — which word belongs with these words?",quiz,quiz
+18ccfa592e9f,"sad, bad, dad — which word belongs with these words?",quiz,quiz
+8cf9c5386a1a,She ___ practises her spelling every night.,quiz,quiz
+d12a07fb5a4e,She had an ___ on her way to school.,quiz,quiz
+60fcfd61118e,She is always kind to ____ person.,quiz,quiz
+b7e868f97dbc,She is my best ___.,quiz,quiz
+df03682d3669,"ship, shop, shell — which word belongs with these words?",quiz,quiz
+c787b5ccef35,"shock, thumb, whale, chop — which word belongs with these words?",quiz,quiz
+ad9cd3951f0a,"sit, hit, bit — select all words that belong with these words.",quiz,quiz
+2e8991088829,"small, slip, shut, stir — which word belongs with these words?",quiz,quiz
+b9db787512eb,"star, farm, bark — which word belongs with these words?",quiz,quiz
+69d90d340f3e,"tap, map, cap — which word does NOT belong with these words?",quiz,quiz
+be035c9dc4f2,"tension, mission, passion — which word belongs with these words?",quiz,quiz
+12e7ca3df066,The actor became ______ after the movie.,quiz,quiz
+46b1ff80db90,The treasure was on the ______.,quiz,quiz
+b841a1a1b97f,The wheels ___ on the ground.,quiz,quiz
+10017d6e394b,"tonight, midnight, moonlight — select all words that belong with these words.",quiz,quiz
+8555e1a80e38,"tonight, midnight, sunlight — which word belongs with these words?",quiz,quiz
+3bf2149293bc,"top, hop, mop — which word belongs with these words?",quiz,quiz
+1377155214c4,"toy, boy, joy — which word belongs with these words?",quiz,quiz
+99d0660c62b9,"unhappy, unfair, unlock — which word begins with the same prefix?",quiz,quiz
+45c950d7f8b9,"vision, explosion, television — select all words that end with the same pattern.",quiz,quiz
+48e5b75ca4ea,"vision, explosion, television — which word belongs with these words?",quiz,quiz
+669315e7c51c,"way, water, wig, wheel — which word belongs with these words?",quiz,quiz
+9830bc911bae,We ___ go to school.,quiz,quiz
+16f3f87f45c8,We go to ___ every day.,quiz,quiz
+40e2c1065655,What does dislike mean?,quiz,quiz
+cc46123a74ca,What does mistake mean?,quiz,quiz
+6e33e63c3b9f,What does preview mean?,quiz,quiz
+0147a6d46226,What does redo mean?,quiz,quiz
+6632c454eb97,What does the root bio mean?,quiz,quiz
+812e427cba74,What does the root geo mean?,quiz,quiz
+f31e0e2012c7,What does the root micro mean?,quiz,quiz
+1a5b49aac681,What does the root photo mean?,quiz,quiz
+fbcfd472d3c0,What does the root tele mean?,quiz,quiz
+93d8f65caefe,What does unhappy mean?,quiz,quiz
+00b50b5ea205,What is your home ___?,quiz,quiz
+7a68664e985e,Which of the following is a correct word?,quiz,quiz
+0c0a15618fd4,Which of the following is the correct spelling?,quiz,quiz
+ce2c372c8695,Which word also means full of care?,quiz,quiz
+4208b5cc2862,Which word also means without hope?,quiz,quiz
+4c175a3c0116,Which word also shows something already happened?,quiz,quiz
+1ef7941df5e6,Which word begins the same way as wrap?,quiz,quiz
+eb47fa77b187,"Which word belongs with biology, biome, biography?",quiz,quiz
+a1321837014b,"Which word belongs with geography, geology, geothermal?",quiz,quiz
+658f3e28e632,"Which word belongs with microscope, microphone, microwave?",quiz,quiz
+503fa2a3208d,"Which word belongs with photograph, photon, photography?",quiz,quiz
+ce0c8904bc9f,"Which word belongs with telephone, telescope, television?",quiz,quiz
+96aeb5ea5753,Which word does NOT end the same way as action?,quiz,quiz
+c58410b5665e,Which word does not end the same way as question?,quiz,quiz
+c13c8c117ea8,Which word does not have the same vowel sound as moon?,quiz,quiz
+248381fef302,Which word does NOT rhyme with bell?,quiz,quiz
+fce7ba2f2762,Which word does NOT rhyme with bug?,quiz,quiz
+405482084420,Which word does NOT rhyme with ham?,quiz,quiz
+d660baf9e677,Which word does NOT rhyme with high?,quiz,quiz
+6fa3a20f2d40,Which word does NOT rhyme with lid?,quiz,quiz
+a5b6df6cde4d,Which word does NOT rhyme with night?,quiz,quiz
+8826e8a3b554,Which word does NOT rhyme with nod?,quiz,quiz
+5308082b5bf9,Which word does NOT rhyme with picture?,quiz,quiz
+81a1afba58d2,Which word ends the same way as bill?,quiz,quiz
+039c1c059b0e,Which word ends the same way as dangerous?,quiz,quiz
+51042e8bb023,Which word ends the same way as famous?,quiz,quiz
+e5a30cdd5955,Which word ends the same way as keg?,quiz,quiz
+368f6a8bc803,Which word ends the same way as lip?,quiz,quiz
+6ffe778d310f,Which word ends the same way as nap?,quiz,quiz
+56bd199b4e50,Which word ends the same way as night?,quiz,quiz
+c1ca82155130,Which word ends the same way as pox?,quiz,quiz
+b6ac6e8a8724,Which word ends the same way as pup?,quiz,quiz
+85eb9c545b0d,Which word ends the same way as sob?,quiz,quiz
+9aa7975cce3a,Which word ends the same way as sum?,quiz,quiz
+62380ceb9493,Which word ends the same way as toy?,quiz,quiz
+2885ba53a134,Which word has a silent first letter like gnaw?,quiz,quiz
+16776f2cc7ae,Which word has a silent first letter like knife?,quiz,quiz
+f69bfc764873,Which word has a silent first letter like wrap?,quiz,quiz
+5fee9e8dce28,Which word has a silent last letter like lamb?,quiz,quiz
+15d76666a9b7,Which word has the same vowel sound as book?,quiz,quiz
+7e42f07b099d,Which word has the same vowel sound as kite?,quiz,quiz
+5469a95ec270,Which word is spelled incorrectly?,quiz,quiz
+bcc33da5ee9a,Which word rhymes with bag?,quiz,quiz
+2f429069ae69,Which word rhymes with bird?,quiz,quiz
+9b83a2dbda54,Which word rhymes with blue?,quiz,quiz
+39eff296e55f,Which word rhymes with boat?,quiz,quiz
+7e17f8025ff7,Which word rhymes with book?,quiz,quiz
+ffcf93cc0ca7,Which word rhymes with box?,quiz,quiz
+25cbffd5509c,Which word rhymes with burn?,quiz,quiz
+ec212897330e,Which word rhymes with cake?,quiz,quiz
+5983e155befc,Which word rhymes with cat?,quiz,quiz
+7b2bada14a08,Which word rhymes with cloud?,quiz,quiz
+61b3c8136849,Which word rhymes with coin?,quiz,quiz
+75f612d89bd8,Which word rhymes with corn?,quiz,quiz
+23042dc8a821,Which word rhymes with cut?,quiz,quiz
+c2e923f826d4,Which word rhymes with dream?,quiz,quiz
+bbc990195a26,Which word rhymes with famous?,quiz,quiz
+86588ceb69d1,Which word rhymes with feet?,quiz,quiz
+7432010498c4,Which word rhymes with fern?,quiz,quiz
+00f067b1175b,Which word rhymes with fruit?,quiz,quiz
+72d4f7c38fa3,Which word rhymes with gum?,quiz,quiz
+b16def1c15c5,Which word rhymes with high?,quiz,quiz
+860b8a095d89,Which word rhymes with hill?,quiz,quiz
+d31d7cb5366b,Which word rhymes with home?,quiz,quiz
+2d3b7fcce799,Which word rhymes with hop?,quiz,quiz
+2ed34d8f359d,Which word rhymes with hot?,quiz,quiz
+077b64060583,Which word rhymes with howl?,quiz,quiz
+bd336f67ad85,Which word rhymes with kite?,quiz,quiz
+a39a2f8e21f5,Which word rhymes with moon?,quiz,quiz
+24859145c106,Which word rhymes with night?,quiz,quiz
+fe80f32f7079,Which word rhymes with pan?,quiz,quiz
+e7cf7f1fd705,Which word rhymes with pet?,quiz,quiz
+40b52f099289,Which word rhymes with picture?,quiz,quiz
+212b261fad3f,Which word rhymes with play?,quiz,quiz
+9d6c36526286,Which word rhymes with rain?,quiz,quiz
+ccbbe736a51a,Which word rhymes with running?,quiz,quiz
+e1d7a50bfeae,Which word rhymes with sell?,quiz,quiz
+43cd9facd7ca,Which word rhymes with sit?,quiz,quiz
+911317efc30b,Which word rhymes with star?,quiz,quiz
+331a87231d35,Which word rhymes with sun?,quiz,quiz
+2eef40d21091,Which word rhymes with ten?,quiz,quiz
+bc4e4a55942b,Which word rhymes with tonight?,quiz,quiz
+5d906b43258a,Which word rhymes with toy?,quiz,quiz
+94d2f06dd147,Which word rhymes with tune?,quiz,quiz
+119842e9e70a,Which word rhymes with win?,quiz,quiz
+0ad6689b144e,Which word starts the same way as phone?,quiz,quiz
+942c4a9a9128,Which word starts the same way as play?,quiz,quiz
+1638af46fec4,Which word starts the same way as slip?,quiz,quiz
+6ac8395237e3,Which word starts the same way as stop?,quiz,quiz
+64d3efd338c9,Which word starts the same way as thin?,quiz,quiz
+a1d59eac8823,Which word starts the same way as when?,quiz,quiz
+88caf727cef2,Which word tells us how something is done?,quiz,quiz
+4dc5ac7d1977,"wrap, wren, write — which word belongs with these words?",quiz,quiz
+a21d61b7a6ef,"""cap"" changes to ""cape""!",story,story:magic_e
+37dc4d22c6fd,"""cub"" changes to ""cube""!",story,story:magic_e
+b0e32b27d8f1,"""dis"" joins the front — now it's ""dislike""!",story,story:prefixes
+8bd1e1af5030,"""hop"" changes to ""hope""!",story,story:magic_e
+4b691ea4e17a,"""kit"" changes to ""kite""!",story,story:magic_e
+94ddcdc2e81f,"""mis"" joins the front — now it's ""misread""!",story,story:prefixes
+e0111ed12a37,"""pre"" joins the front — now it's ""preview""!",story,story:prefixes
+11b728ae8f34,"""re"" joins the front — now it's ""replay""!",story,story:prefixes
+cbbebb355ae6,"""un"" joins the front — now it's ""unhappy""!",story,story:prefixes
+e3606e8fa039,...and the second vowel stays quiet!,story,story:vowel_teams
+fdb34a197f80,a and d make the sound ad,story,story:short_a
+9c705b1498d9,a and g make the sound ag,story,story:short_a
+4b065666947f,a and m make the sound am,story,story:short_a
+af1af04d5ef8,a and n make the sound an,story,story:short_a
+0589beff3e88,a and p make the sound ap,story,story:short_a
+55527e5a19cf,a and t make the sound at,story,story:short_a
+5e0f198bea33,"A consonant comes right before the Y, so the Y CHANGES to I!",story,story:suffixes
+e58cc3821845,A few -sion words don't follow any rule — you just have to remember them!,story,lesson exceptions;story:tion_sion
+2c7c36813dca,"A few words keep their silent E even before an ending like this, to protect a soft C or G sound!",story,lesson exceptions;story:suffixes
+460a65796152,"a says a, like in apple!",story,story:short_a
+f46f0c50384c,"A vowel comes right before the Y, so the Y always STAYS THE SAME!",story,story:suffixes
+cd45d6f18621,"Adding ""dis"" to the front changes the meaning — now it means you don't like it!",story,story:prefixes
+db1d03da82ea,"Adding ""mis"" to the front changes the meaning — now it means to read it wrong!",story,story:prefixes
+c52976a0c3e3,"Adding ""pre"" to the front changes the meaning — now it means to look at it before!",story,story:prefixes
+b32664bb5f0a,"Adding ""re"" to the front changes the meaning — now it means to play again!",story,story:prefixes
+dedb72b62ab7,"Adding ""un"" to the front changes the meaning — now it means not happy!",story,story:prefixes
+0d612c12d2ac,auto,story,story:greek_roots
+2def473cca72,"auto means ""self""!",story,story:greek_roots
+b2d566c594ea,b and ad make bad,story,story:short_a
+c94c6639dc50,b and ag make bag,story,story:short_a
+60a4af335f30,b and at make bat,story,story:short_a
+b581b18b4590,b and ed make bed,story,story:short_e
+74e1f82a4fd0,b and eg make beg,story,story:short_e
+bf2a984fed1b,b and ell make bell,story,story:short_e
+fb3fd7dae320,b and ig make big,story,story:short_i
+175d072da362,b and ill make bill,story,story:short_i
+8661e56be665,b and in make bin,story,story:short_i
+1c3d16c3edcc,b and it make bit,story,story:short_i
+bf3fd9cda3ba,b and l make the sound bl,story,story:blends
+207a4988d407,b and ob make bob,story,story:short_o
+af86429e3aaa,b and ox make box,story,story:short_o
+0ad9b36fa419,b and r make the sound br,story,story:blends
+b4bd3e961b48,b and ug make bug,story,story:short_u
+2d847e096825,b and un make bun,story,story:short_u
+4d61c8a37e4e,b makes the sound b.,story,story:blends
+74521faff0db,bake,story,story:suffixes
+bbfc7a375568,"bare, with nothing on it",story,story:homophones
+fc524ab7d481,"Base words ending in ""de"" or ""se"" use ""-sion""!",story,story:tion_sion
+be6278703ceb,"Base words ending in ""ss"" or ""mit"" use ""-ssion""!",story,story:tion_sion
+809dc015b223,"bear, a big furry animal",story,story:homophones
+e8c943a062eb,"bio means ""life""!",story,story:greek_roots
+7ebff7874a5f,bl and ack make black,story,story:blends
+b19fa2ac2891,bl and ip make blip,story,story:blends
+35dca0e26b1b,bl and ot make blot,story,story:blends
+8259f641f9eb,br and ag make brag,story,story:blends
+c6f25bfb8dd9,br and an make bran,story,story:blends
+07575b8fdbff,br and im make brim,story,story:blends
+1d7f2d0cf24d,"But sometimes, the very same letters say a SHORT sound instead!",story,story:oo_sounds
+27dc5c354782,"But watch out! A few words look like Magic E, but they break the rule — you just have to remember them!",story,lesson exceptions;story:magic_e
+63bc21c90e7e,"But when they come together, the sound changes!",story,story:digraphs
+80b3ecd76dd3,But when they come together...,story,story:blends;story:diphthongs
+588a8a6e370f,c and an make can,story,story:short_a
+f352c0557ea6,c and ap make cap,story,story:short_a
+2aea994fef45,c and at make cat,story,story:short_a
+01199957156a,c and h make the sound ch,story,story:digraphs
+08737f9ff67f,c and l make the sound cl,story,story:blends
+7d2c1c3f4c1c,c and od make cod,story,story:short_o
+b7da8caf1fee,c and ot make cot,story,story:short_o
+33ae116b9f55,c and r make the sound cr,story,story:blends
+80aa05285562,c and up make cup,story,story:short_u
+d2262f4eb9d3,c and ut make cut,story,story:short_u
+8dfd202f47ac,c makes the sound c.,story,story:blends;story:digraphs
+49b255817b10,Can you read this word?,story,story:bossy_r;story:igh_ight;story:magic_e;story:prefixes;st
+7eb684dff706,cape,story,story:magic_e
+de25693c800b,ch and at make chat,story,story:digraphs
+bf13cb205cb9,ch and in make chin,story,story:digraphs
+0fa0fa0d254d,ch and ip make chip,story,story:digraphs
+dc66465b9d47,ch and op make chop,story,story:digraphs
+2323ded5e480,cl and am make clam,story,story:blends
+db81d0d6ce84,cl and ap make clap,story,story:blends
+9264a88a4709,cl and ip make clip,story,story:blends
+84e662571f12,cr and ab make crab,story,story:blends
+304dbd826909,cr and ib make crib,story,story:blends
+4a559c0b1109,cr and op make crop,story,story:blends
+0a0dc58b3679,d and ad make dad,story,story:short_a
+7b47cfc93dfb,d and en make den,story,story:short_e
+46c4f0771648,d and id make did,story,story:short_i
+7885618efd05,d and ig make dig,story,story:short_i
+e1cd3ba55261,d and ip make dip,story,story:short_i
+3892af2150e4,d and og make dog,story,story:short_o
+267c0d5f2841,d and ot make dot,story,story:short_o
+7f68647f9a9a,d and r make the sound dr,story,story:blends
+8a21dec6c2e7,d and ug make dug,story,story:short_u
+49013039f2cc,d makes the sound d.,story,story:blends
+8501a34f34de,decision,story,story:tion_sion
+c255751d518c,discussion,story,story:tion_sion
+65dd36332df8,"Does the base word end in ""de"" or ""se""? (decide, explode)",story,story:tion_sion
+1bbde31f2626,"Does the base word end in ""ss"" or ""mit""? (discuss, permit)",story,story:tion_sion
+34b78a8469a6,dr and ip make drip,story,story:blends
+7c42dadaebac,dr and op make drop,story,story:blends
+d217e66ffafc,dr and um make drum,story,story:blends;story:short_u
+ffbc3e156919,e and d make the sound ed,story,story:short_e
+69ab9549cd62,e and g make the sound eg,story,story:short_e
+8432485976fa,e and l and l make the sound ell,story,story:short_e
+0a4069fb116c,e and n make the sound en,story,story:short_e
+804bed7ead7d,e and t make the sound et,story,story:short_e
+d31e57d6cc6f,"e says e, like in egg!",story,story:short_e
+34117318ae01,"Everything else uses ""-tion"" — it's the most common ending!",story,story:tion_sion
+a521cb192113,f and an make fan,story,story:short_a
+008ee3fb3c6f,f and ed make fed,story,story:short_e
+68da9e7d3a02,f and ell make fell,story,story:short_e
+6d2f5c56dd20,f and ig make fig,story,story:short_i
+e2ae3e42b0cb,f and ill make fill,story,story:short_i
+c8a63fe6a805,f and in make fin,story,story:short_i
+0ab67d40bf37,f and it make fit,story,story:short_i
+d6d4d6358b6b,f and l make the sound fl,story,story:blends
+47cc403d65d2,f and og make fog,story,story:short_o
+92bb51e55592,f and ox make fox,story,story:short_o
+b2ab8d959a51,f and un make fun,story,story:short_u
+5ff3cae71700,f makes the sound f.,story,story:blends
+d4eb513209a0,fl and ag make flag,story,story:blends
+7d24b569419a,fl and at make flat,story,story:blends
+4dbf48b1b8bd,fl and ip make flip,story,story:blends
+389fe3b09679,g and l make the sound gl,story,story:blends
+ac3930e4d85d,g and r make the sound gr,story,story:blends
+7eff1746561a,g and um make gum,story,story:short_u
+0995f3399b66,g makes the sound g.,story,story:blends
+4d9e83054b74,"geo means ""earth""!",story,story:greek_roots
+5c7feb6d053a,gl and ad make glad,story,story:blends
+f1cab351f555,gl and am make glam,story,story:blends
+c13552c89a07,gl and um make glum,story,story:blends
+89ac539cf69b,gr and ab make grab,story,story:blends
+352618bc3590,gr and in make grin,story,story:blends
+c03a77c461e2,gr and ip make grip,story,story:blends
+0eadf73eb9f6,h and ad make had,story,story:short_a
+5fd4ca872e11,h and am make ham,story,story:short_a
+2458889fd565,h and at make hat,story,story:short_a
+023a4d14db0b,h and en make hen,story,story:short_e
+2374f21f6b7d,h and id make hid,story,story:short_i
+27a09f0a9bc6,h and ill make hill,story,story:short_i
+5be9b9a27614,h and ip make hip,story,story:short_i
+2083364f46e9,h and it make hit,story,story:short_i
+32bdad4eca22,h and og make hog,story,story:short_o
+f3f563a95ebc,h and op make hop,story,story:short_o
+6cd0184a4244,h and ot make hot,story,story:short_o
+fccff4261b4c,h and ub make hub,story,story:short_u
+440de762062c,h and ug make hug,story,story:short_u
+b5df5c419e02,h and um make hum,story,story:short_u
+409d3bd41ee9,h and ut make hut,story,story:short_u
+63425cc4cfaa,h makes the sound h.,story,story:digraphs
+3978d009748e,happy,story,story:prefixes
+53e200d03d09,"have, give, love, come",story,story:magic_e
+30898da4e61f,"hear, listen with your ears",story,story:homophones
+199768c2533a,"Here, ""w"" acts like a vowel! We write ""ow"" at the end of a word, but ""oa"" in the middle — like in ""boat""!",story,story:vowel_teams
+39e0553b4985,"Here, ""y"" acts like a vowel! We write ""ay"" at the end of a word, but ""ai"" in the middle — like in ""rain""!",story,story:vowel_teams
+42de39a559cd,"here, in this place",story,story:homophones
+858fe0145102,hoping,story,story:suffixes
+8072a8551428,hopping,story,story:suffixes
+ff1da3e4e231,i and d make the sound id,story,story:short_i
+cb26a383bfe7,i and g make the sound ig,story,story:short_i
+491f33ebee29,i and l and l make the sound ill,story,story:short_i
+e2547185b224,i and n make the sound in,story,story:short_i
+2552695e03a2,i and p make the sound ip,story,story:short_i
+583098c34ef9,i and t make the sound it,story,story:short_i
+7c98aa4e684d,i makes the sound i.,story,story:diphthongs
+24974c94f72d,"i says i, like in igloo!",story,story:short_i
+8f66756ed433,Is it a person or a job? (profession or role),story,story:tion_sion
+7ba47ca7f905,Is it something else? (the default),story,story:tion_sion
+da8d0aba1306,j and am make jam,story,story:short_a
+579a2ceb0c54,j and et make jet,story,story:short_e
+79311958d1a3,j and ug make jug,story,story:short_u
+aabb659e812e,k and eg make keg,story,story:short_e
+2078874af99e,l and ed make led,story,story:short_e
+68c8ee344794,l and eg make leg,story,story:short_e
+1f5546379b1b,l and id make lid,story,story:short_i
+75614bacea1f,l and ip make lip,story,story:short_i
+80c0a9a2e23b,l and og make log,story,story:short_o
+1b33d655fc53,l makes the sound l.,story,story:blends
+2a63b91f407c,Let's explore the words with auto!,story,story:greek_roots
+232050b79446,Let's explore the words with bio!,story,story:greek_roots
+665e8d4880f1,Let's explore the words with geo!,story,story:greek_roots
+1fa8b5a83b7c,Let's explore the words with micro!,story,story:greek_roots
+7ee24f3b65c0,Let's explore the words with ous!,story,story:ture_ous
+500279131709,Let's explore the words with photo!,story,story:greek_roots
+f2209ee95bab,Let's explore the words with tele!,story,story:greek_roots
+347ab3b3c1d8,Let's explore the words with the ad sound!,story,story:short_a
+35ac2ee4d676,Let's explore the words with the ag sound!,story,story:short_a
+fa247791efa5,Let's explore the words with the am sound!,story,story:short_a
+79afb4169357,Let's explore the words with the an sound!,story,story:short_a
+90301a1afc57,Let's explore the words with the ap sound!,story,story:short_a
+fc23e212dac3,Let's explore the words with the at sound!,story,story:short_a
+133e3b1a9776,Let's explore the words with the bl sound!,story,story:blends
+2bdaf42d436c,Let's explore the words with the br sound!,story,story:blends
+f94e38dfff46,Let's explore the words with the ch sound!,story,story:digraphs
+23a7a185b68d,Let's explore the words with the cl sound!,story,story:blends
+612a5cbdb282,Let's explore the words with the cr sound!,story,story:blends
+0e81b02e2ee9,Let's explore the words with the dr sound!,story,story:blends
+dd53b34203c1,Let's explore the words with the ed sound!,story,story:short_e
+2bcad3a56127,Let's explore the words with the eg sound!,story,story:short_e
+ea1c8ee0b549,Let's explore the words with the ell sound!,story,story:short_e
+1847ca67233c,Let's explore the words with the en sound!,story,story:short_e
+54369704ab3d,Let's explore the words with the et sound!,story,story:short_e
+8f919aa34717,Let's explore the words with the fl sound!,story,story:blends
+770940e2df9f,Let's explore the words with the gl sound!,story,story:blends
+c188bc792852,Let's explore the words with the gr sound!,story,story:blends
+9d4354276632,Let's explore the words with the id sound!,story,story:short_i
+447e2cb55b9a,Let's explore the words with the ig sound!,story,story:short_i
+1303f7ff494f,Let's explore the words with the ill sound!,story,story:short_i
+5ef2c40f6f94,Let's explore the words with the in sound!,story,story:short_i
+b1ac74c795a3,Let's explore the words with the ip sound!,story,story:short_i
+47f7e946a526,Let's explore the words with the it sound!,story,story:short_i
+0ccecee3ad36,Let's explore the words with the ob sound!,story,story:short_o
+cb260933cbc0,Let's explore the words with the od sound!,story,story:short_o
+77eb81b2f9a1,Let's explore the words with the og sound!,story,story:short_o
+00872e70aada,Let's explore the words with the oi sound!,story,story:diphthongs
+b19e596a02f2,Let's explore the words with the op sound!,story,story:short_o
+9257212a8671,Let's explore the words with the ot sound!,story,story:short_o
+bea102a5f19c,Let's explore the words with the ou sound!,story,story:diphthongs
+ef813a296568,Let's explore the words with the ow sound!,story,story:diphthongs
+644cd7d4912d,Let's explore the words with the ox sound!,story,story:short_o
+836459942930,Let's explore the words with the oy sound!,story,story:diphthongs
+b3c033c8200f,Let's explore the words with the ph sound!,story,story:digraphs
+54a69591a277,Let's explore the words with the pl sound!,story,story:blends
+76fa4af9b31b,Let's explore the words with the sh sound!,story,story:digraphs
+3beca1b70af3,Let's explore the words with the sl sound!,story,story:blends
+90f932fc5136,Let's explore the words with the sm sound!,story,story:blends
+c38d4f954728,Let's explore the words with the sn sound!,story,story:blends
+560edfa8add0,Let's explore the words with the sp sound!,story,story:blends
+49acc5c9e019,Let's explore the words with the st sound!,story,story:blends
+3a5ec12d857f,Let's explore the words with the sw sound!,story,story:blends
+14b6531612a0,Let's explore the words with the th sound!,story,story:digraphs
+5c8aa9003c3f,Let's explore the words with the tr sound!,story,story:blends
+eebb9bb9483e,Let's explore the words with the ub sound!,story,story:short_u
+2f2d65253230,Let's explore the words with the ug sound!,story,story:short_u
+2c5cd9936ead,Let's explore the words with the um sound!,story,story:short_u
+2f6297c5942c,Let's explore the words with the un sound!,story,story:short_u
+61cf1183e983,Let's explore the words with the up sound!,story,story:short_u
+efbfff58dae6,Let's explore the words with the ut sound!,story,story:short_u
+0fd391d2a13c,Let's explore the words with the wh sound!,story,story:digraphs
+15e2fce62777,Let's explore the words with this sound!,story,story:oo_sounds
+55f4f960d7bd,Let's explore the words with ture!,story,story:ture_ous
+e81edae1e59f,Let's learn a new sound!,story,story:blends;story:digraphs;story:diphthongs;story:oo_sounds
+b0ad63a062ca,Let's learn a new word part!,story,story:greek_roots;story:ture_ous
+e9cfba152cb7,Let's learn some sound-alike words!,story,story:homophones
+45f878923d40,Let's learn some tricky words!,story,story:sight_words_building;story:sight_words_expanding;story
+1ed1f66d7d42,Let's say it: answer.,story,story:sight_words_expanding
+5bc3a2f0f9a4,Let's say it: auto.,story,story:greek_roots
+d3e9fdc17361,Let's say it: bare.,story,story:homophones
+6ebec37e4d91,Let's say it: because.,story,story:sight_words_building
+c23c6593c292,Let's say it: believe.,story,story:sight_words_mastery
+6555db07d00c,Let's say it: bio.,story,story:greek_roots
+2c0f26bced93,Let's say it: come.,story,story:sight_words_foundation
+6e203c7585c2,Let's say it: decide.,story,story:sight_words_expanding
+53010db41482,Let's say it: different.,story,story:sight_words_expanding
+506247029879,Let's say it: every.,story,story:sight_words_building
+9c5c77a1f6ce,Let's say it: experience.,story,story:sight_words_mastery
+7792a9dac0a5,Let's say it: favourite.,story,story:sight_words_mastery
+ce95a128ed33,Let's say it: friend.,story,story:sight_words_building
+7b6ea1af3596,Let's say it: geo.,story,story:greek_roots
+ab2abca0bf02,Let's say it: hear.,story,story:homophones
+afe9d744b523,Let's say it: history.,story,story:sight_words_expanding
+75176d4320af,Let's say it: important.,story,story:sight_words_expanding
+f8e83beae0b2,Let's say it: knowledge.,story,story:sight_words_mastery
+75598b83371d,Let's say it: library.,story,story:sight_words_mastery
+2d8a3dc2f3a4,Let's say it: micro.,story,story:greek_roots
+3536036d65ba,Let's say it: ous.,story,story:ture_ous
+8a02bfff90b3,Let's say it: people.,story,story:sight_words_building
+b57d81bcc300,Let's say it: photo.,story,story:greek_roots
+c4e4dae572b5,Let's say it: said.,story,story:sight_words_foundation
+5dbd5d71b9dd,Let's say it: see.,story,story:homophones
+7071b231d845,Let's say it: tele.,story,story:greek_roots
+6a892d9c7d00,Let's say it: the.,story,story:sight_words_foundation
+de739a86f657,Let's say it: there.,story,story:homophones
+75ea7793f968,Let's say it: to.,story,story:homophones;story:sight_words_foundation
+f935ed231e8e,Let's say it: ture.,story,story:ture_ous
+a119a35f9832,Let's say it: was.,story,story:sight_words_foundation
+c4e6a8ff17fa,Let's say it: water.,story,story:sight_words_building
+cd45aeeedf54,Let's say the sound ad.,story,story:short_a
+affb39ea10b4,Let's say the sound ag.,story,story:short_a
+bb0080ac65c0,Let's say the sound am.,story,story:short_a
+37e27864f578,Let's say the sound an.,story,story:short_a
+5325e7c09e87,Let's say the sound ap.,story,story:short_a
+6299befdd2e3,Let's say the sound at.,story,story:short_a
+c07c6f874023,Let's say the sound bl.,story,story:blends
+65156939338e,Let's say the sound br.,story,story:blends
+588a491aa000,Let's say the sound ch.,story,story:digraphs
+ea88949d5776,Let's say the sound cl.,story,story:blends
+8d6afdb1978b,Let's say the sound cr.,story,story:blends
+d27930d10d83,Let's say the sound dr.,story,story:blends
+bd7e8ff2450e,Let's say the sound ed.,story,story:short_e
+dd26f65e3f35,Let's say the sound eg.,story,story:short_e
+1fbb3156e01e,Let's say the sound ell.,story,story:short_e
+d5988dd9eb59,Let's say the sound en.,story,story:short_e
+d9809d2a800c,Let's say the sound et.,story,story:short_e
+94dbfd730146,Let's say the sound fl.,story,story:blends
+025fff94fe7a,Let's say the sound gl.,story,story:blends
+630eb884003d,Let's say the sound gr.,story,story:blends
+4e44fe84ecd0,Let's say the sound id.,story,story:short_i
+acdc35e6b1b2,Let's say the sound ig.,story,story:short_i
+c52830a6f7d3,Let's say the sound ill.,story,story:short_i
+7501d50e4421,Let's say the sound in.,story,story:short_i
+02ca11a4ada4,Let's say the sound ip.,story,story:short_i
+97fe4e4534de,Let's say the sound it.,story,story:short_i
+c688ab395e9f,Let's say the sound long oo.,story,story:oo_sounds
+1410c544a5c2,Let's say the sound ob.,story,story:short_o
+bb8c2f47450e,Let's say the sound od.,story,story:short_o
+dafa27c8f556,Let's say the sound og.,story,story:short_o
+2f9cf600b81f,Let's say the sound oi.,story,story:diphthongs
+54ea0aea9f47,Let's say the sound op.,story,story:short_o
+b82cafd75459,Let's say the sound ot.,story,story:short_o
+e220a8b2b6ec,Let's say the sound ou.,story,story:diphthongs
+3f659fd826b8,Let's say the sound ow.,story,story:diphthongs
+cbff11d37978,Let's say the sound ox.,story,story:short_o
+5c3b10f7f635,Let's say the sound oy.,story,story:diphthongs
+2b2890d35048,Let's say the sound ph.,story,story:digraphs
+339c620e28ca,Let's say the sound pl.,story,story:blends
+73411d2075a3,Let's say the sound sh.,story,story:digraphs
+0e6fa45ed861,Let's say the sound short oo.,story,story:oo_sounds
+acffcfb21573,Let's say the sound sl.,story,story:blends
+352e9c833f84,Let's say the sound sm.,story,story:blends
+fbe85e0bccda,Let's say the sound sn.,story,story:blends
+732932e96689,Let's say the sound sp.,story,story:blends
+f66b058db4b4,Let's say the sound st.,story,story:blends
+51d2ec08a779,Let's say the sound sw.,story,story:blends
+cdbd48c76923,Let's say the sound th.,story,story:digraphs
+7c28acb539a3,Let's say the sound tr.,story,story:blends
+181ef5c6f9b7,Let's say the sound ub.,story,story:short_u
+cbdef0d285b4,Let's say the sound ug.,story,story:short_u
+1a42cf6a7d68,Let's say the sound um.,story,story:short_u
+0d24ed0b9613,Let's say the sound un.,story,story:short_u
+785de3381d80,Let's say the sound up.,story,story:short_u
+8d06eb44ca54,Let's say the sound ut.,story,story:short_u
+a6c3f7ea22f5,Let's say the sound wh.,story,story:digraphs
+beca6a5eab78,"Let's spell it: a, n, s, w, e, r",story,story:sight_words_expanding
+1a5c349b7102,"Let's spell it: b, e, c, a, u, s, e",story,story:sight_words_building
+0663c17a4163,"Let's spell it: b, e, l, i, e, v, e",story,story:sight_words_mastery
+c403bbf5e543,"Let's spell it: c, o, m, e",story,story:sight_words_foundation
+ca27486f6c09,"Let's spell it: d, e, c, i, d, e",story,story:sight_words_expanding
+ac808ad0c728,"Let's spell it: d, i, f, f, e, r, e, n, t",story,story:sight_words_expanding
+7732c7a47d96,"Let's spell it: e, v, e, r, y",story,story:sight_words_building
+c23153df2d25,"Let's spell it: e, x, p, e, r, i, e, n, c, e",story,story:sight_words_mastery
+c450b1af9439,"Let's spell it: f, a, v, o, u, r, i, t, e",story,story:sight_words_mastery
+59aa9a1a6231,"Let's spell it: f, r, i, e, n, d",story,story:sight_words_building
+f3f92f8437d2,"Let's spell it: h, i, s, t, o, r, y",story,story:sight_words_expanding
+8e3261f44d37,"Let's spell it: i, m, p, o, r, t, a, n, t",story,story:sight_words_expanding
+8358d25ee901,"Let's spell it: k, n, o, w, l, e, d, g, e",story,story:sight_words_mastery
+fbdcd46d80ef,"Let's spell it: l, i, b, r, a, r, y",story,story:sight_words_mastery
+cb97f04f99c5,"Let's spell it: p, e, o, p, l, e",story,story:sight_words_building
+a0d3fb653921,"Let's spell it: s, a, i, d",story,story:sight_words_foundation
+aae13d89666d,"Let's spell it: t, h, e",story,story:sight_words_foundation
+de1f0fed817d,"Let's spell it: t, o",story,story:sight_words_foundation
+752ede93f161,"Let's spell it: w, a, s",story,story:sight_words_foundation
+fe6c3d842ac7,"Let's spell it: w, a, t, e, r",story,story:sight_words_building
+febf43833007,"Like ""decision""!",story,story:tion_sion
+9c3aa519a43a,"Like ""discussion""!",story,story:tion_sion
+ab025d4df456,"Like ""musician""!",story,story:tion_sion
+cec417d60bf5,"Like ""nation""!",story,story:tion_sion
+cb03ff50a75e,long oo,story,story:oo_sounds
+a97b37182344,"Look at the ""r"" standing right next to the vowel!",story,story:bossy_r
+5cdc3bcfbb91,Look closely — one letter is hiding in this word!,story,story:silent_letters
+4e7106cf9941,Look closely — some letters are hiding in this word!,story,story:igh_ight
+c2e79f30076d,Look closely — two vowels are standing together!,story,story:vowel_teams
+8b1e82cd5fe2,Look how the magic E makes the vowel say its own name!,story,story:magic_e
+a80d54ab6616,m and an make man,story,story:short_a
+36e9aa63e21a,m and ap make map,story,story:short_a
+cb549248860d,m and at make mat,story,story:short_a
+388efd1516f2,m and ill make mill,story,story:short_i
+a31cff564690,m and ob make mob,story,story:short_o
+aa711647a843,m and op make mop,story,story:short_o
+e730b2bc3606,m makes the sound m.,story,story:blends
+7b6c8b3eb3fc,"manageable, noticeable, courageous",story,story:suffixes
+96bccd4681b2,micro,story,story:greek_roots
+88336bad75eb,"micro means ""small""!",story,story:greek_roots
+2b69ac0d7e8d,n and ap make nap,story,story:short_a
+683b4eec69e6,n and et make net,story,story:short_e
+b1058f36e21a,n and od make nod,story,story:short_o
+d393d3c026dc,n and ut make nut,story,story:short_u
+2e8a256236db,n makes the sound n.,story,story:blends
+4f11bec0774b,"Now it's not ""a"" anymore — together they make a brand new sound, like in ""star""!",story,story:bossy_r
+a099b14d9ccb,"Now it's not ""e"" anymore — together they make a brand new sound, like in ""fern""!",story,story:bossy_r
+34ccfa722690,"Now it's not ""i"" anymore — together they make a brand new sound, like in ""bird""!",story,story:bossy_r
+b30519b76283,"Now it's not ""o"" anymore — together they make a brand new sound, like in ""corn""!",story,story:bossy_r
+d18adbdf3c1b,"Now it's not ""u"" anymore — together they make a brand new sound, like in ""burn""!",story,story:bossy_r
+c0470e5ec5f5,Now look what happens... a magic E is coming!,story,story:magic_e
+265738bf8f0e,Now watch what happens... a prefix is coming!,story,story:prefixes
+e32a38510f1d,Now you know all the suffix rules! Let's practise!,story,story:sight_words_expanding
+112271d36234,Now you know how -ture & -ous work! Let's practise!,story,story:ture_ous
+c5c36c380263,Now you know how Blends work! Let's practise!,story,story:blends
+d0cdfe7a9562,Now you know how Digraphs work! Let's practise!,story,story:digraphs
+22716a3ba138,Now you know how Diphthongs work! Let's practise!,story,story:diphthongs
+935f2c6eb3e2,Now you know how Greek Roots work! Let's practise!,story,story:greek_roots
+921fadf3e1b1,Now you know how OO Sounds work! Let's practise!,story,story:oo_sounds
+e0d757cf5d16,Now you know how to spell the shun sound! Let's practise!,story,story:ture_ous
+3fed0b1c837a,Now you know how word families work! Let's practise!,story,story:short_a;story:short_e;story:short_i;story:short_o;stor
+740ee029f5cb,Now you know the bossy R secret! Let's practise!,story,story:bossy_r
+8a00f985cf72,Now you know the magic E secret! Let's practise!,story,story:vowel_teams
+da8c57db22c4,Now you know the prefix secret! Let's practise!,story,story:prefixes
+bc797d3fc659,Now you know the silent letter secret! Let's practise!,story,story:igh_ight;story:silent_letters
+ed771958ba2a,Now you know the vowel team secret! Let's practise!,story,story:vowel_teams
+ec064ae868db,Now you know these sound-alike words! Let's practise!,story,story:homophones
+d41278e7f538,Now you know these tricky words by heart! Let's practise!,story,story:sight_words_building;story:sight_words_expanding;story
+a2f999df0263,o and b make the sound ob,story,story:short_o
+b0ca44136eaf,o and d make the sound od,story,story:short_o
+74319354f86c,o and g make the sound og,story,story:short_o
+7973bef06b4f,o and i make the sound oi,story,story:diphthongs
+2dd860468fd9,o and p make the sound op,story,story:short_o
+9f2dd1d6b325,o and t make the sound ot,story,story:short_o
+44ad6c632cd4,o and u make the sound ou,story,story:diphthongs
+23ed7d1bd035,o and w make the sound ow,story,story:diphthongs
+dee5f41bbc68,o and x make the sound ox,story,story:short_o
+25a47671151a,o and y make the sound oy,story,story:diphthongs
+7946a1c7c9a9,o makes the sound o.,story,story:diphthongs
+a299966a3365,"o says o, like in octopus!",story,story:short_o
+cd1dce6fd334,oi and il make foil,story,story:diphthongs
+f110988052dd,oi and il make soil,story,story:diphthongs
+314eff03042e,oi and in make coin,story,story:diphthongs
+2c00182e76fe,oo can say two different things!,story,story:oo_sounds
+0ebb3548be61,ou and oud make cloud,story,story:diphthongs
+cb5febf41af9,ou and out make shout,story,story:diphthongs
+cdf78a8e54e0,ou and und make round,story,story:diphthongs
+91977173ba2d,"ous means ""full of""!",story,story:ture_ous
+a98e93383be3,ow and own make brown,story,story:diphthongs
+2781d1a45a0c,ow and own make crown,story,story:diphthongs
+049182d5289c,ow and wl make howl,story,story:diphthongs
+c475988ee1a7,oy and y make boy,story,story:diphthongs
+90e62f0b7944,oy and y make joy,story,story:diphthongs
+0bd67aac38df,oy and y make toy,story,story:diphthongs
+04081a3aa703,p and an make pan,story,story:short_a
+3bb4de477e64,p and eg make peg,story,story:short_e
+4add0d1fa21f,p and en make pen,story,story:short_e
+fee266937b97,p and et make pet,story,story:short_e
+63d12436f765,p and h make the sound ph,story,story:digraphs
+6ec8ed157385,p and ig make pig,story,story:short_i
+b707a9b58461,p and in make pin,story,story:short_i
+3c8d637fcd6e,p and l make the sound pl,story,story:blends
+fef53b8c073e,p and op make pop,story,story:short_o
+e800a8c3a0d6,p and ot make pot,story,story:short_o
+5b390e422ebe,p and ox make pox,story,story:short_o
+0d3ba65495ec,p and ub make pub,story,story:short_u
+3440d682f7a6,p and up make pup,story,story:short_u
+b8fd760e7f6b,p makes the sound p.,story,story:blends;story:digraphs
+ec03207afd70,"pension, mansion, version, comprehension",story,story:tion_sion
+0faf62ea5be5,ph and ase make phase,story,story:digraphs
+fd85877ff7af,ph and one make phone,story,story:digraphs
+3701e2bbe023,ph and oto make photo,story,story:digraphs
+16c08783936f,"photo means ""light""!",story,story:greek_roots
+6df19df3ced8,pl and an make plan,story,story:blends
+062f3bdcef82,pl and od make plod,story,story:short_o
+ee09fd15997f,pl and op make plop,story,story:blends
+39df2cd3c102,pl and ug make plug,story,story:blends
+5863973edc67,playing,story,story:suffixes
+a654e3d9e7ff,r and ag make rag,story,story:short_a
+87fce203256a,r and am make ram,story,story:short_a
+fda4a779abce,r and ed make red,story,story:short_e
+399bd3c90914,r and id make rid,story,story:short_i
+54215a18b190,r and ob make rob,story,story:short_o
+5fe42489ab85,r and od make rod,story,story:short_o
+5d8f6cfe702c,r and ub make rub,story,story:short_u
+b928e1dbc405,r and un make run,story,story:short_u
+de0985628032,r makes the sound r.,story,story:blends
+a7afddb68260,read,story,story:prefixes
+23dfe5e019dd,Rule 1: Double the Last Letter!,story,story:suffixes
+d256d465b872,Rule 2: Drop the Silent E!,story,story:suffixes
+35768da9bccc,Rule 3: Y or I?,story,story:suffixes
+88acf11e0bb4,s and ad make sad,story,story:short_a
+9b3ebba33fbb,s and ell make sell,story,story:short_e
+e3aaa50f5b0d,s and h make the sound sh,story,story:digraphs
+b5e8867e43a4,s and it make sit,story,story:short_i
+4d81383b8acb,s and l make the sound sl,story,story:blends
+f3bfb9734fb4,s and m make the sound sm,story,story:blends
+da91a15cb544,s and n make the sound sn,story,story:blends
+fdb269361e1d,s and ob make sob,story,story:short_o
+e4842fccd83d,s and ox make sox,story,story:short_o
+d32c6d074fe4,s and p make the sound sp,story,story:blends
+f7b7a1ac4230,s and t make the sound st,story,story:blends
+f779dfc27010,s and um make sum,story,story:short_u
+41527b040c81,s and un make sun,story,story:short_u
+b32187fc8781,s and up make sup,story,story:short_u
+7e47601eb2ba,s and w make the sound sw,story,story:blends
+05d6731f6d16,s makes the sound s.,story,story:blends;story:digraphs
+518187b5360c,"sea, the big blue ocean",story,story:homophones
+a6ae42d0c9d4,"see, look with your eyes",story,story:homophones
+f09756cb9fc9,sh and ed make shed,story,story:digraphs
+8506a66e91cd,sh and in make shin,story,story:digraphs
+8b3f6b237fd4,sh and ip make ship,story,story:digraphs
+1c82d1db4ff6,sh and op make shop,story,story:digraphs
+341079231aef,short oo,story,story:oo_sounds
+9bae9edf8670,"Short word, one vowel, one consonant — we DOUBLE the last letter before adding the ending!",story,story:suffixes
+436a86343651,Sight words don't follow phonics rules — you just have to know them by heart!,story,story:sight_words_building;story:sight_words_expanding;story
+a4573a38134d,sl and ap make slap,story,story:blends
+cd7ec9080eb2,sl and im make slim,story,story:blends
+a3f538d4c9c1,sl and ip make slip,story,story:blends
+8dc087a8557f,sm and ash make smash,story,story:blends
+6e5dea73a8b3,sm and ell make smell,story,story:blends
+9b9863d608d6,sm and og make smog,story,story:blends
+7dff738f9b30,sn and ag make snag,story,story:blends
+66659e0b6ca5,sn and ap make snap,story,story:blends
+63301887a4da,sn and ip make snip,story,story:blends
+7bd315dba7af,Sometimes oo says its LONG sound...,story,story:oo_sounds
+370cbc79593c,"Sometimes the same sound is spelled a different way — at the end of a word, oi becomes oy!",story,story:diphthongs
+2f396bd19b56,"Sometimes the same sound is spelled a different way — at the end of a word, ou becomes ow!",story,story:diphthongs
+9316335ffd53,sp and in make spin,story,story:blends
+efe975f1f04f,sp and it make spit,story,story:blends
+a04c89b75f1d,sp and ot make spot,story,story:blends
+0aaac3957068,st and em make stem,story,story:blends
+a54e29070526,st and ep make step,story,story:blends
+64a4d7b7acd0,st and op make stop,story,story:blends
+a86b2cc151c1,sw and an make swan,story,story:blends
+c84f472caf5e,sw and ell make swell,story,story:blends
+00b4863b7c85,sw and im make swim,story,story:blends
+668145892166,t and ag make tag,story,story:short_a
+75b5a7d97fed,t and ap make tap,story,story:short_a
+5a5d82d10c8f,t and ell make tell,story,story:short_e
+bf77161de078,t and en make ten,story,story:short_e
+f718619e22ee,t and h make the sound th,story,story:digraphs
+5858fb84e0d8,t and ip make tip,story,story:short_i
+57bf3baaef19,t and op make top,story,story:short_o
+e1e18ca57df9,t and r make the sound tr,story,story:blends
+d4603f37995e,t and ub make tub,story,story:short_u
+3ed8e45e692d,t makes the sound t.,story,story:blends;story:digraphs
+5bc660ddd388,tele,story,story:greek_roots
+51bd18c8c021,"tele means ""far""!",story,story:greek_roots
+73bf97ee792d,th and ick make thick,story,story:digraphs
+3cfa02eee793,th and in make thin,story,story:digraphs
+91d233dd0281,th and ud make thud,story,story:digraphs
+bac6ea16d66d,That spells answer!,story,story:sight_words_expanding
+be01bacef811,That spells because!,story,story:sight_words_building
+bb258ab94f63,That spells believe!,story,story:sight_words_mastery
+2656dff8062d,That spells come!,story,story:sight_words_foundation
+77a51712cbbd,That spells decide!,story,story:sight_words_expanding
+9bb321a5b002,That spells different!,story,story:sight_words_expanding
+96761e1e8756,That spells every!,story,story:sight_words_building
+dfa3200f6507,That spells experience!,story,story:sight_words_mastery
+76d3cc7811cb,That spells favourite!,story,story:sight_words_mastery
+251de8e2d661,That spells friend!,story,story:sight_words_building
+cc4afbc1a729,That spells history!,story,story:sight_words_expanding
+61ebbada8ba4,That spells important!,story,story:sight_words_expanding
+c6114dc831ff,That spells knowledge!,story,story:sight_words_mastery
+1bcf45369419,That spells library!,story,story:sight_words_mastery
+b566c7a65d59,That spells people!,story,story:sight_words_building
+8b172416238b,That spells said!,story,story:sight_words_foundation
+0d692dc0eac9,That spells the!,story,story:sight_words_foundation
+385770eb4804,That spells to!,story,story:sight_words_foundation
+1434f0f4d698,That spells was!,story,story:sight_words_foundation
+1888b0b31a30,That spells water!,story,story:sight_words_building
+954893b396d7,"The ""r"" is bossy — it pushes in and changes the vowel's sound!",story,story:bossy_r
+2e6f9ca6d907,The first vowel does the talking...,story,story:vowel_teams
+2dd338d98861,The G and H are silent — but the I says its own name!,story,story:igh_ight
+882127e184b4,"their, belongs to them",story,story:homophones
+78c66feb1746,"there, a place",story,story:homophones
+42da8677432b,These words all sound the same: bare!,story,story:homophones
+f754e78bf93a,These words all sound the same: hear!,story,story:homophones
+094cd1255bb6,These words all sound the same: see!,story,story:homophones
+42e14baab530,These words all sound the same: there!,story,story:homophones
+48bdf9594ecc,These words all sound the same: to!,story,story:homophones
+ab61a0862725,"they're, means they are",story,story:homophones
+7ed1984a6a87,This letter is written... but it stays completely silent!,story,story:silent_letters
+13b6fad0e8c6,This word ends in a silent E — we DROP the E before adding an ending that starts with a vowel!,story,story:suffixes
+f5a7fef4d66a,"to, toward something",story,story:homophones
+e1d918961444,"too, also, or very",story,story:homophones
+94c6a4559681,tr and ap make trap,story,story:blends
+0904b9c324e8,tr and im make trim,story,story:blends
+464b8bc1c6b4,tr and ip make trip,story,story:blends
+c73b2cb7e804,ture,story,story:ture_ous
+0d6ad98a1e1c,"ture says ""cher""!",story,story:ture_ous
+91fdb368d485,"two, the number 2",story,story:homophones
+6b596c238a48,u and b make the sound ub,story,story:short_u
+f8b8b20653ab,u and g make the sound ug,story,story:short_u
+f87eb5544cda,u and m make the sound um,story,story:short_u
+ea07f17bdef9,u and n make the sound un,story,story:short_u
+b300215a0263,u and p make the sound up,story,story:short_u
+5e60fff55729,u and t make the sound ut,story,story:short_u
+c060a331f47f,u makes the sound u.,story,story:diphthongs
+8053de5ba088,"u says u, like in umbrella!",story,story:short_u
+8f3a07543988,view,story,story:prefixes
+f1fe510bc410,w and ag make wag,story,story:short_a
+95ee188afd5f,w and et make wet,story,story:short_e
+cc4711383c3c,w and h make the sound wh,story,story:digraphs
+65d55c155178,w and in make win,story,story:short_i
+5bbf2bfd24af,w makes the sound w.,story,story:blends;story:digraphs
+1702e83f1cf3,Watch closely — a consonant comes right before the Y!,story,story:suffixes
+e4d8922699ea,Watch closely — a vowel comes right before the Y!,story,story:suffixes
+df014e7a3c7b,"Watch closely — short word, one vowel, one consonant at the end!",story,story:suffixes
+d4f13991d152,Watch closely — this word ends in a silent E!,story,story:suffixes
+39b68a34af02,"We still write ""b"", but we never say it — like in ""comb""!",story,story:silent_letters
+987e062c443f,"We still write ""g"", but we never say it — like in ""gnome""!",story,story:silent_letters
+195254ac7c79,"We still write ""gh"", but we never say them — like in ""bright""!",story,story:igh_ight
+f0baac20b20b,"We still write ""gh"", but we never say them — like in ""high""!",story,story:igh_ight
+76ee7659d889,"We still write ""gh"", but we never say them — like in ""light""!",story,story:igh_ight
+1a2fdc087943,"We still write ""gh"", but we never say them — like in ""night""!",story,story:igh_ight
+d77c93d13490,"We still write ""gh"", but we never say them — like in ""sigh""!",story,story:igh_ight
+3000be02c1a8,"We still write ""k"", but we never say it — like in ""knee""!",story,story:silent_letters
+43a40eafcceb,"We still write ""l"", but we never say it — like in ""walk""!",story,story:silent_letters
+85c9efd13b6e,"We still write ""w"", but we never say it — like in ""wrist""!",story,story:silent_letters
+356a90ccbcb7,wh and en make when,story,story:digraphs
+79f846025970,wh and im make whim,story,story:digraphs
+90a75669063d,wh and ip make whip,story,story:digraphs
+c34306176c9d,"When the word is about a PERSON or a JOB, use ""-cian""!",story,story:tion_sion
+446c4dd18f8f,y and am make yam,story,story:short_a
+2a799aed7451,"Yes! It's ""bake"".",story,story:suffixes
+34451b968f9f,"Yes! It's ""bird"".",story,story:bossy_r
+d80e3ec4aabc,"Yes! It's ""boat"".",story,story:vowel_teams
+9fe6ee1b6464,"Yes! It's ""bright"".",story,story:igh_ight
+f21d4bb61bb2,"Yes! It's ""burn"".",story,story:bossy_r
+40323ef0e7a5,"Yes! It's ""cap"".",story,story:magic_e
+0e824be8cc3e,"Yes! It's ""comb"".",story,story:silent_letters
+c26eb4263d3d,"Yes! It's ""corn"".",story,story:bossy_r
+d647927ce87b,"Yes! It's ""cry"".",story,story:suffixes
+bf7fb562f435,"Yes! It's ""cub"".",story,story:magic_e
+dd2f4b3c6a0f,"Yes! It's ""day"".",story,story:vowel_teams
+daab5fb48b4e,"Yes! It's ""dream"".",story,story:vowel_teams
+2b2b70f2cbfe,"Yes! It's ""fern"".",story,story:bossy_r
+5af7d0741ff2,"Yes! It's ""gnome"".",story,story:silent_letters
+1f3e0bc0c7d8,"Yes! It's ""happy"".",story,story:prefixes
+2a9b7ae9fcb4,"Yes! It's ""high"".",story,story:igh_ight
+fb8c832e09df,"Yes! It's ""hop"".",story,story:magic_e;story:suffixes
+0ce3f25d2b10,"Yes! It's ""hope"".",story,story:suffixes
+0ccbad8afa5a,"Yes! It's ""kit"".",story,story:magic_e
+0f1813074457,"Yes! It's ""knee"".",story,story:silent_letters
+55f5c809a89e,"Yes! It's ""light"".",story,story:igh_ight
+ae66af577c42,"Yes! It's ""like"".",story,story:prefixes
+0d4ae9e80c29,"Yes! It's ""night"".",story,story:igh_ight
+a5ff4282e3d4,"Yes! It's ""play"".",story,story:prefixes;story:suffixes
+bee75243c96c,"Yes! It's ""rain"".",story,story:vowel_teams
+a3c74278b443,"Yes! It's ""read"".",story,story:prefixes
+c30d812e1291,"Yes! It's ""run"".",story,story:suffixes
+8c6ecdadb4fd,"Yes! It's ""sigh"".",story,story:igh_ight
+adfcc03b2b5d,"Yes! It's ""snow"".",story,story:vowel_teams
+7b97737e81b9,"Yes! It's ""star"".",story,story:bossy_r
+b4dfe897933c,"Yes! It's ""tree"".",story,story:vowel_teams
+81ddc35b7d30,"Yes! It's ""view"".",story,story:prefixes
+d8ff8957d589,"Yes! It's ""walk"".",story,story:silent_letters
+1780c6057d30,"Yes! It's ""wrist"".",story,story:silent_letters
+4aeb195cd69e,ad,sound,story:short_a
+7edd1dd232a6,ag,sound,story:short_a
+96e8155732e8,am,sound,story:short_a
+de73eac0c305,an,sound,story:short_a
+ac78b022715c,ap,sound,story:short_a
+27e90dfa57c3,at,sound,story:short_a
+f5ab0a953dd0,bio,sound,story:greek_roots
+f55fb78160b9,bl,sound,story:blends
+3eb65786145e,br,sound,story:blends
+482bd64c6c9f,ch,sound,story:digraphs
+ef3ecccf258f,cl,sound,story:blends
+ccd8c1593808,cr,sound,story:blends
+a05d478d6e09,cry,sound,story:suffixes
+0139bc242af2,cub,sound,story:magic_e
+05c77e49f6a3,dr,sound,story:blends
+a162caffcb68,ed,sound,story:short_e
+3a1c21a559ed,eg,sound,story:short_e
+d027b4c247e6,ell,sound,story:short_e
+094b0fe0e302,en,sound,story:short_e
+a5bc1d9b2ae7,et,sound,story:short_e
+d0cf1ef21f0c,fl,sound,story:blends
+7a8f6388fec1,geo,sound,story:greek_roots
+5644a3f6d24d,gl,sound,story:blends
+de06109890d2,gr,sound,story:blends
+87ea5dfc8b8e,id,sound,story:short_i
+e2a64bf04181,ig,sound,story:short_i
+e233f084399e,ill,sound,story:short_i
+af10ef20dd90,in,sound,story:short_i
+f9aba3f1299b,ip,sound,story:short_i
+6c5522ca8af8,it,sound,story:short_i
+15cbe07988bc,ob,sound,story:short_o
+f6d794ec98ce,od,sound,story:short_o
+f8bf1076b5ce,og,sound,story:short_o
+ef67e0868c98,oi,sound,story:diphthongs
+824f601c2a81,op,sound,story:short_o
+aeed71d78dc0,ot,sound,story:short_o
+d5f10c9bc837,ou,sound,story:diphthongs
+4c9257b96d2a,ous,sound,story:ture_ous
+0d142f8ccdd6,ow,sound,story:diphthongs
+4b3032e11383,oy,sound,story:diphthongs
+8df74dda184c,ph,sound,story:digraphs
+f437cb078acc,pl,sound,story:blends
+16795633e2c1,sh,sound,story:digraphs
+2b002dcf5eba,sl,sound,story:blends
+3e76c24356d3,sm,sound,story:blends
+c3ecef83d068,sn,sound,story:blends
+e8c5e5be4d49,sp,sound,story:blends
+9b02d9974c14,st,sound,story:blends
+8d4c780fcfdc,sw,sound,story:blends
+fa6af6e97d01,th,sound,story:digraphs
+d9e83874d260,tr,sound,story:blends
+8a5ce58444d0,ub,sound,story:short_u
+8b438931efa6,ug,sound,story:short_u
+ec92b7430684,um,sound,story:short_u
+dd3bc42b2cbb,un,sound,story:short_u
+7c0a25c06ea3,up,sound,story:short_u
+e746699d3947,ut,sound,story:short_u
+d764022e7248,wh,sound,story:digraphs
+5780daf6db0b,about,word,lessons
+f2b195dcacba,accident,word,lessons
+799af25155e6,accident accident,word,quiz
+f9659d46b223,achieve,word,lessons
+34eb4c4ef005,action,word,lessons;quiz
+d617b5ef5a36,actually,word,lessons
+aed1be2056a3,actually actually,word,quiz
+c662180230ca,address,word,lessons
+ae78612a049c,adventure,word,lessons;quiz
+aaa4d5f872be,again,word,lessons
+613c427e32a7,again again,word,quiz
+d87c448044de,all,word,lessons
+c65dc3b9a9ee,alphabet,word,lessons
+25dc282b5a3d,answer,word,lessons;story:sight_words_expanding
+90d761b6f4a6,answer answer,word,quiz
+910f17dc52f0,appear,word,lessons
+6578aea7f639,appear appear,word,quiz
+1b2a623b2b21,appoint,word,lessons
+5f9e5802bbab,are,word,lessons
+163001e29033,arrive,word,lessons
+8960298cc32a,arrive arrive,word,quiz
+d0278de5f6e5,attention,word,lessons
+9aa45b95cd6b,autobiography,word,lessons
+c71922477746,autograph,word,lessons;story:greek_roots
+ebe8872498bd,automatic,word,lessons;story:greek_roots
+e37e19ee167e,automobile,word,lessons;story:greek_roots
+9e301e6f293f,autopilot,word,lessons
+dec0734503a9,avoid,word,lessons
+1902e3d6fc4e,bad,word,lessons
+9b4e473e4de7,bag,word,lessons
+31ebb51159ad,baked,word,lessons
+096291b950d9,baking,word,lessons;story:suffixes
+8bec0406497c,ball,word,lessons
+2580d49ff406,ban,word,lessons
+b9e2c5c9b81a,bare,word,lessons;story:homophones
+cc86fbef6659,bark,word,lessons;quiz
+9b64d4ad2ee2,bat,word,lessons
+b483b668ed18,bath,word,lessons
+986b1bc1eb8d,be,word,lessons
+48617412af62,beach,word,lessons
+09f5edeb4f5b,bear,word,lessons;quiz
+485adcf436d2,beautician,word,lessons
+6393bcdfe36c,beautiful,word,lessons
+97c815a3a92a,beautiful beautiful,word,quiz
+d1ef4731ec5c,because,word,lessons;story:sight_words_building
+afcf422f4519,because because,word,quiz
+fefe2393a7fc,bed,word,lessons;quiz
+ff14a3626696,beg,word,lessons
+94ec44c4f4ad,believe,word,lessons;story:sight_words_mastery
+deba6d6c17c4,believe believe,word,quiz
+04bf886e8ac2,bell,word,lessons
+489c7fc8339f,below,word,lessons
+73675debcd8a,ben,word,lessons
+e5c89c529dcc,bench,word,lessons
+c033816b54c9,bet,word,lessons
+a3e3318b0a30,bicycle,word,lessons
+92e89baaca79,bicycle bicycle,word,quiz
+a65df7094b22,bid,word,lessons
+95c4bea12e4e,big,word,lessons;quiz
+44d536903233,bike,word,lessons
+c692d6a10598,bill,word,lessons
+9a5d56716d56,bin,word,lessons
+2265c60667e8,biodiversity,word,lessons
+bf7d7e82b9df,biography,word,lessons
+324d1dcc22de,biology,word,lessons;story:greek_roots
+0d58af0d3925,biome,word,lessons;story:greek_roots
+4c769085dedc,bionic,word,lessons;quiz;story:greek_roots
+cd92815bf627,bird,word,lessons;story:bossy_r
+e461268b795e,birth,word,lessons
+5ab860616d3e,biscuit,word,lessons
+026e996a3a58,bit,word,lessons;quiz
+466bc8cef3e7,black,word,lessons
+efb61c7f9cd0,bland,word,lessons;quiz
+0fd0bcfb44f8,blob,word,lessons
+169254c45fa4,blog,word,lessons
+5812e2b73561,bloom,word,lessons
+4c9a82ce72ca,blue,word,lessons
+2a50ddf9299c,boat,word,lessons;story:vowel_teams
+48181acd22b3,bob,word,lessons
+7ae7a24fc346,bog,word,lessons
+807a11e7b931,boil,word,lessons
+cd4dc89a223d,bomb,word,lessons
+ffdf4ccbf050,bone,word,lessons
+e7e694c58cd5,book,word,lessons;story:oo_sounds
+5c73b0c6f476,boot,word,lessons
+03715355e5db,born,word,lessons;quiz
+c7d8a6d722a1,box,word,lessons
+ceac9b04aced,boy,word,lessons
+9233b6f5388d,brad,word,lessons
+f18479d59856,brag,word,lessons
+8b9248a4e0b6,brain,word,lessons
+9fc1aa648fa1,brave,word,lessons
+3830e28736d8,bravely,word,lessons
+5deaaaa4530e,breathless,word,lessons
+b6fc12d785c9,brew,word,lessons
+bbd39e73eb57,bride,word,lessons
+0570b92fa1d6,bright,word,lessons;story:igh_ight
+055adfea1d49,brim,word,lessons
+9166eeff1e50,brown,word,lessons;quiz
+bc2b786705f1,bruise,word,lessons
+6885858486f3,bug,word,lessons
+138d732519ec,bull,word,lessons
+b14615a7fdef,bun,word,lessons
+03b5db720ed1,burn,word,lessons;story:bossy_r
+ad1157c58d56,burst,word,lessons
+e18a89f9cc5b,busy,word,lessons
+786e97b3ee9f,but,word,lessons
+d4f925b0d9a4,buttercup,word,lessons
+5ddc2ae17d5b,cake,word,lessons
+e4ffacba5591,calendar,word,lessons
+2ec3d0c752de,calm,word,lessons
+7e9219a0599e,can,word,lessons
+ac4be5ac63e1,cap,word,lessons;story:magic_e
+fbc259d1f78c,capture,word,lessons
+2ab0591dbcf5,card,word,lessons
+7c41bee11e41,careful,word,lessons
+eeaae8b6ef9a,careless,word,lessons
+20729d5f5b00,carried,word,lessons
+9d989e8d27dc,cat,word,lessons
+8b5241c71bbd,caught,word,lessons
+9dba6a05bc1c,cave,word,lessons;quiz
+2bd5fb5dde0b,centre,word,lessons
+eb27a3239c15,certain,word,lessons
+2cf64e447b84,chain,word,lessons
+142f5b555a46,chalk,word,lessons
+7ecde348ff9c,chat,word,lessons;quiz
+e86b4785d14f,cheerful,word,lessons
+8fe63c015a9b,chess,word,lessons
+220451adaa29,chew,word,lessons
+44613ba4f925,chin,word,lessons
+c6b6df0a9e1b,chip,word,lessons
+b91105648886,chirp,word,lessons
+0914b71d9a69,chop,word,lessons
+ef1feb0016f7,clam,word,lessons
+c19ab8d3c2c9,clap,word,lessons
+631b6b1e7d40,clapped,word,lessons
+6b2dc7c5f3fb,clapping,word,lessons;quiz
+8d767bf5b723,class,word,lessons
+de6b29cb1808,clay,word,lessons
+cd42169de3fa,climb,word,lessons
+e3a93fa81145,clip,word,lessons
+5a08f674cc62,clog,word,lessons
+a8d3866ed41c,cloth,word,lessons
+000e793db70c,cloud,word,lessons
+6725c9e20e61,clown,word,lessons
+e9933e8a7556,club,word,lessons
+452d2582883a,clue,word,lessons;quiz
+09d5f620386e,coat,word,lessons
+83f677838fa9,cod,word,lessons
+db2dfb7cb56e,coil,word,lessons
+3478fe69c7dc,coin,word,lessons
+2037de437c80,collection,word,lessons
+f74a5be97d91,colourful,word,lessons
+e51f8984adcc,comb,word,lessons;story:silent_letters
+4bad2b983d92,combustion,word,lessons
+d88d473b374e,come,word,lessons;story:sight_words_foundation
+0737c22d3bfa,complete,word,lessons
+077dea7f658b,comprehension,word,lessons
+6a38a38f03e4,conclusion,word,lessons
+cfc8b23ab1a1,confusion,word,lessons
+7211a145b2e5,congestion,word,lessons
+9cef6dd4b5bf,consider,word,lessons
+eee0bbba4ff9,continue,word,lessons
+f3ba4d993e2d,cook,word,lessons
+3bb4096cd3e1,cop,word,lessons
+3b3488380c9f,copied,word,lessons
+7cacb75c4cc3,corn,word,lessons;story:bossy_r
+7fd2e982067b,cot,word,lessons
+e30de8fdbd3f,could,word,lessons
+273e1fcdd4e8,courageous,word,lessons
+6739e64b73e0,coy,word,lessons
+13e87b4d20c1,crab,word,lessons
+7bdd161c9458,cream,word,lessons
+93fda888e218,creature,word,lessons;quiz;story:ture_ous
+fc3e05dc0ec4,cried,word,lessons;quiz;story:suffixes
+ad2b6e09a5c3,crop,word,lessons
+e857ca232f92,crow,word,lessons
+cdd97e00d3d8,crown,word,lessons
+b18907901692,cruise,word,lessons
+f73a8d346283,crumb,word,lessons
+54eda0d3622b,crush,word,lessons
+55f7d1f71091,cube,word,lessons;story:magic_e
+8f2e7cd78496,culture,word,lessons
+ad00c690d667,cup,word,lessons
+293028aa6ff9,curious,word,lessons
+5300d17a1d69,curl,word,lessons
+4a130aec0704,curriculum,word,lessons
+6792236dd07b,curve,word,lessons
+06e45e384318,cut,word,lessons
+c62a1190b91b,cute,word,lessons;quiz
+0da19b540f7c,dad,word,lessons
+296ef2014ffd,dam,word,lessons
+51f81b7ab79f,danced,word,lessons
+6e6ec3a652d1,dangerous,word,lessons;quiz;story:ture_ous
+3d09ba44760d,dark,word,lessons
+a2620cbc10f5,day,word,lessons;quiz;story:vowel_teams
+d14809f05ad6,decide,word,lessons;story:sight_words_expanding
+2a17ce1476cc,delight,word,lessons
+0e1ddfe761f4,den,word,lessons
+dbc3503fab01,describe,word,lessons
+056f11827899,design,word,lessons
+6870010883a7,destroy,word,lessons
+85c577fb2e59,detox,word,lessons
+418a6bc4decc,develop,word,lessons
+5dd92d182350,did,word,lessons
+4834b89c00e9,dietician,word,lessons
+517d5a724086,different,word,lessons;story:sight_words_expanding
+d2a26f03aa5a,difficult,word,lessons
+9080a51cd6de,dig,word,lessons
+15ff67ac66cc,digestion,word,lessons;quiz
+6b665e89f23e,dip,word,lessons
+57077e98504c,direction,word,lessons
+f584439dd0ea,disagree,word,lessons
+dbec95941dfc,disappear,word,lessons
+4bbfd520f959,discomfort,word,lessons
+573bb1c8af16,disconnect,word,lessons
+1eb0b8dc987b,discover,word,lessons
+5862a4b1fef8,dish,word,lessons
+aedf61564743,dislike,word,lessons;story:prefixes
+ce2fcff2aeb8,disorder,word,lessons;quiz
+49753b5374d8,displace,word,lessons
+59b189070af7,display,word,lessons
+f65f74f32525,distrust,word,lessons
+35d1b36277d4,diving,word,lessons
+4fd95a301ae3,division,word,lessons
+e49512524f47,dog,word,lessons;quiz
+4bbf2ddc3879,dolphin,word,lessons
+2680b6746cf8,door,word,lessons
+348a3c4a81ea,dot,word,lessons;quiz
+77346d0447da,down,word,lessons
+a4e2dc760403,drag,word,lessons
+5f04a8843e6c,dream,word,lessons;story:vowel_teams
+9685a78bf02e,drew,word,lessons
+049c32667ae7,drip,word,lessons
+db86c0d0674e,drool,word,lessons
+aa20c3bf5eca,drop,word,lessons
+1a1b2a546e6f,drove,word,lessons
+2011fdcd2d58,drown,word,lessons
+1804bfc99ddc,drum,word,lessons
+ff3bde741799,dug,word,lessons
+421771305044,dumb,word,lessons
+0bb831d59c5e,eggcup,word,lessons
+3b1028122b8e,elbow,word,lessons
+0cd63ccea041,electrician,word,lessons
+0ae9e4deba26,elephant,word,lessons
+e1b8d885b4cc,emptied,word,lessons
+ea2091be332f,endless,word,lessons
+540e181495e5,enjoy,word,lessons
+b3d6a9b743ac,enormous,word,lessons;quiz
+57bda4999f05,erosion,word,lessons
+5873f666d03f,every,word,lessons;story:sight_words_building
+eb70d1fcdf82,exercise,word,lessons
+8bebf68bd167,exhaustion,word,lessons
+429688a9b9de,expansion,word,lessons
+f96da029a6da,experience,word,lessons;story:sight_words_mastery
+9eac472c3f7a,experience expirience,word,quiz
+e6b620d135f9,explosion,word,lessons
+ec9814396ba2,expression,word,lessons
+f98961015a0a,extension,word,lessons
+6928e8493254,extreme,word,lessons
+79df4b171812,eye,word,lessons
+4a43d29dc895,fame,word,lessons
+d923de9f6945,famous,word,lessons;story:ture_ous
+2899441143e2,fan,word,lessons
+36a3bbe0659d,farm,word,lessons
+5b5fb1c9d703,fat,word,lessons
+824168b68d01,favourite,word,lessons;story:sight_words_mastery
+d18e447b972b,fearless,word,lessons
+4b7615dce52c,feature,word,lessons
+4d8f35e9ae90,February,word,lessons
+8d0ea520e285,fed,word,lessons
+67c0fccad5fd,feet,word,lessons
+432aeb804333,fell,word,lessons
+654edb122a04,fern,word,lessons;story:bossy_r
+b219a5c95dfc,fig,word,lessons
+517bd000b74c,fight,word,lessons;quiz
+7aec9744ba15,fill,word,lessons;quiz
+b76049e61518,fin,word,lessons
+e0996a37c13d,first,word,lessons
+64875fcccaac,fish,word,lessons
+9c20b9ba55a2,fit,word,lessons
+112f3a99b283,flag,word,lessons
+f41c19c580f7,flame,word,lessons
+eb40cd09ff89,flashlight,word,lessons
+b9c7b42de27f,flat,word,lessons
+bd102cd7b809,fled,word,lessons
+d1de9198a0aa,flew,word,lessons
+cca5020761d4,flight,word,lessons
+40f924d802a7,flip,word,lessons
+3684c9d3c05e,floor,word,lessons
+3bcfa747d171,flour,word,lessons
+d8f7e9c783be,flow,word,lessons
+5a46b8253d07,flower,word,lessons
+ba6665281a61,flute,word,lessons
+0974abfe4509,flying,word,lessons
+dfebbda7af18,fog,word,lessons
+f71134c08d26,foil,word,lessons;quiz
+2d02ecf89aff,folk,word,lessons
+39ccb32d95ed,food,word,lessons;story:oo_sounds
+32cb9138ce24,foot,word,lessons
+2787a85eb23c,fort,word,lessons
+ace0c5e90ac0,forward,word,lessons
+57b9bc6f0480,forward forward,word,quiz
+2739bb260ce4,found,word,lessons
+ff0f0a8b656f,fox,word,lessons;quiz
+ca3ad46f5661,fraction,word,lessons
+b03727da759d,fracture,word,lessons
+4ff88aaddbd2,free,word,lessons
+e69867ca7d5a,friend,word,lessons;story:sight_words_building
+c0514c0e5cbf,friend friend,word,quiz
+806299aee866,fright,word,lessons
+b3e0f62fa104,frog,word,lessons
+07120c7bc05b,frown,word,lessons
+f053b8b6867d,fruit,word,lessons
+52e6d8ab8847,full,word,lessons
+c84c50d5a767,fun,word,lessons
+de09d1100f01,furious,word,lessons
+7b6e7a2599ce,furniture,word,lessons
+81a5b34cb663,fuse,word,lessons
+d848c9713eb1,future,word,lessons
+81bf0145c8f2,gap,word,lessons
+feb97d0e31b0,generous,word,lessons
+5f4e484b31c0,gently,word,lessons
+5b50acc9656e,geocache,word,lessons
+b27c2f67af07,geography,word,lessons;story:greek_roots
+9f1647ab8edc,geology,word,lessons;story:greek_roots
+ff63fac4076c,geometry,word,lessons;quiz;story:greek_roots
+2d0eb3814d8e,geothermal,word,lessons
+367c55c2b3ba,germ,word,lessons
+783923e57ba5,get,word,lessons
+25b732b3425c,girl,word,lessons
+fa9f22e62229,give,word,lessons
+3d95672b7ca9,glad,word,lessons
+e9359b6bfa62,glam,word,lessons
+91080b5865f9,glamorous,word,lessons
+bf135d1f23a4,glue,word,lessons
+09244541f353,gnaw,word,lessons
+7d448a797437,gnome,word,lessons;story:silent_letters
+1ec558a60b5d,go,word,lessons
+eee6f06e35cd,go go,word,quiz
+21298df8a327,God,word,lessons
+fc19318dd131,good,word,lessons;story:oo_sounds
+0a6af09f6e46,gorgeous,word,lessons
+816ade65594d,got,word,lessons
+29f0b5328ee9,gown,word,lessons
+d9483b238012,grab,word,lessons
+39a6bd435eb6,grade,word,lessons
+338df5dd54a1,grammar,word,lessons
+29a184b65cab,graph,word,lessons;quiz
+bbc29b76c59b,grass,word,lessons
+54bb9bd5dd47,grateful,word,lessons;quiz
+bc74f4f071a5,green,word,lessons
+79e2475f81a6,Greg,word,lessons
+f3c543ad5fe9,grid,word,lessons
+e1545f8f38fd,grill,word,lessons
+a266986861f0,grin,word,lessons
+e752c3b34a28,grip,word,lessons;quiz
+cd12af96fa5c,ground,word,lessons
+64292b1c2b2e,group,word,lessons
+c7c5d759817f,grow,word,lessons
+f45aad6858e4,growl,word,lessons
+43a3103d2595,grub,word,lessons
+c7e42d43b0a3,guard,word,lessons
+db4517266f26,gum,word,lessons
+ebebee19b34c,gun,word,lessons
+823c1e79fcc2,gut,word,lessons;quiz
+85d72cb875cd,had,word,lessons
+78844960f3eb,ham,word,lessons
+cae5970fc939,hard,word,lessons
+6fe234f24790,harmless,word,lessons
+10e5866050d2,hat,word,lessons
+ff87cea4a48b,have,word,lessons
+30f088ea6673,he,word,lessons
+762b28bba687,he he,word,quiz
+ca607cf696dc,hear,word,lessons;story:homophones
+928b45389f6a,heard,word,lessons
+73e7e545c519,height,word,lessons
+4b7392910ae3,helpful,word,lessons
+d811086176db,hen,word,lessons
+999400659233,her,word,lessons
+dffdaa3f5008,herd,word,lessons
+0154c0dabe71,here,word,lessons;quiz
+5834a4ed4c44,hiccup,word,lessons
+ce2505af510d,hid,word,lessons
+9235afd3e988,high,word,lessons;story:igh_ight
+c9addaa49db2,highlight,word,lessons
+5ce9c4dfa820,hill,word,lessons
+ae763d5994a0,hip,word,lessons
+66f79d8a6327,history,word,lessons;story:sight_words_expanding
+d7d390bd9eba,hit,word,lessons
+9bf0e809ef19,hog,word,lessons
+e83249bd3ba7,home,word,lessons
+ef0104533771,homeless,word,lessons
+6bab147e478a,hook,word,lessons
+cffb6b20e0ee,hop,word,lessons;story:magic_e;story:suffixes
+4955742b2d74,hope,word,lessons;story:magic_e;story:suffixes
+05a2a1ad294d,hopeful,word,lessons
+0a92310758dd,hopeless,word,lessons
+3b1fbc94ed56,hopped,word,lessons
+4bd8eddacb60,hot,word,lessons
+52ab86a87214,hour,word,lessons
+c3f51c209bf4,howl,word,lessons
+65acf0a7ced5,hub,word,lessons
+f11fb55cedc6,hug,word,lessons
+f2104f952646,huge,word,lessons
+39c9940833ee,hum,word,lessons;quiz
+6b3c044195eb,humorous,word,lessons
+74b2994593d7,hurried,word,lessons
+7ee201fb09fb,hurt,word,lessons;quiz
+00020d3566ae,hut,word,lessons
+042dc4512fa3,I,word,lessons
+0a5c12bdd978,I I,word,quiz
+469983f93a1c,illusion,word,lessons
+971687e355a1,imagine,word,lessons
+5b4009518b37,important,word,lessons;story:sight_words_expanding
+5c00aab5b806,impression,word,lessons
+afb56160aba3,infection,word,lessons
+5e8aa8dfeca5,interest,word,lessons
+a379c85f8c69,into,word,lessons
+48880ab02e9c,into into,word,quiz
+d6dc139f529a,invasion,word,lessons
+94ac05762d59,invention,word,lessons
+7bd1a907a1ec,island,word,lessons
+da3dd5c2657f,jam,word,lessons
+b12fb7efbc12,jealous,word,lessons
+2f659ba6749c,jet,word,lessons
+14808c7325b2,jig,word,lessons
+2eda8ad1632a,job,word,lessons
+c455b38e0762,join,word,lessons
+c7d56fc0723a,joy,word,lessons;quiz
+aed7c4d5621d,joyful,word,lessons
+1c35e97db7d1,jug,word,lessons
+07ef87917542,juice,word,lessons
+1b2b800ad20f,jumped,word,lessons
+d0f9310437be,jumping,word,lessons
+48381c951e03,jut,word,lessons
+9399b6f4bee2,keg,word,lessons
+470bc5781627,ken,word,lessons
+864005992769,kindly,word,lessons
+b17eb192f8d2,kit,word,lessons;story:magic_e
+34e1c7876de9,kite,word,lessons;story:magic_e
+cd9ec222b003,knack,word,lessons
+65a108e74c89,knave,word,lessons
+d22dda44c8bc,knee,word,lessons;story:silent_letters
+ddb49116d4c9,kneel,word,lessons
+6e32618ee300,knife,word,lessons;quiz
+8f2174c83b06,knight,word,lessons
+668166eff767,knit,word,lessons
+5e50971cb25b,knob,word,lessons
+03c065bae9f5,knock,word,lessons
+40a22a4a629c,knot,word,lessons
+97accafb5337,know,word,lessons
+cce245fbd902,knowledge,word,lessons;story:sight_words_mastery
+cdf42945742d,lad,word,lessons
+ac0bb7d6a6eb,lamb,word,lessons
+d2c5d61afa3b,lane,word,lessons
+fcedddf47290,lap,word,lessons
+98798241748e,leaf,word,lessons
+af09e2fcaf45,lecture,word,lessons
+6a9a37af6cf5,led,word,lessons
+321d6cc5177a,leg,word,lessons
+0262f9bb6ecb,let,word,lessons
+00299a408dc3,library,word,lessons;story:sight_words_mastery
+a53814d71f56,lid,word,lessons
+dfccc06f1441,light,word,lessons;story:igh_ight
+c4eb7d7fea3c,like,word,lessons;story:prefixes
+69f0e8cdc852,limb,word,lessons
+7d72878c2a31,lip,word,lessons
+efa0c129598d,literature,word,lessons
+5dbc716c4600,load,word,lessons
+7babc233de26,log,word,lessons
+e09315fa02d7,look,word,lessons
+dcf6aa5497e0,lot,word,lessons
+afdced5da711,loudly,word,lessons
+9f2feb0f1ef4,love,word,lessons
+434759d3164b,lox,word,lessons
+68ad5b4ed0bd,loyal,word,lessons
+094530549b5e,lunch,word,lessons
+1b3cccda27f8,mad,word,lessons
+182f3dc46834,magician,word,lessons
+1d6e1cf70ec6,mail,word,lessons;quiz
+78e7b9cb5374,makeup,word,lessons
+8175e3c8753a,man,word,lessons
+6884ece877ec,manageable,word,lessons
+9bf235d7e9a3,mansion,word,lessons
+37745ed7a0f0,map,word,lessons
+52d081ef4d70,married,word,lessons
+541d0b60bbbf,marsh,word,lessons
+1b8a0bcee0e2,marvellous,word,lessons
+cc7c5be316e4,mat,word,lessons;quiz
+97912524f347,material,word,lessons
+85da3407b813,mathematician,word,lessons
+860afcbe89eb,mathematics,word,lessons
+b1c1d8736f20,me,word,lessons
+bb40f75a9c60,meat,word,lessons
+ea5eb8e27f6e,medicine,word,lessons
+392d7871944a,meet,word,lessons
+8fdc8713516a,Meg,word,lessons
+6711b9ebf598,men,word,lessons
+ad367612541b,mess,word,lessons
+2e6d60242831,microbe,word,lessons
+afd4a02f47e4,microbiology,word,lessons
+17d396020d8a,microphone,word,lessons;story:greek_roots
+34a95f2c94b4,microscope,word,lessons;story:greek_roots
+ba44f54770e6,microwave,word,lessons;quiz;story:greek_roots
+62b487bc8482,midnight,word,lessons
+13f29965b773,might,word,lessons
+be37ec2ec8ed,mill,word,lessons
+8034c43d15bb,mine,word,lessons
+04987fcab72a,minute,word,lessons
+bc229b4326f0,miscount,word,lessons
+55afdf79d0f5,misguide,word,lessons
+59cbfe4a1635,mislead,word,lessons
+170dae42122e,mismatch,word,lessons
+1ed8ada5f57c,misplace,word,lessons;quiz
+db7288509bdc,misprint,word,lessons
+79853e06b28b,misread,word,lessons;story:prefixes
+e59abed35218,mission,word,lessons
+20846165bfa7,misspell,word,lessons
+c07a45a81c6a,mistake,word,lessons
+d2440e17d945,misuse,word,lessons
+ab41eb3febbf,mixture,word,lessons;quiz
+b56a7ce48531,mob,word,lessons
+9b3f15cecebc,moist,word,lessons
+46dcd4dd65b6,moon,word,lessons;story:oo_sounds
+18cae9faeeb9,moonlight,word,lessons;quiz
+e428b54c599d,mop,word,lessons
+c9d24a5ff5e1,moth,word,lessons
+87d17825792d,mouth,word,lessons
+379d6ce99a8a,move,word,lessons
+7d3f44729dc2,much,word,lessons
+41eceaf7561b,mug,word,lessons
+2e417fcbfb17,musician,word,lessons;quiz;story:tion_sion
+c38ad78f4410,mute,word,lessons
+3ece1471f44f,my,word,lessons
+3b41c7aefc79,mysterious,word,lessons
+f1faf9d84fc2,nag,word,lessons
+6ae999552a0d,name,word,lessons
+c2640f79b4ed,nap,word,lessons
+f6908a01e19f,nation,word,lessons;quiz;story:tion_sion
+11e60b0eaade,natural,word,lessons
+a5197f10266a,nature,word,lessons;story:ture_ous
+2638da864f86,neatly,word,lessons
+fce3b4d725ee,necessary,word,lessons
+efe30e310694,need,word,lessons
+b8a818857cbe,neighbour,word,lessons
+424a55e0d200,nerve,word,lessons
+e159bc524f9a,nervous,word,lessons;story:ture_ous
+391b6629d9b6,net,word,lessons;quiz
+42765b4b93d9,nigh,word,lessons
+1be2a44cb53d,night,word,lessons;story:igh_ight
+fd1286353570,no,word,lessons
+68240ede4163,no no,word,quiz
+55e5f07f1efb,nod,word,lessons
+3099447db4c8,north,word,lessons
+1a1f58c9adc7,nose,word,lessons
+557f25551671,not,word,lessons
+a81b09d95215,notice,word,lessons
+a8210b565ab2,noticeable,word,lessons
+4f41ed4f4f50,numb,word,lessons
+3de1769618b2,nun,word,lessons
+285f9a003f67,nurse,word,lessons
+85ae1763938d,nut,word,lessons
+e339de7c197c,nutmeg,word,lessons
+84eeb8492554,occasion,word,lessons
+11b0b7df4e2c,occasionally,word,lessons
+78ae0cc6dcec,occasionally occasionally,word,quiz
+1863835675e3,once,word,lessons
+95901050a1d6,opposite,word,lessons
+18ebdfde9216,optician,word,lessons
+eb9e4a900705,ordinary,word,lessons
+150c70aa93d1,orphan,word,lessons
+edde5448f4a1,outrageous,word,lessons
+d57eb76398ee,ox,word,lessons;story:short_o
+51da2df9f47e,pad,word,lessons
+17d7968853b0,painless,word,lessons
+747a7c98545d,palm,word,lessons
+bd2bd8216b9c,pan,word,lessons
+ce4151ff856b,park,word,lessons
+8c4a6b36a09c,particular,word,lessons
+9d4e1e23bd5b,pass,word,lessons
+eabc12ab2e0e,passion,word,lessons;quiz
+7ffe1ba40f25,pat,word,lessons
+bab4c3dbad3e,peaceful,word,lessons
+acbe10e69a72,peach,word,lessons
+8bd8d5e46f8f,peculiar,word,lessons
+ae8d391039d0,peg,word,lessons
+31a841af7b2f,pen,word,lessons
+5257ab4bb925,pension,word,lessons
+ab3ccc8dba2a,people,word,lessons;story:sight_words_building
+5e1620b2afe9,people people,word,quiz
+24b9ac476a78,perch,word,lessons
+b81f4a81f361,perhaps,word,lessons
+6d244f583642,permission,word,lessons
+1b034c38bec0,pet,word,lessons
+fe77c82bb2a4,phase,word,lessons
+f6be6ca91098,phone,word,lessons
+eeb35d331bdd,photo,word,lessons;story:greek_roots
+1d1215089f78,photocopier,word,lessons;story:greek_roots
+5df588cdf685,photograph,word,lessons;story:greek_roots
+9aa15b5bf5c7,photography,word,lessons
+8764bc836969,photon,word,lessons;quiz
+f73fecc9ff6b,photosynthesis,word,lessons;story:greek_roots
+5896b2d61e35,phrase,word,lessons
+f622146fed68,physician,word,lessons
+4fe6a7dfe411,pickup,word,lessons
+0e66b49d04a4,picture,word,lessons;story:ture_ous
+2cd4ba93087f,pig,word,lessons
+93720caa8410,pill,word,lessons
+d145a2a905bc,pin,word,lessons
+2d02a8f51cd3,pine,word,lessons;quiz
+00884428322b,pit,word,lessons
+68c46e84d76d,plain,word,lessons
+bed97175b06e,plan,word,lessons
+516626bf8a50,play,word,lessons;story:prefixes;story:suffixes
+c1f3e1901b94,played,word,lessons
+1cb048ee32c2,plod,word,lessons
+64faf5d0b1dc,plop,word,lessons;quiz
+705b77c0acf1,ploy,word,lessons
+685601509a56,plug,word,lessons
+d6a0ca33c03b,plum,word,lessons
+71a7ca855f38,point,word,lessons
+57e9db67451c,pole,word,lessons
+8279ece1cb3c,politician,word,lessons
+51a4b13bc790,pool,word,lessons;quiz;story:oo_sounds
+2156e40a12d6,poor,word,lessons
+4f197c99a78b,pop,word,lessons
+062d8a9dec0f,port,word,lessons
+914fb82ef86c,possession,word,lessons
+cb79bd0ce2a8,pot,word,lessons
+0e1ce4b96457,powerful,word,lessons
+c21d2445dbed,pox,word,lessons
+3f4b26106b9e,precook,word,lessons
+5226c875836a,predict,word,lessons
+ecdac18efe83,preorder,word,lessons
+4197eb0cd811,prepare,word,lessons
+f46ef282f81e,prepay,word,lessons;quiz
+7775e212de08,preschool,word,lessons
+6d1861f9350a,preset,word,lessons
+cd09e18a9bd7,press,word,lessons
+973a68e360e4,pretest,word,lessons
+162fd259d9c6,pretty,word,lessons
+2b9beeb30893,pretty pretty,word,quiz
+1b2bf1cea798,prevent,word,lessons
+1aa787fe0cfb,preview,word,lessons;story:prefixes
+ac1cea310fc7,pride,word,lessons
+f6c433acac2a,prod,word,lessons
+6ae2df692f64,profession,word,lessons
+ef64363d23b3,proof,word,lessons
+0f4d4213d6d9,proud,word,lessons
+82ffc9435b79,prove,word,lessons
+83000ea0c820,prune,word,lessons
+3f0ec57c0da5,pub,word,lessons
+c872d5564551,pull,word,lessons
+b7257dfbed6e,pup,word,lessons
+a7e546716acb,purse,word,lessons
+3b2be2e26344,question,word,lessons;quiz
+0b35c19a59e7,quickly,word,lessons
+69a537093ff9,rag,word,lessons
+fbec17cb2fcb,rain,word,lessons;story:vowel_teams
+77c7960e890d,ram,word,lessons
+24765b4c90fc,ran,word,lessons
+51c4ccfd6b81,rap,word,lessons
+359ce0caae50,rat,word,lessons
+baff1506c267,reach,word,lessons
+227f38db8f94,reading,word,lessons
+2dba2861bcd4,rebuild,word,lessons
+c50cbe2a7225,recognise,word,lessons
+089f4e36079e,recycle,word,lessons
+78988010b890,red,word,lessons
+4d64c2287901,redo,word,lessons
+181f09555d31,refill,word,lessons
+180920ab183c,reheat,word,lessons
+d6e6e576541f,reload,word,lessons
+0759f56c5c8c,remember,word,lessons
+341d953e69dd,replay,word,lessons;story:prefixes
+baec5e22e1b5,replied,word,lessons
+38ad87fe6615,retell,word,lessons
+1fc36975bb71,reuse,word,lessons
+d03cc55fcd85,rewrite,word,lessons;quiz
+972a13cbbe5e,rich,word,lessons
+a77018e21d77,rid,word,lessons
+320ef6a3e22f,ride,word,lessons
+d27a1f117712,right,word,lessons
+ab8e595618bc,rip,word,lessons
+4adfa5797f24,road,word,lessons;quiz
+7e09c9d3e963,rob,word,lessons
+341b3b3bddab,robe,word,lessons;quiz
+f9f039034290,rod,word,lessons
+7f7889bab81b,roll,word,lessons
+e1588771eb64,rot,word,lessons
+f0590a6dd366,round,word,lessons;quiz
+ae685575101e,Roy,word,lessons
+9d644bbc5571,royal,word,lessons
+0eb10e9f9675,rub,word,lessons;quiz
+06458dcb90a4,rude,word,lessons
+0602f910beee,rug,word,lessons
+0f400122e37d,rule,word,lessons
+df6ad19037c9,run,word,lessons;story:suffixes
+3c49d9cc3c0c,running,word,lessons;story:suffixes
+6572e9cf0d5c,rush,word,lessons
+3109beea0969,rut,word,lessons
+b4914600112b,sad,word,lessons;quiz
+04efcab00df6,safely,word,lessons
+abc1350f2b5b,said,word,lessons;story:sight_words_foundation
+df8c165555a5,sail,word,lessons
+5b8a763b5451,sale,word,lessons
+f4603bd4ae9e,sap,word,lessons
+c55de0f5998e,sat,word,lessons
+dc01c6b7487a,say,word,lessons
+a384cff1a369,scarf,word,lessons
+655f83be7512,school,word,lessons
+84772cafc5ef,school school,word,quiz
+35b19fa87f2e,screen,word,lessons
+35cc01a53b05,screw,word,lessons
+a6cd96ce30b4,scrum,word,lessons
+49ba7ec67f6f,sculpture,word,lessons
+6fa11fb296a8,sea,word,lessons;quiz
+ac814ccccbf9,seat,word,lessons;quiz
+3d637fc60499,see,word,lessons;story:homophones
+92713d470937,seed,word,lessons;quiz
+dee2dd34f4ff,sell,word,lessons
+2b33481854c8,serious,word,lessons
+65c10dc3549f,set,word,lessons
+5080fd62c278,shape,word,lessons
+ca0b6293f204,sharp,word,lessons
+4a240ec058b4,she,word,lessons
+299fe84ecac4,she she,word,quiz
+46eb1094e87b,shed,word,lessons;quiz
+ec122f54cf16,shell,word,lessons
+1b09045adc25,shin,word,lessons
+3da90bd3db53,shine,word,lessons
+ed43a8a09e9b,ship,word,lessons
+faa5d6830269,shirt,word,lessons
+dadd0244407a,shod,word,lessons
+9fe79dec4549,shook,word,lessons
+5042d1466675,shop,word,lessons
+a0f4ea7d9149,short,word,lessons
+c6dc9bc9f77b,should,word,lessons
+d1c79aa3eaf4,shout,word,lessons
+278f7c86db1c,shrub,word,lessons
+e9683b50d456,shut,word,lessons
+49ac96a94170,sigh,word,lessons;story:igh_ight
+81e9209e64bd,sign,word,lessons;quiz
+7d14c04a713a,sin,word,lessons
+de77a66ed5be,singing,word,lessons
+bff8797c8e35,sip,word,lessons
+abdcde66d68b,sit,word,lessons
+cfc1e90d72b7,skid,word,lessons
+34b33e00b199,skill,word,lessons
+233c29034025,slam,word,lessons
+d31beed25865,slap,word,lessons
+c3ca5f787365,sleep,word,lessons
+634db2b6b073,slid,word,lessons
+209700f37a11,slight,word,lessons
+80a9a73f8183,slim,word,lessons;quiz
+191c1609d7f3,slip,word,lessons
+b972c8ef2b9a,slowly,word,lessons
+63007774fdc1,slug,word,lessons
+b8564a81e0eb,slum,word,lessons
+31fe827aea4c,smash,word,lessons
+410acf5ec68d,smell,word,lessons
+26f580ae0efc,smile,word,lessons
+88451c3ea85f,smiled,word,lessons;quiz
+26e46a7bdfdf,smiling,word,lessons
+5cb1e6240fb4,smoke,word,lessons
+254f76970b57,smooth,word,lessons
+27c89d320cc1,snag,word,lessons
+9054cc2304e6,snail,word,lessons
+603863e39883,snap,word,lessons
+90a20aa4f9e9,snip,word,lessons
+f16910369ac6,snob,word,lessons
+b94e9f3d7e00,snow,word,lessons;story:vowel_teams
+0e767424cc0d,sob,word,lessons
+8672414cc44c,softly,word,lessons;quiz
+118e80c09483,soil,word,lessons
+eb875812858d,some,word,lessons
+98c4b8f6e2d7,sort,word,lessons
+5e2e97c3c7ba,sound,word,lessons
+93ad1edafafa,soup,word,lessons
+f78ff729a763,sox,word,lessons
+d03f8dd37abd,sped,word,lessons
+3c29d0c3c4f4,speechless,word,lessons
+9e8fbda8d5ff,spell,word,lessons
+a801301ec2b8,spin,word,lessons
+5fe3f6d08391,spit,word,lessons
+f557e92965db,spoon,word,lessons
+8ab6a8a0cf06,sport,word,lessons
+9f4b5271fc0c,spot,word,lessons
+6e91db97823c,spotlight,word,lessons
+761b4fbbdf6b,spray,word,lessons
+5881ce920633,sprig,word,lessons
+3fc74fd0baa7,sprout,word,lessons
+1d08450feaff,spun,word,lessons
+4e3e01b9af84,star,word,lessons;story:bossy_r
+2da36ff30a38,station,word,lessons
+396f9974da4e,stay,word,lessons
+bf2903b55e59,steam,word,lessons
+e1d3fe39d1cb,stem,word,lessons;quiz
+bd370d1b6f9b,step,word,lessons
+75ea6bb7bfc1,stern,word,lessons
+186f52ede0e5,stir,word,lessons;quiz
+e30bfd0c38dc,stone,word,lessons
+ee971d808eae,stood,word,lessons
+1b480158e1f3,stop,word,lessons
+5acf41112413,stopped,word,lessons
+6ad3a9478f1c,storm,word,lessons
+9338aa5b38dd,stove,word,lessons
+6ec09feb3f12,straight,word,lessons
+adbc5ec97a8a,stray,word,lessons
+d3a9fb075d49,street,word,lessons
+58801e339195,stub,word,lessons
+0739a9e09977,studied,word,lessons
+fea71c3b1ddd,stun,word,lessons
+148d46fb75d9,subtraction,word,lessons
+30eef85dfdd3,sugar,word,lessons
+97e9422ac449,suggestion,word,lessons
+338ad11a14ea,suit,word,lessons;quiz
+e9dff3557ded,sum,word,lessons
+22fa6121da96,sun,word,lessons
+1f4ae04738c5,sunlight,word,lessons
+3844b17b3678,sup,word,lessons
+a001cca444c6,surf,word,lessons
+1f4f476af99d,swan,word,lessons
+60ab5c380786,sway,word,lessons
+ef4d07e4307b,sweep,word,lessons
+eb684e51b40a,swell,word,lessons
+b89f90f328fa,swim,word,lessons
+bb500fcedfa3,swimming,word,lessons
+917fe78a87f2,swirl,word,lessons
+8158e054a90c,swum,word,lessons
+5e9b60f69165,tag,word,lessons
+fbf5f2a2875b,tail,word,lessons
+34edfb0961a6,tale,word,lessons
+e55e91b2cc22,talk,word,lessons
+35ca8cf12ff7,tan,word,lessons
+25f30d353d67,tap,word,lessons
+bbe5bb364fb3,teach,word,lessons
+55d25800fb82,technician,word,lessons
+a81fecb038e8,teeth,word,lessons
+22368285a4cb,telegram,word,lessons
+dec7356b342f,telepathy,word,lessons
+3b01d3ebd10b,telephone,word,lessons;story:greek_roots
+82f4516eee9d,telescope,word,lessons;story:greek_roots
+60085763fb0f,television,word,lessons;quiz;story:greek_roots
+47b8015d98d5,tell,word,lessons
+7033e90fcdda,temperature,word,lessons
+dd3562449147,ten,word,lessons
+e6bacb0da062,tension,word,lessons;quiz
+2a4c3b84009d,term,word,lessons
+8ab5cbe29ff8,texture,word,lessons
+d820aa5f8750,than,word,lessons
+33b82201081e,that,word,lessons;quiz
+bbccdf2efb33,the,word,lessons;story:sight_words_foundation
+df055c669423,their,word,lessons
+98910a6e9ae7,them,word,lessons
+490528f36deb,there,word,lessons;story:homophones
+f1fdd46d8d22,they,word,lessons
+1010638da6f1,they're,word,lessons;quiz
+e22c51403b0f,thigh,word,lessons;quiz
+6ca0fa2674cd,thin,word,lessons
+34fb3300b9a7,third,word,lessons
+c2543fff3bfa,this,word,lessons
+3b4524320a92,though,word,lessons
+8dc22f4261c0,threw,word,lessons
+be6a563e765d,through,word,lessons
+d28d2b77fa48,thumb,word,lessons;quiz
+98b9f3569789,tight,word,lessons
+f269197686c5,tin,word,lessons
+306a967f976e,tip,word,lessons
+4374aaee247f,to,word,lessons;story:homophones;story:sight_words_foundation
+1c5e3fd2007d,to to,word,quiz
+d660902bf83c,tomb,word,lessons
+4ce0cba1df89,tonight,word,lessons
+164a5c24f5df,too,word,lessons
+63b3ea556378,tooth,word,lessons
+af2c7b4ca07a,top,word,lessons
+e7de9e6263e2,torch,word,lessons
+0cd0b19231db,town,word,lessons
+cd1933db799b,toy,word,lessons
+94efdd6f628e,train,word,lessons
+aaf2dd34829d,tram,word,lessons
+e6d307367af5,trap,word,lessons
+a08689140788,tray,word,lessons
+80655da8d80a,tree,word,lessons;story:vowel_teams
+c4832b3644bb,tried,word,lessons
+7ab4b0a80acc,trim,word,lessons
+fdd91fbac0e5,trip,word,lessons
+2127b01b9f44,trod,word,lessons
+1f5bbe7f3c28,trophy,word,lessons
+ac63f89619a0,trot,word,lessons
+5ffe533b830f,true,word,lessons
+18957262654a,tub,word,lessons
+920ae2fa4bff,tune,word,lessons
+5009c8e190ee,turkey,word,lessons
+b09c738b5976,turn,word,lessons
+7b937ada1a83,twig,word,lessons
+2f24fb18e9ad,twilight,word,lessons
+8ff307a4c71e,twirl,word,lessons
+ad782ecdac77,two,word,lessons;quiz
+95ef18f58f32,unable,word,lessons
+ee50a54d0fd6,unfair,word,lessons;quiz
+8c643cce3eac,unhappy,word,lessons;story:prefixes
+ca4339ee5842,unkind,word,lessons
+8ec498110256,unlock,word,lessons
+9a106745b32b,unpack,word,lessons
+752bb3ff1805,unsafe,word,lessons
+5c124dd68605,untidy,word,lessons
+d720d9c173f5,unwell,word,lessons
+b9e827c97f75,unwrap,word,lessons
+133375685a55,upright,word,lessons
+9384dbba8f5c,useless,word,lessons;quiz
+efa44987b6e3,van,word,lessons
+7942c90e546d,various,word,lessons
+aca6ddc032a1,verb,word,lessons;quiz
+28146f20ff90,verse,word,lessons
+c692273deb27,version,word,lessons
+d4362077965a,vigorous,word,lessons
+37ef0562902c,vine,word,lessons
+625f139d6ccd,vision,word,lessons;quiz
+21861253d6fc,vocabulary,word,lessons
+d1075839ea05,vox,word,lessons
+d4087e8efd19,vulture,word,lessons
+d47d8b0a383c,wag,word,lessons
+daaad336276d,wait,word,lessons
+df06b147f778,walk,word,lessons;story:silent_letters
+a409e016736d,walked,word,lessons
+3de521d36191,was,word,lessons;story:sight_words_foundation
+6d5a45920a15,water,word,lessons;story:sight_words_building
+caeb735f8233,water water,word,quiz
+d7ce74466d54,wave,word,lessons
+ed36cbf2c9bb,way,word,lessons
+676e6f35cfc1,we,word,lessons
+f39ef848d2db,wed,word,lessons
+1ea8af94f5c9,weigh,word,lessons
+afe0444198ad,weight,word,lessons
+bd8483287459,well,word,lessons
+c8e275e6d188,wet,word,lessons
+1769e230f788,whale,word,lessons
+a110e6b9a361,what,word,lessons
+7f572f2b5a5d,wheat,word,lessons;quiz
+3a7195d99bee,wheel,word,lessons
+30603fa9e0f6,when,word,lessons
+46148cc3b4d2,where,word,lessons
+ed04ff4dabf1,which,word,lessons
+6517f89c46c3,while,word,lessons
+ca5b7e9d7d23,whip,word,lessons
+4a0281103096,whisper,word,lessons
+574e6278eff3,whistle,word,lessons
+528cef87d0bf,white,word,lessons
+b7adf77905f5,who,word,lessons
+af81132610ec,whole,word,lessons
+f6be1064be55,wig,word,lessons
+37d41699bdee,will,word,lessons
+c76ac2e9cd86,win,word,lessons
+ff502ab858e6,wisely,word,lessons
+7b2577c452c5,wish,word,lessons
+482c22363595,wished,word,lessons
+614c059b1c64,wit,word,lessons
+8fcd25a39d20,with,word,lessons
+51f90c38d793,wonderful,word,lessons
+e8002c169040,wood,word,lessons;quiz;story:oo_sounds
+a7a60b68a618,wool,word,lessons
+7c3dc3889b6f,worried,word,lessons
+0955dd818206,would,word,lessons
+10e0b8afcbb0,wound,word,lessons
+f0cad97953df,wrap,word,lessons
+4c0aeed38edf,wreath,word,lessons
+df8d221d4551,wreck,word,lessons
+be730a52e1ae,wren,word,lessons
+4cacb5b2baf0,wrestle,word,lessons
+d642624c073c,wring,word,lessons
+a72cc496d582,wrinkle,word,lessons
+f65c1f7d6d97,wrist,word,lessons;story:silent_letters
+e1d0c6c1c29e,write,word,lessons;quiz
+a4b48a81cdab,wrong,word,lessons
+8813acb6df4c,yam,word,lessons
+53e20197cb46,yell,word,lessons
+720766642bbc,yen,word,lessons
+8af56de68279,you,word,lessons
+f9925d1162ae,youth,word,lessons
