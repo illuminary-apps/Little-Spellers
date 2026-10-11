@@ -3784,7 +3784,7 @@ function showScreen(id) {
    tap made while the child is away from Home. Each Back pops one entry and runs that
    screen's own back button (or closes an overlay). Reaching Home clears any leftovers,
    so Back on Home leaves the app as normal. */
-let _navDepth = 0, _navIgnore = 0, _navExitArmed = false;
+let _navDepth = 0, _navIgnore = 0;
 const _navLog = [];
 try { const _old = localStorage.getItem('ls_navlog'); if (_old) { _old.split('\n').slice(-30).forEach(l => _navLog.push('(prev) ' + l)); } } catch (e) {}
 function _nl(msg) {
@@ -3842,21 +3842,17 @@ window.addEventListener('popstate', () => {
   _nl('pop');
   const active = document.querySelector('.screen.active');
   if (!active || active.id === 'home') {
-    if (_navExitArmed) {
-      // Second Back press on Home in a row: this is the real exit. Trap it
-      // with one more pushState (same trick the rest of this file uses) so
-      // the browser doesn't leave immediately, show Lumi's goodbye, then
-      // let the real exit happen underneath once she's done.
-      _navExitArmed = false;
-      _navIgnore++; try { history.pushState({ ls: 1 }, ''); } catch (e) { _navIgnore--; }
-      showLumiGoodbye(() => { _navIgnore++; try { history.back(); } catch (e) { _navIgnore--; } });
-      return;
-    }
-    _navClear(); _navExitArmed = true; setTimeout(() => { _navExitArmed = false; }, 2500);
+    // The second Back press here is the REAL exit — with no more app-pushed
+    // history left, the browser can leave the page before any JS of ours
+    // gets a chance to run, so there's no reliable way to catch it and play
+    // an animation afterwards. Instead, show Lumi's goodbye right now,
+    // alongside the toast, so she's already seen it if that second press
+    // comes. It doesn't block taps, so changing her mind still works fine.
+    _navClear();
     _navToast('Press Back again to exit');
+    showLumiGoodbye();
     return;
   }
-  _navExitArmed = false;
   try {
     const modal = document.getElementById('install-modal');
     if (modal && modal.style.display === 'flex') { closeInstall(); }
@@ -3982,25 +3978,39 @@ function showLumiSplash(onDone) {
   caption.textContent = "Hi! I'm Lumi. Hop into my little universe of words!";
   ov.appendChild(starWrap); ov.appendChild(caption);
   document.body.appendChild(ov);
-  let done = false;
-  const finish = () => {
+  let done = false, pendingClose = false;
+  const shownAt = Date.now();
+  const MIN_VISIBLE = 2600; // give her time to actually read/hear it, even if speech fails instantly
+  const close = () => {
     if (done) return; done = true;
     try { if (synth) synth.cancel(); } catch (e) {}
     ov.classList.add('closing');
     setTimeout(() => { ov.remove(); if (onDone) onDone(); }, 550);
   };
-  // Plays through on its own — no tap needed. Ends right after the greeting
-  // finishes speaking; if speech can't play (muted, or the browser blocked
-  // autoplay before any tap on the page), the fallback timer below still
-  // moves it along a moment later so it's never stuck.
+  const finish = () => {
+    const waited = Date.now() - shownAt;
+    if (waited >= MIN_VISIBLE) { close(); return; }
+    if (pendingClose) return;
+    pendingClose = true;
+    setTimeout(close, MIN_VISIBLE - waited);
+  };
+  // Plays through on its own — no tap needed. Most mobile browsers block
+  // autoplaying speech on a fresh page load (no gesture yet) and fire
+  // 'error' almost instantly — so onerror must NOT close the splash right
+  // away, or it flashes shut before she can read it. finish() always
+  // enforces the minimum visible time above; onend lets it close exactly
+  // on cue when speech actually plays all the way through.
   const utt = (() => { try { return speak("Hi! I'm Lumi. Hop into my little universe of words!", null, 0.95); } catch (e) { return null; } })();
   if (utt) { utt.onend = finish; utt.onerror = finish; }
   setTimeout(finish, 3400);
 }
 
-/* ── Lumi's goodbye: plays when the child exits via the "press Back again
-   to exit" toast on Home — a big drifting-away Lumi, then lets the real
-   exit (history back, closing the app) happen underneath. ── */
+/* ── Lumi's goodbye: a big drifting-away Lumi shown the moment the "Press
+   Back again to exit" toast appears (first Back press on Home). We can't
+   reliably catch the actual second press — once there's no more app-pushed
+   history left, the browser can leave the page before any of our JS runs —
+   so this plays proactively instead, during the toast's own window, rather
+   than trying (and sometimes failing) to delay the real exit for it. ── */
 function showLumiGoodbye(onDone) {
   if (document.getElementById('lumi-goodbye')) { if (onDone) onDone(); return; }
   const heroStar = document.getElementById('hero-star');
@@ -7696,7 +7706,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 41;
+const APP_VERSION = 42;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -9031,12 +9041,17 @@ _refreshInstallBtn();
 .bg-sheet .pt{font-size:.85rem;margin-top:6px;opacity:.85}
 .bg-sheet .rw{margin-top:10px;font-size:.88rem;color:#ffd166}
 /* ── Lumi hello/goodbye overlays ── */
-#lumi-splash,#lumi-goodbye{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:radial-gradient(ellipse at 50% 32%,#1a2050 0%,#070a1e 72%);-webkit-tap-highlight-color:transparent;animation:lsIn .4s ease-out}
-#lumi-splash .ls-star-wrap .wondle,#lumi-goodbye .lg-star-wrap .wondle{transform:scale(1.4)}
+#lumi-splash{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:radial-gradient(ellipse at 50% 32%,#1a2050 0%,#070a1e 72%);-webkit-tap-highlight-color:transparent;animation:lsIn .4s ease-out}
+#lumi-splash .ls-star-wrap .wondle{transform:scale(1.4)}
 #lumi-splash .ls-caption{color:#fff;font:700 1.15rem/1.45 var(--ff-head,system-ui);text-align:center;max-width:300px;padding:0 24px;text-shadow:0 0 14px rgba(255,209,102,.5)}
 #lumi-splash.closing{animation:lsOut .55s ease-in forwards}
 @keyframes lsIn{0%{opacity:0}100%{opacity:1}}
 @keyframes lsOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(2.8)}}
+/* Shown alongside the "Press Back again to exit" toast — doesn't cover or
+   block Home, so she can still tap away immediately if she didn't mean to
+   leave; it just quietly plays out in the same window the toast is up. */
+#lumi-goodbye{position:fixed;inset:0;z-index:99997;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;pointer-events:none;animation:lsIn .25s ease-out}
+#lumi-goodbye .lg-star-wrap .wondle{transform:scale(1.4)}
 #lumi-goodbye .lg-star-wrap{animation:lgDrift 1.6s ease-in forwards}
 #lumi-goodbye .lg-caption{color:#fff;font:700 1.2rem/1.4 var(--ff-head,system-ui);text-shadow:0 0 14px rgba(255,209,102,.5);animation:lgFade 1.6s ease-in forwards}
 @keyframes lgDrift{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(40vw,-30vh) scale(.3);opacity:0}}
