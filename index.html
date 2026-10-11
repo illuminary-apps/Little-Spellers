@@ -1716,7 +1716,7 @@ html, body {
   font-size: 3.2rem;
 }
 .ach-popup-name { font-family: var(--ff-head); font-size: 0.95rem; color: var(--white); margin-top: 14px; }
-.ach-popup-tap { font-size: 0.7rem; color: #a9c2de; margin-top: 6px; }
+.ach-popup-tap { font-size: 0.7rem; color: #a9c2de; margin-top: 10px; }
 
 /* ── persistent achievements shortcut on Complete / Review screens ── */
 .ach-shortcut-btn {
@@ -3765,10 +3765,26 @@ function _navToast(msg) {
 function _navClear() {
   if (_navDepth > 0) { const n = _navDepth; _navDepth = 0; _navIgnore++; try { history.go(-n); } catch (e) { _navIgnore--; } }
 }
+function _navReloadClean() {
+  // Collapses any history entries we pushed back to the real baseline, THEN
+  // reloads — so the fresh page starts with _navDepth=0 that actually matches
+  // the real browser history (instead of just resetting the JS counter and
+  // leaving stray entries behind for Back to trip over).
+  if (_navDepth > 0) {
+    const n = _navDepth; _navDepth = 0; _navIgnore++;
+    let done = false;
+    const finish = () => { if (done) return; done = true; window.removeEventListener('popstate', finish); location.reload(); };
+    window.addEventListener('popstate', finish);
+    try { history.go(-n); } catch (e) { finish(); }
+    setTimeout(finish, 350); // safety net if popstate never fires
+  } else {
+    location.reload();
+  }
+}
 function _navTrimHome() {
   if (_navDepth > 1) { const n = _navDepth - 1; _navDepth = 1; _navIgnore++; try { history.go(-n); } catch (e) { _navIgnore--; } }
 }
-function _navOnScreen(id) { _nl('show ' + id); if (id === 'home') { _navTrimHome(); if (window.__pendingReload) { window.__pendingReload = false; setTimeout(() => location.reload(), 50); } } }
+function _navOnScreen(id) { _nl('show ' + id); if (id === 'home') { _navTrimHome(); if (window.__pendingReload) { window.__pendingReload = false; setTimeout(() => _navReloadClean(), 50); } } }
 /* One history entry per tap, added synchronously inside the tap itself so Chrome treats it as
    user-made (entries added any later are skipped by Back). */
 document.addEventListener('click', e => {
@@ -6904,6 +6920,40 @@ function checkForNewAchievements() {
   }
 }
 
+
+function achievementEarnedText(a){
+  var w=BG_WORLD_NAME[a.world]||'';
+  if(a.id){
+    if(/^pp-.*-catch$/.test(a.id))return 'You caught '+a.target+' planets in '+w+' Planet Patrol!';
+    if(/^pp-.*-ears$/.test(a.id))return 'You played '+a.target+' perfect Planet Patrol round'+(a.target===1?'':'s')+' in '+w+'!';
+    if(/^pp-.*-heart$/.test(a.id))return 'You finished '+a.target+' Planet Patrol round'+(a.target===1?'':'s')+' in '+w+' without losing a heart!';
+    if(/^sp-.*-collect$/.test(a.id))return 'You mastered '+a.target+' words in '+w+' Spell-a-thon!';
+    if(/^sp-.*-perfect$/.test(a.id))return 'You got '+a.target+' perfect round'+(a.target===1?'':'s')+' in '+w+' Spell-a-thon!';
+    if(/^sp-.*-comeback$/.test(a.id))return 'You spelled '+a.target+' comeback word'+(a.target===1?'':'s')+' right in '+w+'!';
+  }
+  var m={
+    'First Lesson':'You finished your first lesson!',
+    'First Dictation':'You spelled your first Spell-a-thon word!',
+    '100 Words':'You practised 100 words!',
+    '500 Words':'You practised 500 words!',
+    '1000 Words':'You practised 1000 words!',
+    '3 Day Streak':'You practised 3 days in a row!',
+    '7 Day Streak':'You practised 7 days in a row!',
+    '30 Day Streak':'You practised 30 days in a row!',
+    'Perfect Lesson':'You got every question right in a lesson!',
+    'Perfect Dictation Round':'You got a perfect Spell-a-thon round!',
+    '5 Perfect Lessons':'You got 5 perfect lessons!',
+    'Planet Patrol Rookie':'You caught your very first planet!',
+    'Perfect Patrol':'You caught every right planet in a Planet Patrol round!',
+    'Galaxy Explorer':'You played Planet Patrol in all four worlds!',
+    '100 Planets Caught':'You caught 100 planets in Planet Patrol!',
+    '5 Perfect Dictation Rounds':'You got 5 perfect Spell-a-thon rounds!',
+    'World Champion':'You finished a whole world in Spell-a-thon!'
+  };
+  if(m[a.name])return m[a.name];
+  if(/ Complete$/.test(a.name))return 'You finished every lesson in '+a.name.replace(' Complete','')+'!';
+  return 'You earned this for great work in '+a.name+'!';
+}
 function showAchievementPopup(newAchievements, index) {
   if (index >= newAchievements.length) return;
   const a = newAchievements[index];
@@ -6911,11 +6961,15 @@ function showAchievementPopup(newAchievements, index) {
 
   const overlay = document.createElement('div');
   overlay.className = 'ach-popup-overlay';
+  const earnedText = achievementEarnedText(a);
+  const rewardText = (typeof badgeReward === 'function') ? badgeReward(a) : '';
   overlay.innerHTML = `
     <div class="ach-popup-card" id="ach-popup-card">
       <div class="ach-popup-label">🎉 Sticker Unlocked!</div>
       <div class="ach-popup-sticker" style="--cat-colour:${colours.colour}; --cat-glow:${colours.glow};">${a.icon}</div>
       <div class="ach-popup-name">${a.popupName || a.name}</div>
+      <div class="ach-popup-reason">${earnedText}</div>
+      ${rewardText ? `<div class="ach-popup-reward">${rewardText}</div>` : ''}
       <div class="ach-popup-tap">Tap the sticker to see your collection</div>
     </div>`;
   document.body.appendChild(overlay);
@@ -7436,12 +7490,11 @@ function buildSettings() {
 function openParentHub() {
   requireParentPin(() => {
     buildParentHub();
-    const _v = document.createElement('div'); _v.style.cssText = 'text-align:center;opacity:.4;font-size:.75rem;margin:18px 0'; _v.textContent = 'App version 38'; _v.onclick = () => { let last = ''; try { last = localStorage.getItem('ls_navlog') || ''; } catch (e) {} alert('Navigation log (newest last):\n' + _navLog.slice(-45).join('\n')); }; document.getElementById('parent-hub-body').appendChild(_v);
-    const _u = document.createElement('div'); _u.className='ch-level-card'; _u.style.margin='0 0 24px'; _u.innerHTML='<span class="ch-level-icon">🔄</span><div class="ch-level-info"><div class="ch-level-name">Refresh app</div><div class="ch-level-sub">Get the latest version. Your progress is kept.</div></div>'; _u.onclick = checkForUpdates; document.getElementById('parent-hub-body').appendChild(_u);
     showScreen('parent-hub-screen');
   });
 }
 
+const APP_VERSION = 39;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -7451,6 +7504,7 @@ function buildParentHub() {
     { icon: '📈', name: 'Learning Timeline', sub: "This week's story", fn: openTimeline },
     { icon: '📚', name: 'Spelling Secrets', sub: 'Every rule, explained', fn: openSpellingSecrets },
     { icon: '⚙️', name: 'Settings', sub: 'Profile, PIN & sound', fn: openSettings },
+    { icon: '🔄', name: 'Refresh app (v' + APP_VERSION + ')', sub: 'Get the newest version. Your progress stays saved.', fn: checkForUpdates },
   ];
   sections.forEach(s => {
     const card = document.createElement('div');
@@ -7465,6 +7519,8 @@ function buildParentHub() {
     card.addEventListener('click', s.fn);
     body.appendChild(card);
   });
+  const _v = document.createElement('div'); _v.style.cssText = 'text-align:center;opacity:.35;font-size:.68rem;margin:10px 0 2px'; _v.textContent = 'tap-hold the refresh ribbon for a diagnostic log'; _v.onclick = () => { let last = ''; try { last = localStorage.getItem('ls_navlog') || ''; } catch (e) {} alert('Navigation log (newest last):\n' + _navLog.slice(-45).join('\n')); };
+  body.appendChild(_v);
 }
 
 function openParent() {
@@ -8645,7 +8701,7 @@ if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
   navigator.serviceWorker.addEventListener('controllerchange',function(){
     if(!_hadSW){_hadSW=true;return;}
     var a=document.querySelector('.screen.active');
-    if(!a||a.id==='home')location.reload(); else window.__pendingReload=true;   // refresh as soon as the child is back on Home
+    if(!a||a.id==='home')_navReloadClean(); else window.__pendingReload=true;   // refresh as soon as the child is back on Home
   });
   window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').then(function(r){
     document.addEventListener('visibilitychange',function(){if(!document.hidden)r.update().catch(function(){});});
@@ -8653,7 +8709,7 @@ if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
   }).catch(function(){});});
 }
 function checkForUpdates(){
-  var go=function(){location.reload();};
+  var go=function(){_navReloadClean();};
   var p=('serviceWorker' in navigator)?navigator.serviceWorker.getRegistrations().then(function(rs){return Promise.all(rs.map(function(r){return r.unregister();}));}):Promise.resolve();
   p.then(function(){return window.caches?caches.keys().then(function(ks){return Promise.all(ks.map(function(k){return caches.delete(k);}));}):0;}).then(go,go);
 }
@@ -8940,5 +8996,8 @@ window.__wordTotal=n;
 .np-btn{align-self:flex-start}
 .np-flag{font-size:.72rem;color:#ffd166;background:rgba(255,209,102,.12);border:1px solid rgba(255,209,102,.35);border-radius:99px;padding:3px 10px;align-self:flex-start}
 .np-ok{margin-top:6px;border-top:1px solid rgba(255,255,255,.07);padding-top:10px;font-size:.78rem;color:var(--teal)}
-</style></body>
+.ach-popup-reason{font-size:.85rem;color:#fff;opacity:.92;margin-top:4px;line-height:1.4;max-width:270px;padding:0 10px}
+.ach-popup-reward{font-size:.8rem;color:var(--gold);margin-top:6px;font-weight:700;max-width:270px;padding:0 10px}
+</style>
+</body>
 </html>
