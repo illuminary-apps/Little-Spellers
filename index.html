@@ -3985,7 +3985,11 @@ function showLumiSplash(onDone) {
     if (done) return; done = true;
     try { if (synth) synth.cancel(); } catch (e) {}
     ov.classList.add('closing');
-    setTimeout(() => { ov.remove(); if (onDone) onDone(); }, 550);
+    setTimeout(() => {
+      ov.remove();
+      if (onDone) onDone();
+      if (window.__pendingReload) { window.__pendingReload = false; setTimeout(() => _navReloadClean(), 50); }
+    }, 550);
   };
   const finish = () => {
     const waited = Date.now() - shownAt;
@@ -4030,7 +4034,12 @@ function showLumiGoodbye(onDone) {
   document.body.appendChild(ov);
   try { speak('See you later!', null, 0.95); } catch (e) {}
   let done = false;
-  const finish = () => { if (done) return; done = true; ov.remove(); if (onDone) onDone(); };
+  const finish = () => {
+    if (done) return; done = true;
+    ov.remove();
+    if (onDone) onDone();
+    if (window.__pendingReload) { window.__pendingReload = false; setTimeout(() => _navReloadClean(), 50); }
+  };
   setTimeout(finish, 1700);
 }
 
@@ -7706,7 +7715,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 42;
+const APP_VERSION = 43;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -8909,12 +8918,21 @@ if (getProgress().setupDone && !_skipSplashOnce()) showLumiSplash();
 
 </script>
 <script>
+/* A silent background update must never interrupt Lumi's hello/goodbye —
+   both sit on top of Home as overlays while .screen.active is still
+   'home', so the old "reload as soon as we're on Home" check alone would
+   reload mid-splash. Defer it like the existing "wait till Home" path
+   already does, and flush it once the overlay in question clears. */
+function _reloadWhenSafe(){
+  if(document.getElementById('lumi-splash')||document.getElementById('lumi-goodbye')){window.__pendingReload=true;return;}
+  _navReloadClean();
+}
 if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
   var _hadSW=!!navigator.serviceWorker.controller;
   navigator.serviceWorker.addEventListener('controllerchange',function(){
     if(!_hadSW){_hadSW=true;return;}
     var a=document.querySelector('.screen.active');
-    if(!a||a.id==='home')_navReloadClean(); else window.__pendingReload=true;   // refresh as soon as the child is back on Home
+    if(!a||a.id==='home')_reloadWhenSafe(); else window.__pendingReload=true;   // refresh as soon as the child is back on Home
   });
   window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').then(function(r){
     document.addEventListener('visibilitychange',function(){if(!document.hidden)r.update().catch(function(){});});
@@ -8922,7 +8940,7 @@ if('serviceWorker' in navigator&&location.protocol.startsWith('http')){
   }).catch(function(){});});
 }
 function checkForUpdates(){
-  var go=function(){_navReloadClean();};
+  var go=function(){_reloadWhenSafe();};
   var p=('serviceWorker' in navigator)?navigator.serviceWorker.getRegistrations().then(function(rs){return Promise.all(rs.map(function(r){return r.unregister();}));}):Promise.resolve();
   p.then(function(){return window.caches?caches.keys().then(function(ks){return Promise.all(ks.map(function(k){return caches.delete(k);}));}):0;}).then(go,go);
 }
