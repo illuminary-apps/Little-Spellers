@@ -3784,7 +3784,7 @@ function _navReloadClean() {
 function _navTrimHome() {
   if (_navDepth > 1) { const n = _navDepth - 1; _navDepth = 1; _navIgnore++; try { history.go(-n); } catch (e) { _navIgnore--; } }
 }
-function _navOnScreen(id) { _nl('show ' + id); if (id === 'home') { _navTrimHome(); if (window.__pendingReload) { window.__pendingReload = false; setTimeout(() => _navReloadClean(), 50); } } }
+function _navOnScreen(id) { _nl('show ' + id); _wakeSet(id !== 'home'); if (id === 'home') { _navTrimHome(); if (window.__pendingReload) { window.__pendingReload = false; setTimeout(() => _navReloadClean(), 50); } } }
 /* One history entry per tap, added synchronously inside the tap itself so Chrome treats it as
    user-made (entries added any later are skipped by Back). */
 document.addEventListener('click', e => {
@@ -3817,9 +3817,58 @@ function sceneAlive(el) {
   const sc = el.closest('.screen');
   return !sc || sc.classList.contains('active');
 }
+/* ── Keep the screen awake while a lesson, story or game is on screen, so the
+   OS doesn't dim/lock it just because no taps are happening (reading/listening
+   is normal, not idle). Standard Wake Lock API; released on Home, re-requested
+   whenever the tab regains focus (the browser always releases it on hide). ── */
+let _wakeLock = null, _wantWake = false;
+async function _wakeAcquire() {
+  if (!('wakeLock' in navigator) || !_wantWake || _wakeLock) return;
+  try {
+    _wakeLock = await navigator.wakeLock.request('screen');
+    _wakeLock.addEventListener('release', () => { _wakeLock = null; });
+  } catch (e) { /* e.g. battery saver refused it — the resume prompt below covers us */ }
+}
+function _wakeRelease() { if (_wakeLock) { try { _wakeLock.release(); } catch (e) {} _wakeLock = null; } }
+function _wakeSet(want) { _wantWake = want; if (want) _wakeAcquire(); else _wakeRelease(); }
+
+/* ── If the screen DOES still get interrupted (manual lock button, a call,
+   battery saver blocking the wake lock), speech stops and story/game timers
+   go quiet. Rather than leave it silently stuck, show a friendly "tap to
+   continue" once she's back, and cleanly restart whatever was talking. ── */
+let _hiddenAt = 0;
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { try { if (synth) synth.cancel(); } catch (e) {} }
+  if (document.hidden) {
+    _hiddenAt = Date.now();
+    try { if (synth) synth.cancel(); } catch (e) {}
+  } else {
+    _wakeAcquire();
+    const awayMs = _hiddenAt ? (Date.now() - _hiddenAt) : 0;
+    _hiddenAt = 0;
+    if (awayMs > 1200) _maybeShowResume();
+  }
 });
+function _maybeShowResume() {
+  const active = document.querySelector('.screen.active');
+  if (!active || active.id === 'home' || document.getElementById('resume-overlay')) return;
+  const ov = document.createElement('div');
+  ov.id = 'resume-overlay';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;background:rgba(5,10,25,.72);-webkit-tap-highlight-color:transparent';
+  ov.innerHTML = '<button style="background:#141a45;color:#fff;border:2px solid #ffd166;border-radius:20px;padding:22px 32px;font:700 1.05rem system-ui;box-shadow:0 0 24px rgba(255,209,102,.4)">▶️ Tap to continue</button>';
+  ov.addEventListener('click', () => { ov.remove(); _resumeCurrentScreen(); });
+  document.body.appendChild(ov);
+}
+function _resumeCurrentScreen() {
+  const active = document.querySelector('.screen.active');
+  if (!active) return;
+  try {
+    // Teach (restarts the story cleanly) and Quiz (redraws the same question,
+    // nothing lost) are safe to redraw. Practice/Word Blocks track taps the
+    // child has already made, so we leave those exactly as they are — nothing
+    // was actually lost there, only the audio for the one word stopped.
+    if (active.id === 'lesson' && (lessonPhase === 'teach' || lessonPhase === 'quiz')) renderPhase();
+  } catch (e) {}
+}
 window.addEventListener('pagehide', () => { try { if (synth) synth.cancel(); } catch (e) {} });
 
 const WORLD_SETUP = [
@@ -7494,7 +7543,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 39;
+const APP_VERSION = 40;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
