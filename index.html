@@ -2150,8 +2150,8 @@ html, body {
 
     <!-- Hero UFO + Cat -->
     <div class="cat-moon-wrap" id="home-ufo-wrap">
-    <div class="rb-hero" id="rb-hero" onclick="openBadges()" role="button" aria-label="Open my badges"><svg class="rb-arc" id="rb-arc" viewBox="0 0 340 190" width="340" height="190"></svg>
-      <div class="wondle" id="hero-star" aria-label="Smiling star"><i style="left:8%;top:40px;animation-delay:0s;width:6px;height:6px"></i><i style="left:88%;top:60px;animation-delay:0.7s;width:5px;height:5px"></i><i style="left:20%;top:150px;animation-delay:1.4s;width:4px;height:4px"></i><i style="left:78%;top:150px;animation-delay:2.1s;width:6px;height:6px"></i><i style="left:50%;top:10px;animation-delay:2.8s;width:4px;height:4px"></i><i style="left:94%;top:110px;animation-delay:3.5s;width:4px;height:4px"></i><i style="left:2%;top:100px;animation-delay:1.1s;width:5px;height:5px"></i><svg class="wondle-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M92.6,37.9 Q100.0,20.0 107.4,37.9 L116.1,59.2 Q123.0,76.0 141.0,76.0 L163.8,76.0 Q183.0,76.0 167.6,87.5 L149.4,101.2 Q135.0,112.0 140.4,129.4 L147.2,151.4 Q153.0,170.0 136.0,158.8 L115.9,145.5 Q100.0,135.0 84.1,145.5 L64.0,158.8 Q47.0,170.0 52.8,151.4 L59.6,129.4 Q65.0,112.0 50.6,101.2 L32.4,87.5 Q17.0,76.0 36.2,76.0 L59.0,76.0 Q77.0,76.0 83.9,59.2 Z" fill="#ffd166" stroke="#f4a637" stroke-width="4" stroke-linejoin="round"/><g class="w-eyes"><ellipse cx="82" cy="98" rx="7" ry="7" fill="#2c2410"/><ellipse cx="118" cy="98" rx="7" ry="7" fill="#2c2410"/><circle cx="84.5" cy="95.5" r="2.5" fill="#fff8e8"/><circle cx="120.5" cy="95.5" r="2.5" fill="#fff8e8"/></g><path d="M85 115 Q100 128 115 115" fill="none" stroke="#2c2410" stroke-width="4" stroke-linecap="round"/><ellipse cx="68" cy="112" rx="7" ry="4.5" fill="#ff9aa2" opacity=".55"/><ellipse cx="132" cy="112" rx="7" ry="4.5" fill="#ff9aa2" opacity=".55"/></svg></div>
+    <div class="rb-hero" id="rb-hero"><svg class="rb-arc" id="rb-arc" viewBox="0 0 340 190" width="340" height="190" onclick="openBadges()" role="button" aria-label="Open my badges"></svg>
+      <div class="wondle" id="hero-star" onclick="tickleStar(event)" role="button" aria-label="Lumi the star"><i style="left:8%;top:40px;animation-delay:0s;width:6px;height:6px"></i><i style="left:88%;top:60px;animation-delay:0.7s;width:5px;height:5px"></i><i style="left:20%;top:150px;animation-delay:1.4s;width:4px;height:4px"></i><i style="left:78%;top:150px;animation-delay:2.1s;width:6px;height:6px"></i><i style="left:50%;top:10px;animation-delay:2.8s;width:4px;height:4px"></i><i style="left:94%;top:110px;animation-delay:3.5s;width:4px;height:4px"></i><i style="left:2%;top:100px;animation-delay:1.1s;width:5px;height:5px"></i><svg class="wondle-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M92.6,37.9 Q100.0,20.0 107.4,37.9 L116.1,59.2 Q123.0,76.0 141.0,76.0 L163.8,76.0 Q183.0,76.0 167.6,87.5 L149.4,101.2 Q135.0,112.0 140.4,129.4 L147.2,151.4 Q153.0,170.0 136.0,158.8 L115.9,145.5 Q100.0,135.0 84.1,145.5 L64.0,158.8 Q47.0,170.0 52.8,151.4 L59.6,129.4 Q65.0,112.0 50.6,101.2 L32.4,87.5 Q17.0,76.0 36.2,76.0 L59.0,76.0 Q77.0,76.0 83.9,59.2 Z" fill="#ffd166" stroke="#f4a637" stroke-width="4" stroke-linejoin="round"/><g class="w-eyes"><ellipse cx="82" cy="98" rx="7" ry="7" fill="#2c2410"/><ellipse cx="118" cy="98" rx="7" ry="7" fill="#2c2410"/><circle cx="84.5" cy="95.5" r="2.5" fill="#fff8e8"/><circle cx="120.5" cy="95.5" r="2.5" fill="#fff8e8"/></g><path d="M85 115 Q100 128 115 115" fill="none" stroke="#2c2410" stroke-width="4" stroke-linecap="round"/><ellipse cx="68" cy="112" rx="7" ry="4.5" fill="#ff9aa2" opacity=".55"/><ellipse cx="132" cy="112" rx="7" ry="4.5" fill="#ff9aa2" opacity=".55"/></svg></div>
 </div>
 <style>
 .wondle{position:relative;width:230px;height:230px;margin:0 auto;display:flex;align-items:center;justify-content:center}
@@ -2163,6 +2163,18 @@ html, body {
 @keyframes wblink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
 @keyframes wdust{0%{opacity:0;transform:translateY(-8px) scale(.6)}30%{opacity:1}100%{opacity:0;transform:translateY(34px) scale(1)}}
 @media (prefers-reduced-motion:reduce){.wondle-svg,.wondle .w-eyes,.wondle i{animation:none}}
+/* ── tap-to-tickle: a few different reactions, picked at random so Lumi
+   doesn't do the same thing twice in a row. Each overrides the resting
+   wbob animation for one quick burst, then wglow (unaffected) keeps going. ── */
+.wondle-svg.st-t1{animation:wglow 2.8s ease-in-out infinite,stWiggle .8s ease-in-out 1!important}
+.wondle-svg.st-t2{animation:wglow 2.8s ease-in-out infinite,stSpin .7s ease-in-out 1!important}
+.wondle-svg.st-t3{animation:wglow 2.8s ease-in-out infinite,stBounce .8s ease-in-out 1!important}
+.wondle-svg.st-t4{animation:wglow 2.8s ease-in-out infinite,stShake .5s ease-in-out 2!important}
+@keyframes stWiggle{0%,100%{transform:rotate(0) scale(1)}20%{transform:rotate(-10deg) scale(1.08)}40%{transform:rotate(8deg) scale(1.05)}60%{transform:rotate(-6deg) scale(1.1)}80%{transform:rotate(4deg) scale(1.02)}}
+@keyframes stSpin{0%{transform:rotate(0) scale(1)}50%{transform:rotate(180deg) scale(1.18)}100%{transform:rotate(360deg) scale(1)}}
+@keyframes stBounce{0%,100%{transform:scale(1,1)}20%{transform:scale(1.22,.8)}40%{transform:scale(.85,1.22)}60%{transform:scale(1.12,.9)}80%{transform:scale(.95,1.05)}}
+@keyframes stShake{0%,100%{transform:translateX(0) rotate(0)}25%{transform:translateX(-6px) rotate(-5deg)}75%{transform:translateX(6px) rotate(5deg)}}
+@media (prefers-reduced-motion:reduce){.wondle-svg.st-t1,.wondle-svg.st-t2,.wondle-svg.st-t3,.wondle-svg.st-t4{animation:wglow 2.8s ease-in-out infinite!important}}
 </style>
     </div>
     <h1 class="home-title">Little Spellers</h1>
@@ -2542,11 +2554,17 @@ const ClipAudio = {
 ClipAudio.load();
 if (synth) { const _cancel = synth.cancel.bind(synth); synth.cancel = function () { ClipAudio.stop(); return _cancel(); }; }
 
+/* Remembers the most recent speak() call and the object the caller is
+   hanging an .onend chain off of, so a story that gets silently cut off
+   (screen locked mid-beat) can be picked back up on the same line rather
+   than restarted — see _resumeSpeechIfStuck() near the wake-lock code. */
+let _lastSpeakArgs = null, _lastSpeakReturn = null;
 function speak(text, el, rate) {
   if (!synth) return;
   if (getProgress().soundMuted) return;
   synth.cancel();
   if (currentSpeakEl) { currentSpeakEl.classList.remove('speaking'); currentSpeakEl = null; }
+  _lastSpeakArgs = { text, el, rate };
   if (ClipAudio.has(text)) {
     const shim = { onend: null, onerror: null };
     const done = () => {
@@ -2561,9 +2579,11 @@ function speak(text, el, rate) {
         u.onend = u.onerror = done;
       });
     }, 150);
+    _lastSpeakReturn = shim;
     return shim;
   }
-  return speakTTS(text, el, rate);
+  _lastSpeakReturn = speakTTS(text, el, rate);
+  return _lastSpeakReturn;
 }
 
 function speakTTS(text, el, rate) {
@@ -2612,6 +2632,28 @@ function burstStar(x, y) {
       setTimeout(() => el.remove(), 800);
     }, i * 80);
   }
+}
+
+/* Lumi (the home-screen star) reacts when tapped — a little glow/wiggle,
+   randomized so it's not the same every time. Purely decorative: doesn't
+   open anything, doesn't stopPropagation (it has no onclick ancestor). */
+const ST_TICKLE_ANIMS = ['st-t1', 'st-t2', 'st-t3', 'st-t4'];
+const ST_TICKLE_GIGGLES = ['Hee hee!', 'Tee hee!', 'Wheee!', 'Hi there!'];
+let _stTickleBusy = false;
+function tickleStar(e) {
+  if (_stTickleBusy) return;
+  const svg = document.querySelector('#hero-star .wondle-svg');
+  if (!svg) return;
+  _stTickleBusy = true;
+  ST_TICKLE_ANIMS.forEach(c => svg.classList.remove(c));
+  void svg.offsetWidth; // restart animation even if the same class is picked again
+  const anim = ST_TICKLE_ANIMS[Math.floor(Math.random() * ST_TICKLE_ANIMS.length)];
+  svg.classList.add(anim);
+  if (e) burstStar(e.clientX, e.clientY);
+  if (Math.random() < 0.3) { try { speak(ST_TICKLE_GIGGLES[Math.floor(Math.random() * ST_TICKLE_GIGGLES.length)], null, 1.1); } catch (err) {} }
+  const onEnd = () => { svg.classList.remove(anim); svg.removeEventListener('animationend', onEnd); _stTickleBusy = false; };
+  svg.addEventListener('animationend', onEnd);
+  setTimeout(() => { if (_stTickleBusy) onEnd(); }, 1200); // safety net
 }
 
 function confetti() {
@@ -3742,7 +3784,7 @@ function showScreen(id) {
    tap made while the child is away from Home. Each Back pops one entry and runs that
    screen's own back button (or closes an overlay). Reaching Home clears any leftovers,
    so Back on Home leaves the app as normal. */
-let _navDepth = 0, _navIgnore = 0;
+let _navDepth = 0, _navIgnore = 0, _navExitArmed = false;
 const _navLog = [];
 try { const _old = localStorage.getItem('ls_navlog'); if (_old) { _old.split('\n').slice(-30).forEach(l => _navLog.push('(prev) ' + l)); } } catch (e) {}
 function _nl(msg) {
@@ -3770,6 +3812,9 @@ function _navReloadClean() {
   // reloads — so the fresh page starts with _navDepth=0 that actually matches
   // the real browser history (instead of just resetting the JS counter and
   // leaving stray entries behind for Back to trip over).
+  // This reload is a silent background update, not the child opening the
+  // app — skip the Lumi "Hi!" splash on the page load it causes.
+  try { sessionStorage.setItem('ls_skip_splash', '1'); } catch (e) {}
   if (_navDepth > 0) {
     const n = _navDepth; _navDepth = 0; _navIgnore++;
     let done = false;
@@ -3796,7 +3841,22 @@ window.addEventListener('popstate', () => {
   if (_navDepth > 0) _navDepth--;
   _nl('pop');
   const active = document.querySelector('.screen.active');
-  if (!active || active.id === 'home') { _navClear(); _navToast('Press Back again to exit'); return; }
+  if (!active || active.id === 'home') {
+    if (_navExitArmed) {
+      // Second Back press on Home in a row: this is the real exit. Trap it
+      // with one more pushState (same trick the rest of this file uses) so
+      // the browser doesn't leave immediately, show Lumi's goodbye, then
+      // let the real exit happen underneath once she's done.
+      _navExitArmed = false;
+      _navIgnore++; try { history.pushState({ ls: 1 }, ''); } catch (e) { _navIgnore--; }
+      showLumiGoodbye(() => { _navIgnore++; try { history.back(); } catch (e) { _navIgnore--; } });
+      return;
+    }
+    _navClear(); _navExitArmed = true; setTimeout(() => { _navExitArmed = false; }, 2500);
+    _navToast('Press Back again to exit');
+    return;
+  }
+  _navExitArmed = false;
   try {
     const modal = document.getElementById('install-modal');
     if (modal && modal.style.display === 'flex') { closeInstall(); }
@@ -3835,7 +3895,7 @@ function _wakeSet(want) { _wantWake = want; if (want) _wakeAcquire(); else _wake
 /* ── If the screen DOES still get interrupted (manual lock button, a call,
    battery saver blocking the wake lock), speech stops and story/game timers
    go quiet. Rather than leave it silently stuck, show a friendly "tap to
-   continue" once she's back, and cleanly restart whatever was talking. ── */
+   continue" once she's back, and pick the story back up on the same line. ── */
 let _hiddenAt = 0;
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
@@ -3858,18 +3918,111 @@ function _maybeShowResume() {
   ov.addEventListener('click', () => { ov.remove(); _resumeCurrentScreen(); });
   document.body.appendChild(ov);
 }
+/* A locked screen cancels whatever line was mid-sentence, and that cancel
+   doesn't fire the beat's own onend (browsers fire onerror, not onend, for
+   a cancelled utterance) — so the beat's own advance-timer chain was simply
+   never told to continue. Re-speaking the same line and re-attaching the
+   SAME onend/onerror the caller already wired up (see speak()'s
+   _lastSpeakArgs/_lastSpeakReturn) picks the story up exactly where it
+   paused, instead of restarting it from the top. */
+function _resumeSpeechIfStuck() {
+  if (!_lastSpeakArgs || !_lastSpeakReturn) return false;
+  const prevOnend = _lastSpeakReturn.onend, prevOnerror = _lastSpeakReturn.onerror;
+  if (!prevOnend && !prevOnerror) return false; // nothing was waiting on this line
+  const args = _lastSpeakArgs;
+  const fresh = speak(args.text, args.el, args.rate);
+  if (!fresh) { try { if (prevOnend) prevOnend(); } catch (e) {} return true; }
+  if (prevOnend) fresh.onend = prevOnend;
+  if (prevOnerror) fresh.onerror = prevOnerror;
+  return true;
+}
 function _resumeCurrentScreen() {
   const active = document.querySelector('.screen.active');
   if (!active) return;
   try {
-    // Teach (restarts the story cleanly) and Quiz (redraws the same question,
-    // nothing lost) are safe to redraw. Practice/Word Blocks track taps the
-    // child has already made, so we leave those exactly as they are — nothing
-    // was actually lost there, only the audio for the one word stopped.
-    if (active.id === 'lesson' && (lessonPhase === 'teach' || lessonPhase === 'quiz')) renderPhase();
+    if (active.id === 'lesson' && lessonPhase === 'teach') {
+      // Story mid-playback: continue on the same beat/line rather than
+      // restarting the whole story from the top.
+      if (!_resumeSpeechIfStuck()) renderPhase();
+    } else if (active.id === 'lesson' && lessonPhase === 'quiz') {
+      // Quiz is tap-driven, not a timed chain — redrawing it is safe and
+      // loses nothing.
+      renderPhase();
+    }
+    // Practice/Word Blocks/Planet Patrol track taps the child has already
+    // made, so they're left exactly as they are.
   } catch (e) {}
 }
 window.addEventListener('pagehide', () => { try { if (synth) synth.cancel(); } catch (e) {} });
+
+/* ── Lumi's hello: plays once per real app open (not on in-app Back-to-Home
+   navigation, which never reloads the page). A silent background update
+   reload (_navReloadClean) sets a one-shot sessionStorage flag so its own
+   reload doesn't replay this. ── */
+function _skipSplashOnce() {
+  try {
+    if (sessionStorage.getItem('ls_skip_splash') === '1') { sessionStorage.removeItem('ls_skip_splash'); return true; }
+  } catch (e) {}
+  return false;
+}
+function showLumiSplash(onDone) {
+  if (document.getElementById('lumi-splash')) { if (onDone) onDone(); return; }
+  const heroStar = document.getElementById('hero-star');
+  const ov = document.createElement('div');
+  ov.id = 'lumi-splash';
+  const starWrap = document.createElement('div');
+  starWrap.className = 'ls-star-wrap';
+  if (heroStar) {
+    const clone = heroStar.cloneNode(true);
+    clone.removeAttribute('id'); clone.removeAttribute('onclick'); clone.removeAttribute('role'); clone.removeAttribute('aria-label');
+    starWrap.appendChild(clone);
+  }
+  const caption = document.createElement('div');
+  caption.className = 'ls-caption';
+  caption.textContent = "Hi! I'm Lumi. Hop into my little universe of words!";
+  ov.appendChild(starWrap); ov.appendChild(caption);
+  document.body.appendChild(ov);
+  let done = false;
+  const finish = () => {
+    if (done) return; done = true;
+    try { if (synth) synth.cancel(); } catch (e) {}
+    ov.classList.add('closing');
+    setTimeout(() => { ov.remove(); if (onDone) onDone(); }, 550);
+  };
+  // Plays through on its own — no tap needed. Ends right after the greeting
+  // finishes speaking; if speech can't play (muted, or the browser blocked
+  // autoplay before any tap on the page), the fallback timer below still
+  // moves it along a moment later so it's never stuck.
+  const utt = (() => { try { return speak("Hi! I'm Lumi. Hop into my little universe of words!", null, 0.95); } catch (e) { return null; } })();
+  if (utt) { utt.onend = finish; utt.onerror = finish; }
+  setTimeout(finish, 3400);
+}
+
+/* ── Lumi's goodbye: plays when the child exits via the "press Back again
+   to exit" toast on Home — a big drifting-away Lumi, then lets the real
+   exit (history back, closing the app) happen underneath. ── */
+function showLumiGoodbye(onDone) {
+  if (document.getElementById('lumi-goodbye')) { if (onDone) onDone(); return; }
+  const heroStar = document.getElementById('hero-star');
+  const ov = document.createElement('div');
+  ov.id = 'lumi-goodbye';
+  const starWrap = document.createElement('div');
+  starWrap.className = 'lg-star-wrap';
+  if (heroStar) {
+    const clone = heroStar.cloneNode(true);
+    clone.removeAttribute('id'); clone.removeAttribute('onclick'); clone.removeAttribute('role'); clone.removeAttribute('aria-label');
+    starWrap.appendChild(clone);
+  }
+  const caption = document.createElement('div');
+  caption.className = 'lg-caption';
+  caption.textContent = 'See you later!';
+  ov.appendChild(starWrap); ov.appendChild(caption);
+  document.body.appendChild(ov);
+  try { speak('See you later!', null, 0.95); } catch (e) {}
+  let done = false;
+  const finish = () => { if (done) return; done = true; ov.remove(); if (onDone) onDone(); };
+  setTimeout(finish, 1700);
+}
 
 const WORLD_SETUP = [
   { id: 'foundation', desc: 'Just starting out: letter sounds, short vowels, first words' },
@@ -7543,7 +7696,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 40;
+const APP_VERSION = 41;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -8742,6 +8895,7 @@ function wbSpeak(q, onDone) {
 runAchievementAudit();
 updateHomeProgress();
 maybeShowWelcome();
+if (getProgress().setupDone && !_skipSplashOnce()) showLumiSplash();
 
 </script>
 <script>
@@ -8826,11 +8980,12 @@ _refreshInstallBtn();
 /* world colours (shared by rainbow, cards, badges) */
 :root{--wc-foundation:#ff6b6b;--wc-building:#ffd166;--wc-expanding:#06d6a0;--wc-mastery:#c77dff}
 .cat-moon-wrap#home-ufo-wrap{width:340px;max-width:100%}
-.rb-hero{position:relative;width:340px;max-width:100%;height:195px;margin:0 auto;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.rb-hero:active{transform:scale(.98)}
+.rb-hero{position:relative;width:340px;max-width:100%;height:195px;margin:0 auto}
 .rb-arc{display:block;overflow:visible}
-.rb-hero .rb-arc{position:absolute;left:50%;top:0;margin-left:-170px}
-.rb-hero .wondle{position:absolute;left:50%;bottom:-8px;margin:0;transform:translateX(-50%) scale(.56);transform-origin:50% 100%}
+.rb-hero .rb-arc{position:absolute;left:50%;top:0;margin-left:-170px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rb-hero .rb-arc:active{opacity:.82}
+.rb-hero .wondle{position:absolute;left:50%;bottom:-8px;margin:0;transform:translateX(-50%) scale(.56);transform-origin:50% 100%;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rb-hero .wondle:active{filter:brightness(1.08)}
 .rb-hint{position:absolute;left:0;right:0;bottom:0;text-align:center;font-size:.78rem;color:#ffd166;opacity:.9}
 .rb-glow{animation:rbpulse 3.2s ease-in-out infinite}
 @keyframes rbpulse{0%,100%{opacity:.82}50%{opacity:1}}
@@ -8875,6 +9030,18 @@ _refreshInstallBtn();
 .bg-sheet .pbar{height:10px;border-radius:10px;background:rgba(255,255,255,.14);overflow:hidden}.bg-sheet .pbar i{display:block;height:100%;background:var(--c);border-radius:10px}
 .bg-sheet .pt{font-size:.85rem;margin-top:6px;opacity:.85}
 .bg-sheet .rw{margin-top:10px;font-size:.88rem;color:#ffd166}
+/* ── Lumi hello/goodbye overlays ── */
+#lumi-splash,#lumi-goodbye{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:radial-gradient(ellipse at 50% 32%,#1a2050 0%,#070a1e 72%);-webkit-tap-highlight-color:transparent;animation:lsIn .4s ease-out}
+#lumi-splash .ls-star-wrap .wondle,#lumi-goodbye .lg-star-wrap .wondle{transform:scale(1.4)}
+#lumi-splash .ls-caption{color:#fff;font:700 1.15rem/1.45 var(--ff-head,system-ui);text-align:center;max-width:300px;padding:0 24px;text-shadow:0 0 14px rgba(255,209,102,.5)}
+#lumi-splash.closing{animation:lsOut .55s ease-in forwards}
+@keyframes lsIn{0%{opacity:0}100%{opacity:1}}
+@keyframes lsOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(2.8)}}
+#lumi-goodbye .lg-star-wrap{animation:lgDrift 1.6s ease-in forwards}
+#lumi-goodbye .lg-caption{color:#fff;font:700 1.2rem/1.4 var(--ff-head,system-ui);text-shadow:0 0 14px rgba(255,209,102,.5);animation:lgFade 1.6s ease-in forwards}
+@keyframes lgDrift{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(40vw,-30vh) scale(.3);opacity:0}}
+@keyframes lgFade{0%,55%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){#lumi-splash,#lumi-goodbye,#lumi-splash.closing,#lumi-goodbye .lg-star-wrap,#lumi-goodbye .lg-caption{animation-duration:.01ms!important}}
 </style>
 <script>
 /* ---------- rainbow ---------- */
