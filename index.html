@@ -6223,7 +6223,7 @@ function renderComplete(body) {
   const achBtn = document.createElement('button');
   achBtn.className = 'ach-shortcut-btn';
   achBtn.innerHTML = '🏆 My Achievements';
-  achBtn.addEventListener('click', openAchievements);
+  achBtn.addEventListener('click', openBadges);
   wrap.appendChild(achBtn);
 
   body.appendChild(wrap);
@@ -6713,11 +6713,31 @@ function ppShowResults() {
   if (ppCaught === PP_TARGET_COUNT && ppLives > 0) confetti();
   speak(ppLives <= 0 ? 'Great flying! Let us try again.' : ppCaught === PP_TARGET_COUNT ? 'Perfect! You are a Planet Patrol champion!' : 'Well done! Want to play again?', null, 0.9);
 
+  // Did well and there's another world to patrol? Offer "Next World" instead
+  // of just replaying the same one.
+  const ppDidWell = ppCaught === PP_TARGET_COUNT && ppLives > 0;
+  const ppLevelIdx = ppCurrentLevel ? LEVELS.findIndex(lv => lv.id === ppCurrentLevel.id) : -1;
+  const ppNextLevel = (ppDidWell && ppLevelIdx > -1 && ppLevelIdx < LEVELS.length - 1) ? LEVELS[ppLevelIdx + 1] : null;
+
   const againBtn = document.createElement('button');
   againBtn.className = 'action-btn primary';
-  againBtn.textContent = 'Play again →';
-  againBtn.addEventListener('click', () => openPlanetPatrol(ppCurrentLevel));
+  if (ppNextLevel) {
+    againBtn.textContent = 'Next world: ' + ppNextLevel.name + ' →';
+    againBtn.addEventListener('click', () => openPlanetPatrol(ppNextLevel));
+  } else {
+    againBtn.textContent = 'Play again →';
+    againBtn.addEventListener('click', () => openPlanetPatrol(ppCurrentLevel));
+  }
   body.appendChild(againBtn);
+
+  if (ppNextLevel) {
+    const replayBtn = document.createElement('button');
+    replayBtn.className = 'action-btn secondary';
+    replayBtn.textContent = 'Play this world again';
+    replayBtn.style.marginTop = '10px';
+    replayBtn.addEventListener('click', () => openPlanetPatrol(ppCurrentLevel));
+    body.appendChild(replayBtn);
+  }
 
   const backBtn = document.createElement('button');
   backBtn.className = 'action-btn secondary';
@@ -6729,7 +6749,7 @@ function ppShowResults() {
   const achBtn = document.createElement('button');
   achBtn.className = 'ach-shortcut-btn';
   achBtn.innerHTML = '🏆 My Achievements';
-  achBtn.addEventListener('click', openAchievements);
+  achBtn.addEventListener('click', openBadges);
   body.appendChild(achBtn);
 
   setTimeout(checkForNewAchievements, 700);
@@ -7180,7 +7200,9 @@ function showAchievementPopup(newAchievements, index) {
     card.classList.add('flying');
     setTimeout(() => {
       overlay.remove();
-      if (goToAchievements) openAchievements();
+      // Tapping the sticker should take a child to their own My Badges screen,
+      // never the parent-hub Achievements view (that one lives behind the PIN gate).
+      if (goToAchievements) openBadges();
       else showAchievementPopup(newAchievements, index + 1);
     }, 500);
   }
@@ -7191,6 +7213,11 @@ function showAchievementPopup(newAchievements, index) {
 }
 
 function openAchievements() {
+  // Defense in depth: always go through the PIN gate directly, even if some
+  // future code path calls this instead of going through openParentHub().
+  requireParentPin(_openAchievementsImpl);
+}
+function _openAchievementsImpl() {
   showScreen('achievements-screen');
   const container = document.getElementById('ach-stations');
   container.innerHTML = '';
@@ -7319,6 +7346,9 @@ function requireParentPin(onSuccess) {
 }
 
 function openSpellingSecrets() {
+  requireParentPin(_openSpellingSecretsImpl);
+}
+function _openSpellingSecretsImpl() {
   showScreen('spelling-secrets-screen');
   document.getElementById('ss-back-btn').onclick = openParentHub;
   document.querySelector('#spelling-secrets-screen .lm-title').textContent = '📚 Spelling Secrets';
@@ -7451,8 +7481,7 @@ function openSecretLesson(level, lesson) {
    LEARNING TIMELINE
 ════════════════════════════════════════════ */
 function openTimeline() {
-  buildTimeline();
-  showScreen('timeline-screen');
+  requireParentPin(() => { buildTimeline(); showScreen('timeline-screen'); });
 }
 
 function lessonById(id) {
@@ -7563,8 +7592,7 @@ function buildTimeline() {
    SETTINGS
 ════════════════════════════════════════════ */
 function openSettings() {
-  buildSettings();
-  showScreen('settings-screen');
+  requireParentPin(() => { buildSettings(); showScreen('settings-screen'); });
 }
 
 function buildSettings() {
@@ -7682,7 +7710,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 45;
+const APP_VERSION = 46;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -7712,8 +7740,7 @@ function buildParentHub() {
 }
 
 function openParent() {
-  buildParentDashboard();
-  showScreen('parent');
+  requireParentPin(() => { buildParentDashboard(); showScreen('parent'); });
 }
 
 
@@ -8416,7 +8443,7 @@ function chRenderReview() {
   const achBtn = document.createElement('button');
   achBtn.className = 'ach-shortcut-btn';
   achBtn.innerHTML = '🏆 My Achievements';
-  achBtn.addEventListener('click', openAchievements);
+  achBtn.addEventListener('click', openBadges);
   body.appendChild(achBtn);
 
   if (complete) confetti();
