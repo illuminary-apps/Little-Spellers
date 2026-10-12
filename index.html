@@ -6760,175 +6760,6 @@ function openBadges() {
   showScreen('badges');
 }
 
-function buildBadgesScreen() {
-  const container = document.getElementById('badges-stations');
-  container.innerHTML = '';
-  const p = getProgress();
-
-  const LEVEL_COLOURS = { foundation: '#ff6b6b', building: 'var(--gold)', expanding: 'var(--teal)', mastery: 'var(--lavender)' };
-  const LEVEL_GLOWS   = { foundation: 'rgba(255,107,107,0.55)', building: 'rgba(255,209,102,0.55)', expanding: 'rgba(6,214,160,0.5)', mastery: 'rgba(199,125,255,0.55)' };
-
-  let totalEarned = 0;
-  let totalBadges = 0;
-  let firstLockedIdx = -1;
-  let flatIdx = 0;
-  const flatList = [];
-
-  function addStation(icon, name, unlocked, subText, colour) {
-    if (!unlocked && firstLockedIdx === -1) firstLockedIdx = flatIdx;
-    flatList.push({ unlocked });
-
-    const node = document.createElement('div');
-    node.className = `station-node${unlocked ? ' completed' : ' locked'}`;
-
-    const planetEl = document.createElement('div');
-    planetEl.className = 'station-planet';
-    planetEl.style.setProperty('border-color', unlocked ? colour : 'rgba(255,255,255,0.25)');
-    planetEl.style.setProperty('background', unlocked ? 'rgba(255,255,255,0.04)' : 'var(--navy2)');
-    planetEl.innerHTML = unlocked ? icon : '🔒';
-
-    const infoEl = document.createElement('div');
-    infoEl.className = 'station-info';
-    infoEl.innerHTML = `
-      <div class="si-name">${name}</div>
-      <span class="si-tag ${unlocked ? 'tag-done' : 'tag-locked'}">${subText}</span>
-    `;
-
-    node.appendChild(planetEl);
-    node.appendChild(infoEl);
-    container.appendChild(node);
-    flatIdx++;
-    return node;
-  }
-
-  function addConnector(unlocked) {
-    const conn = document.createElement('div');
-    conn.className = 'station-connector';
-    for (let d = 0; d < 3; d++) {
-      const dot = document.createElement('div');
-      dot.className = 'connector-dot' + (unlocked ? ' lit' : '');
-      conn.appendChild(dot);
-    }
-    container.appendChild(conn);
-  }
-
-  // Lessons, grouped by world — same winding path the Achievements screen uses
-  LEVELS.forEach(level => {
-    const colour = LEVEL_COLOURS[level.id] || 'var(--gold)';
-    const glow   = LEVEL_GLOWS[level.id] || 'rgba(255,209,102,0.55)';
-
-    const divider = document.createElement('div');
-    divider.className = 'ach-category-divider';
-    divider.style.setProperty('--divider-colour', colour);
-    divider.style.setProperty('--divider-glow', glow);
-    divider.textContent = level.name;
-    container.appendChild(divider);
-
-    level.lessons.forEach((lesson, i) => {
-      totalBadges++;
-      const done  = !!p[lesson.id];
-      const score = p[lesson.id]?.score || 0;
-      const total = lesson.quizzes.length;
-      if (done) totalEarned++;
-
-      const subText = done
-        ? ((score === total ? '⭐⭐⭐' : score >= total*0.6 ? '⭐⭐' : '⭐') + ' Unlocked!')
-        : `${score} / ${total}`;
-
-      const node = addStation(lessonThemeIcon(lesson), lesson.name, done, subText, colour);
-      node.addEventListener('click', e => {
-        burstStar(e.clientX, e.clientY);
-        if (done) speak(lesson.name + ' — completed! You earned ' + score + ' out of ' + total + ' stars.', null, 0.9);
-      });
-
-      addConnector(done);
-    });
-
-    // This world's game badges sit right after its lessons
-    const worldGames = buildAchievementsList().filter(a => a.world === level.id);
-    worldGames.forEach((a, gi) => {
-      totalBadges++;
-      if (a.unlocked) totalEarned++;
-      const node = addStation(a.icon, a.short, a.unlocked, achSubText(a), colour);
-      node.addEventListener('click', e => {
-        burstStar(e.clientX, e.clientY);
-        if (a.unlocked) speak(a.short + ' — earned ' + a.count + (a.count === 1 ? ' time!' : ' times!'), null, 0.9);
-      });
-      if (gi < worldGames.length - 1) addConnector(a.unlocked);
-    });
-  });
-
-  // Game Achievements — Planet Patrol + Spell-a-thon, same winding path
-  const gamesAch = buildAchievementsList().filter(a => a.category === 'Games' && !a.world);
-  if (gamesAch.length) {
-    totalBadges += gamesAch.length;
-    const gColour = '#ff6ec7';
-    const gGlow = 'rgba(255,110,199,0.55)';
-
-    const divider = document.createElement('div');
-    divider.className = 'ach-category-divider';
-    divider.style.setProperty('--divider-colour', gColour);
-    divider.style.setProperty('--divider-glow', gGlow);
-    divider.textContent = 'Explorer Badges';
-    container.appendChild(divider);
-
-    gamesAch.forEach((a, i) => {
-      if (a.unlocked) totalEarned++;
-      const subText = achSubText(a);
-      const node = addStation(a.icon, a.name, a.unlocked, subText, gColour);
-      node.addEventListener('click', e => {
-        burstStar(e.clientX, e.clientY);
-        if (a.unlocked) speak(a.name + ' — unlocked! Great playing!', null, 0.9);
-      });
-      if (i < gamesAch.length - 1) addConnector(a.unlocked);
-    });
-  }
-
-  // Summary banner
-  const overallPct = totalBadges ? Math.round((totalEarned / totalBadges) * 100) : 0;
-  const summary = document.getElementById('badges-summary');
-  summary.innerHTML = `
-    <div class="badge-summary-ring" style="--pct:${overallPct};">
-      <div class="badge-summary-ring-inner">${overallPct}%</div>
-    </div>
-    <div>
-      <div class="badge-summary-text">${totalEarned} / ${totalBadges} Badges Earned</div>
-      <div class="badge-summary-sub">Keep flying — every lesson and game adds a new sticker!</div>
-    </div>
-  `;
-
-  if (totalEarned === totalBadges && totalBadges > 0) {
-    confetti();
-    speak('Amazing! You have collected all badges! You are a superstar speller!', null, 0.9);
-  }
-
-  const unlockedCount = flatList.filter(f => f.unlocked).length;
-  setTimeout(() => {
-    const totalHeight = container.scrollHeight || (flatList.length * 82);
-    const trailPct = flatList.length ? (unlockedCount / flatList.length) * 100 : 0;
-    const trailEl = document.getElementById('badges-trail-done');
-    if (trailEl) trailEl.style.height = (trailPct / 100 * totalHeight) + 'px';
-  }, 200);
-
-  positionBadgesRocket(firstLockedIdx === -1 ? flatList.length - 1 : firstLockedIdx);
-}
-
-function positionBadgesRocket(idx) {
-  const rocket = document.getElementById('badges-rocket');
-  const container = document.getElementById('badges-stations');
-  if (!rocket || !container) return;
-  requestAnimationFrame(() => {
-    const nodes = container.querySelectorAll('.station-node');
-    if (!nodes.length) { rocket.style.top = '24px'; return; }
-    const target = nodes[Math.max(0, Math.min(idx, nodes.length - 1))];
-    const wrapRect = container.closest('.journey-wrap').getBoundingClientRect();
-    const nodeRect = target.getBoundingClientRect();
-    const rocketH  = rocket.offsetHeight || 58;
-    const nodeCentre = nodeRect.top - wrapRect.top + nodeRect.height / 2;
-    rocket.style.top = Math.max(8, nodeCentre - rocketH / 2) + 'px';
-  });
-}
-
 /* ════════════════════════════════════════════
    PARENT DASHBOARD
 ════════════════════════════════════════════ */
@@ -7007,7 +6838,8 @@ function achievementStats() {
       return out;
     })(),
     ppWorldsPlayed: (pp.worldsPlayed || []).length,
-    chLevelWorldsCount: chLevelWorlds.length
+    chLevelWorldsCount: chLevelWorlds.length,
+    chLevelWorlds
   };
 }
 
@@ -7074,7 +6906,6 @@ function buildAchievementsList() {
   list.push({ category: 'Games', icon: '🌌', name: 'Galaxy Explorer', unlocked: s.ppWorldsPlayed >= 4, current: Math.min(s.ppWorldsPlayed,4), target: 4 });
   list.push({ category: 'Games', icon: '🪐', name: '100 Planets Caught', unlocked: s.ppTotalCaught >= 100, current: Math.min(s.ppTotalCaught,100), target: 100 });
   list.push({ category: 'Games', icon: '🎖️', name: '5 Perfect Dictation Rounds', unlocked: s.perfectDictationRounds >= 5, current: Math.min(s.perfectDictationRounds,5), target: 5 });
-  list.push({ category: 'Games', icon: '👑', name: 'World Champion', unlocked: s.chLevelWorldsCount >= 1, current: Math.min(s.chLevelWorldsCount,1), target: 1 });
 
   // Per-world Planet Patrol badges — earned again and again
   LEVELS.forEach(lv => {
@@ -7091,6 +6922,8 @@ function buildAchievementsList() {
     list.push(makeRepeat('Games', '💎', 'sp-' + lv.id + '-collect', lv.id, 'Word Collector', 10, (s.masteredByWorld || {})[lv.id] || 0));
     list.push(makeRepeat('Games', '🎯', 'sp-' + lv.id + '-perfect', lv.id, 'Perfect Speller', 3, sw.perfect));
     list.push(makeRepeat('Games', '🦸', 'sp-' + lv.id + '-comeback', lv.id, 'Comeback Kid', 5, sw.comeback));
+    const isChamp = (s.chLevelWorlds || []).includes(lv.id);
+    list.push({ category: 'Games', world: lv.id, id: 'wc-' + lv.id, icon: '👑', name: (WORLD_EMOJI[lv.id] || '') + ' World Champion', short: 'World Champion', unlocked: isChamp, current: isChamp ? 1 : 0, target: 1 });
   });
 
   return list;
@@ -7138,6 +6971,7 @@ function achievementEarnedText(a){
     if(/^sp-.*-collect$/.test(a.id))return 'You mastered '+a.target+' words in '+w+' Spell-a-thon!';
     if(/^sp-.*-perfect$/.test(a.id))return 'You got '+a.target+' perfect round'+(a.target===1?'':'s')+' in '+w+' Spell-a-thon!';
     if(/^sp-.*-comeback$/.test(a.id))return 'You spelled '+a.target+' comeback word'+(a.target===1?'':'s')+' right in '+w+'!';
+    if(/^wc-/.test(a.id))return 'You finished the whole '+w+' world in Spell-a-thon!';
   }
   var m={
     'First Lesson':'You finished your first lesson!',
@@ -7155,8 +6989,7 @@ function achievementEarnedText(a){
     'Perfect Patrol':'You caught every right planet in a Planet Patrol round!',
     'Galaxy Explorer':'You played Planet Patrol in all four worlds!',
     '100 Planets Caught':'You caught 100 planets in Planet Patrol!',
-    '5 Perfect Dictation Rounds':'You got 5 perfect Spell-a-thon rounds!',
-    'World Champion':'You finished a whole world in Spell-a-thon!'
+    '5 Perfect Dictation Rounds':'You got 5 perfect Spell-a-thon rounds!'
   };
   if(m[a.name])return m[a.name];
   if(/ Complete$/.test(a.name))return 'You finished every lesson in '+a.name.replace(' Complete','')+'!';
@@ -7681,16 +7514,8 @@ function buildSettings() {
       <button class="set-save-btn" id="set-audit-btn">🔍 Check Achievements</button>
       <div class="set-future-note" id="set-audit-note"></div>
     </div>
-    <div class="set-row">
-      <button class="set-danger-btn" id="set-reset-btn">🔄 Reset All Progress</button>
-    </div>
-    <div class="set-row">
-      <button class="set-future-btn" disabled>⬆️ Export Progress</button>
-      <div class="set-future-note">Coming soon</div>
-    </div>
     <div class="set-row" style="margin-bottom:0;">
-      <button class="set-future-btn" disabled>⬇️ Import Progress</button>
-      <div class="set-future-note">Coming soon</div>
+      <button class="set-danger-btn" id="set-reset-btn">🔄 Reset All Progress</button>
     </div>
   `;
   dataCard.querySelector('#set-audit-btn').addEventListener('click', () => {
@@ -7710,7 +7535,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 46;
+const APP_VERSION = 47;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -9095,8 +8920,9 @@ function badgeHowTo(a){
     if(/^sp-.*-collect$/.test(a.id))return 'Master '+a.target+' words in '+w+' Spell-a-thon.';
     if(/^sp-.*-perfect$/.test(a.id))return 'Get '+a.target+' perfect rounds in '+w+' Spell-a-thon.';
     if(/^sp-.*-comeback$/.test(a.id))return 'Spell '+a.target+' words right that you missed before in '+w+'.';
+    if(/^wc-/.test(a.id))return 'Finish the whole '+w+' world in Spell-a-thon.';
   }
-  var m={'Planet Patrol Rookie':'Catch your very first planet!','Perfect Patrol':'Catch every right planet in one Planet Patrol round.','Galaxy Explorer':'Play Planet Patrol in all four worlds.','100 Planets Caught':'Catch 100 planets in Planet Patrol.','5 Perfect Dictation Rounds':'Get 5 perfect Spell-a-thon rounds.','World Champion':'Finish a whole world in Spell-a-thon.'};
+  var m={'Planet Patrol Rookie':'Catch your very first planet!','Perfect Patrol':'Catch every right planet in one Planet Patrol round.','Galaxy Explorer':'Play Planet Patrol in all four worlds.','100 Planets Caught':'Catch 100 planets in Planet Patrol.','5 Perfect Dictation Rounds':'Get 5 perfect Spell-a-thon rounds.'};
   return m[a.name]||'Keep playing to earn this one!';
 }
 function badgeReward(a){
