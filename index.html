@@ -105,6 +105,54 @@ html, body {
   gap: 0;
 }
 
+.profile-chip {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  right: 14px;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(14,19,52,0.72);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 999px;
+  padding: 5px 10px 5px 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.profile-chip #profile-chip-avatar { font-size: 1.1rem; line-height: 1; }
+.profile-chip #profile-chip-name { font-size: 0.74rem; color: var(--white); font-weight: 600; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.profile-chip .profile-chip-caret { font-size: 0.6rem; color: #7a9cc0; }
+
+.profile-switch-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(8,10,28,0.72);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.profile-switch-box {
+  width: 100%; max-width: 340px;
+  background: var(--navy2);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 18px;
+  padding: 18px 16px;
+  display: flex; flex-direction: column; gap: 10px;
+  max-height: 80vh; overflow-y: auto;
+}
+.profile-switch-title { font-family: var(--ff-head); color: var(--gold); font-size: 1rem; text-align: center; margin-bottom: 2px; }
+.profile-switch-row {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+.profile-switch-row.active { border-color: var(--gold); background: rgba(255,209,102,0.08); }
+.profile-switch-row .psr-avatar { font-size: 1.5rem; }
+.profile-switch-row .psr-name { font-size: 0.88rem; font-weight: 700; color: var(--white); flex: 1; }
+.profile-switch-row .psr-tag { font-size: 0.65rem; color: var(--gold); font-weight: 600; }
+
 /* Cat on moon — home screen */
 .cat-moon-wrap {
   position: relative;
@@ -2147,6 +2195,11 @@ html, body {
      HOME SCREEN
 ══════════════════════════════════ -->
 <div id="home" class="screen active">
+  <div class="profile-chip" id="profile-chip" onclick="openProfileSwitcher()" role="button" aria-label="Switch learner">
+    <span id="profile-chip-avatar">🦊</span>
+    <span id="profile-chip-name">Explorer</span>
+    <span class="profile-chip-caret">▾</span>
+  </div>
   <div class="home-header">
 
     <!-- Hero UFO + Cat -->
@@ -2677,14 +2730,228 @@ function confetti() {
 }
 
 /* ════════════════════════════════════════════
-   PROGRESS — localStorage
+   PROFILES — multiple children can share one device, each with
+   their own isolated progress. Still no accounts/cloud — just a
+   small index (ls_profiles) naming each child and which one is
+   active, with that child's actual progress kept in its own
+   localStorage key (ls_progress::<id>) in the same shape progress
+   has always used. The parent PIN lives in its own shared key
+   (ls_parent_pin) since it protects the parent, not one child.
+════════════════════════════════════════════ */
+const PROFILE_AVATARS = ['🦊','🐻','🐱','🐰','🦁','🐼','🐨','🐸','🦄','🐶','🐥','🐢'];
+const MAX_PROFILES = 4;
+
+function getProfilesMeta() {
+  try {
+    const raw = localStorage.getItem('ls_profiles');
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return null;
+}
+function saveProfilesMeta(meta) {
+  try { localStorage.setItem('ls_profiles', JSON.stringify(meta)); } catch {}
+}
+function makeProfileId() { return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+/* Runs before anything else touches progress. If ls_profiles doesn't
+   exist yet, either migrates a pre-profiles install's single
+   ls_progress blob into a first profile (carrying the parent PIN out
+   into its own key along the way), or — for a brand-new install —
+   creates one default empty profile. Safe to call repeatedly. */
+function ensureProfilesMigrated() {
+  let meta = getProfilesMeta();
+  if (meta && meta.profiles && meta.profiles.length) return meta;
+
+  const id = makeProfileId();
+  let oldRaw = null;
+  try { oldRaw = localStorage.getItem('ls_progress'); } catch {}
+  if (oldRaw && oldRaw !== '{}') {
+    try {
+      const old = JSON.parse(oldRaw);
+      if (old.parentPin) {
+        try { localStorage.setItem('ls_parent_pin', old.parentPin); } catch {}
+        delete old.parentPin;
+      }
+      localStorage.setItem('ls_progress::' + id, JSON.stringify(old));
+    } catch { localStorage.setItem('ls_progress::' + id, oldRaw); }
+    window.__lsJustMigrated = true; // tells init to offer a one-time "name this learner" prompt
+  } else {
+    try { localStorage.setItem('ls_progress::' + id, '{}'); } catch {}
+  }
+  meta = { profiles: [{ id, name: 'Explorer', avatar: PROFILE_AVATARS[0], age: '', createdAt: Date.now() }], activeId: id };
+  saveProfilesMeta(meta);
+  return meta;
+}
+
+function getActiveProfile() {
+  const meta = getProfilesMeta() || ensureProfilesMigrated();
+  return meta.profiles.find(pr => pr.id === meta.activeId) || meta.profiles[0];
+}
+function getActiveProfileId() {
+  const prof = getActiveProfile();
+  return prof ? prof.id : null;
+}
+function setActiveProfileId(id) {
+  const meta = getProfilesMeta();
+  if (!meta) return;
+  meta.activeId = id;
+  saveProfilesMeta(meta);
+}
+function listProfiles() {
+  const meta = getProfilesMeta() || ensureProfilesMigrated();
+  return meta.profiles;
+}
+function createProfile(name, avatar) {
+  const meta = getProfilesMeta() || ensureProfilesMigrated();
+  if (meta.profiles.length >= MAX_PROFILES) return null;
+  const id = makeProfileId();
+  meta.profiles.push({
+    id,
+    name: (name || 'Explorer').trim().slice(0, 20) || 'Explorer',
+    avatar: avatar || PROFILE_AVATARS[meta.profiles.length % PROFILE_AVATARS.length],
+    age: '',
+    createdAt: Date.now()
+  });
+  saveProfilesMeta(meta);
+  try { localStorage.setItem('ls_progress::' + id, '{}'); } catch {}
+  return id;
+}
+function updateProfile(id, updates) {
+  const meta = getProfilesMeta();
+  if (!meta) return;
+  const prof = meta.profiles.find(pr => pr.id === id);
+  if (!prof) return;
+  Object.assign(prof, updates);
+  if (typeof prof.name === 'string') prof.name = prof.name.trim().slice(0, 20) || 'Explorer';
+  saveProfilesMeta(meta);
+}
+function deleteProfile(id) {
+  const meta = getProfilesMeta();
+  if (!meta || meta.profiles.length <= 1) return false;
+  meta.profiles = meta.profiles.filter(pr => pr.id !== id);
+  if (meta.activeId === id) meta.activeId = meta.profiles[0].id;
+  saveProfilesMeta(meta);
+  try { localStorage.removeItem('ls_progress::' + id); } catch {}
+  return true;
+}
+
+function getParentPin() {
+  try { return localStorage.getItem('ls_parent_pin') || ''; } catch { return ''; }
+}
+function setParentPin(pin) {
+  try {
+    if (pin) localStorage.setItem('ls_parent_pin', pin);
+    else localStorage.removeItem('ls_parent_pin');
+  } catch {}
+}
+
+/* Home-screen chip showing who's currently playing. Updated on load and
+   whenever the active profile might have changed. */
+function refreshProfileChip() {
+  const chip = document.getElementById('profile-chip');
+  if (!chip) return;
+  const profiles = listProfiles();
+  // Only one learner ever set up — no point showing a switcher for one.
+  if (profiles.length <= 1) { chip.style.display = 'none'; return; }
+  chip.style.display = 'flex';
+  const prof = getActiveProfile();
+  document.getElementById('profile-chip-avatar').textContent = prof.avatar || '🦊';
+  document.getElementById('profile-chip-name').textContent = prof.name || 'Explorer';
+}
+
+/* One-time prompt shown right after upgrading from a single-child install:
+   we've already carried their existing progress into a first profile
+   named "Explorer" — this just lets them put the real name on it. Chained
+   after the hello splash (if any) so the two overlays never stack. */
+function maybeShowMigrationRename() {
+  if (!window.__lsJustMigrated) return;
+  window.__lsJustMigrated = false;
+  const prof = getActiveProfile();
+  if (!prof) return;
+  const overlay = document.createElement('div');
+  overlay.className = 'profile-switch-overlay';
+  const box = document.createElement('div');
+  box.className = 'profile-switch-box';
+  box.innerHTML = '<div class="profile-switch-title">Welcome back! 🌟</div><div style="font-size:0.78rem; color:#9ab8d6; text-align:center; margin-bottom:2px;">We kept all the progress so far. What should we call this learner?</div>';
+  const nameInput = document.createElement('input');
+  nameInput.className = 'set-input';
+  nameInput.placeholder = "Learner's name";
+  nameInput.value = prof.name || 'Explorer';
+  nameInput.maxLength = 20;
+  box.appendChild(nameInput);
+  const avatarRow = document.createElement('div');
+  avatarRow.style.cssText = 'display:flex; gap:6px; flex-wrap:wrap; justify-content:center;';
+  let selectedAvatar = prof.avatar || PROFILE_AVATARS[0];
+  PROFILE_AVATARS.forEach(em => {
+    const b = document.createElement('button');
+    b.textContent = em; b.type = 'button';
+    b.style.cssText = 'font-size:1.25rem; background:rgba(255,255,255,0.05); border:2px solid ' + (em === selectedAvatar ? 'var(--gold)' : 'transparent') + '; border-radius:10px; padding:4px 7px; cursor:pointer;';
+    b.addEventListener('click', () => {
+      selectedAvatar = em;
+      avatarRow.querySelectorAll('button').forEach(bb => bb.style.borderColor = bb.textContent === em ? 'var(--gold)' : 'transparent');
+    });
+    avatarRow.appendChild(b);
+  });
+  box.appendChild(avatarRow);
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'set-save-btn';
+  saveBtn.style.marginTop = '6px';
+  saveBtn.textContent = 'Continue';
+  saveBtn.addEventListener('click', () => {
+    updateProfile(prof.id, { name: nameInput.value.trim() || 'Explorer', avatar: selectedAvatar });
+    refreshProfileChip();
+    overlay.remove();
+  });
+  box.appendChild(saveBtn);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+}
+
+/* Lightweight "who's playing?" overlay — switching is not PIN-gated (it's
+   just picking a save file, nothing sensitive), but adding/renaming/
+   deleting learners lives in Settings behind the parent PIN. */
+function openProfileSwitcher() {
+  const profiles = listProfiles();
+  if (profiles.length <= 1) return;
+  const activeId = getActiveProfileId();
+  const overlay = document.createElement('div');
+  overlay.className = 'profile-switch-overlay';
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  const box = document.createElement('div');
+  box.className = 'profile-switch-box';
+  box.innerHTML = '<div class="profile-switch-title">Who\'s playing? ⭐</div>';
+  profiles.forEach(prof => {
+    const row = document.createElement('div');
+    row.className = 'profile-switch-row' + (prof.id === activeId ? ' active' : '');
+    row.innerHTML = `<span class="psr-avatar">${prof.avatar || '🦊'}</span><span class="psr-name">${prof.name}</span>${prof.id === activeId ? '<span class="psr-tag">PLAYING NOW</span>' : ''}`;
+    row.addEventListener('click', () => {
+      if (prof.id === activeId) { overlay.remove(); return; }
+      setActiveProfileId(prof.id);
+      location.reload();
+    });
+    box.appendChild(row);
+  });
+  const manageBtn = document.createElement('button');
+  manageBtn.className = 'set-future-btn';
+  manageBtn.style.cssText = 'cursor:pointer; margin-top:4px;';
+  manageBtn.textContent = 'Add / manage learners (parent)';
+  manageBtn.addEventListener('click', () => { overlay.remove(); openSettings(); });
+  box.appendChild(manageBtn);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+}
+
+/* ════════════════════════════════════════════
+   PROGRESS — localStorage, namespaced per active child profile
 ════════════════════════════════════════════ */
 function getProgress() {
-  try { return JSON.parse(localStorage.getItem('ls_progress') || '{}'); } catch { return {}; }
+  const id = getActiveProfileId();
+  try { return JSON.parse(localStorage.getItem('ls_progress::' + id) || '{}'); } catch { return {}; }
 }
 
 function saveProgress(data) {
-  try { localStorage.setItem('ls_progress', JSON.stringify(data)); } catch {}
+  const id = getActiveProfileId();
+  try { localStorage.setItem('ls_progress::' + id, JSON.stringify(data)); } catch {}
 }
 
 function markLessonComplete(lessonId, score) {
@@ -7124,8 +7391,7 @@ function positionAchRocket(idx) {
 function requireParentPin(onSuccess) {
   const _act = document.querySelector('.screen.active');
   if (_act && ['parent-hub-screen','parent','achievements-screen','spelling-secrets-screen','timeline-screen','settings-screen'].indexOf(_act.id) > -1) { onSuccess(); return; }
-  const p = getProgress();
-  const pin = p.parentPin;
+  const pin = getParentPin();
   if (!pin) { onSuccess(); return; }
 
   const overlay = document.createElement('div');
@@ -7395,6 +7661,188 @@ function buildTimeline() {
 }
 
 /* ════════════════════════════════════════════
+   MANAGE LEARNERS — add / rename / switch / delete child profiles
+════════════════════════════════════════════ */
+let lmEditingId = null;  // profile id currently being edited inline, or null
+let lmAdding    = false; // whether the "add a learner" inline form is open
+
+function buildManageLearnersCard() {
+  const card = document.createElement('div');
+  card.className = 'pd-section-card';
+  const profiles = listProfiles();
+  const activeId = getActiveProfileId();
+
+  const title = document.createElement('div');
+  title.className = 'pd-section-title';
+  title.textContent = '👨‍👩‍👧‍👦 Manage Learners';
+  card.appendChild(title);
+
+  const sub = document.createElement('div');
+  sub.style.cssText = 'font-size:0.72rem; color:#7a9cc0; margin-bottom:10px;';
+  sub.textContent = 'Each learner keeps their own separate progress, badges and starting world on this device.';
+  card.appendChild(sub);
+
+  const list = document.createElement('div');
+  list.style.cssText = 'display:flex; flex-direction:column; gap:8px;';
+
+  profiles.forEach(prof => {
+    if (lmEditingId === prof.id) {
+      list.appendChild(buildLearnerEditRow(prof));
+      return;
+    }
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.04); border-radius:12px; padding:8px 10px;' + (prof.id === activeId ? ' border:1.5px solid var(--gold);' : ' border:1.5px solid transparent;');
+    const lessonsDone = countLessonsDoneFor(prof.id);
+    row.innerHTML = `
+      <span style="font-size:1.6rem;">${prof.avatar || '🦊'}</span>
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:0.88rem; font-weight:700; color:var(--white);">${prof.name}${prof.id === activeId ? ' <span style="color:var(--gold); font-size:0.68rem; font-weight:600;">· PLAYING NOW</span>' : ''}</div>
+        <div style="font-size:0.68rem; color:#7a9cc0;">${lessonsDone} lesson${lessonsDone === 1 ? '' : 's'} completed${prof.age ? ' · age ' + prof.age : ''}</div>
+      </div>
+    `;
+    const btnWrap = document.createElement('div');
+    btnWrap.style.cssText = 'display:flex; gap:6px; flex-shrink:0;';
+    if (prof.id !== activeId) {
+      const switchBtn = document.createElement('button');
+      switchBtn.className = 'set-save-btn';
+      switchBtn.style.cssText = 'padding:6px 10px; font-size:0.72rem;';
+      switchBtn.textContent = 'Switch';
+      switchBtn.addEventListener('click', () => { setActiveProfileId(prof.id); location.reload(); });
+      btnWrap.appendChild(switchBtn);
+    }
+    const editBtn = document.createElement('button');
+    editBtn.className = 'set-future-btn';
+    editBtn.style.cssText = 'padding:6px 9px; font-size:0.8rem; cursor:pointer;';
+    editBtn.textContent = '✏️';
+    editBtn.setAttribute('aria-label', 'Edit ' + prof.name);
+    editBtn.addEventListener('click', () => { lmEditingId = prof.id; lmAdding = false; buildSettings(); });
+    btnWrap.appendChild(editBtn);
+    if (profiles.length > 1) {
+      const delBtn = document.createElement('button');
+      delBtn.className = 'set-future-btn';
+      delBtn.style.cssText = 'padding:6px 9px; font-size:0.8rem; cursor:pointer;';
+      delBtn.textContent = '🗑️';
+      delBtn.setAttribute('aria-label', 'Delete ' + prof.name);
+      delBtn.addEventListener('click', () => {
+        if (!confirm(`Delete ${prof.name}'s profile? This erases all of their progress and cannot be undone.`)) return;
+        const wasActive = prof.id === activeId;
+        deleteProfile(prof.id);
+        if (wasActive) { location.reload(); } else { buildSettings(); }
+      });
+      btnWrap.appendChild(delBtn);
+    }
+    row.appendChild(btnWrap);
+    list.appendChild(row);
+  });
+  card.appendChild(list);
+
+  if (lmAdding) {
+    card.appendChild(buildLearnerEditRow(null));
+  } else if (profiles.length < MAX_PROFILES) {
+    const addBtn = document.createElement('button');
+    addBtn.className = 'set-save-btn';
+    addBtn.style.marginTop = '10px';
+    addBtn.textContent = '+ Add a Learner';
+    addBtn.addEventListener('click', () => { lmAdding = true; lmEditingId = null; buildSettings(); });
+    card.appendChild(addBtn);
+  } else {
+    const maxNote = document.createElement('div');
+    maxNote.style.cssText = 'font-size:0.68rem; color:#7a9cc0; margin-top:8px;';
+    maxNote.textContent = `Up to ${MAX_PROFILES} learners per device.`;
+    card.appendChild(maxNote);
+  }
+
+  return card;
+}
+
+function countLessonsDoneFor(profileId) {
+  try {
+    const p = JSON.parse(localStorage.getItem('ls_progress::' + profileId) || '{}');
+    let count = 0;
+    LEVELS.forEach(lv => lv.lessons.forEach(l => { if (p[l.id]) count++; }));
+    return count;
+  } catch { return 0; }
+}
+
+/* Shared inline form for both "add a learner" (prof === null) and
+   "edit this learner" (prof is the existing profile object). */
+function buildLearnerEditRow(prof) {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'background:rgba(255,255,255,0.06); border-radius:12px; padding:10px;';
+  const isNew = !prof;
+  const nameVal = prof ? prof.name : '';
+  const ageVal = prof ? (prof.age || '') : '';
+  const curAvatar = prof ? (prof.avatar || PROFILE_AVATARS[0]) : PROFILE_AVATARS[0];
+
+  const avatarRow = document.createElement('div');
+  avatarRow.style.cssText = 'display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;';
+  let selectedAvatar = curAvatar;
+  PROFILE_AVATARS.forEach(em => {
+    const b = document.createElement('button');
+    b.textContent = em;
+    b.type = 'button';
+    b.style.cssText = 'font-size:1.25rem; background:rgba(255,255,255,0.05); border:2px solid ' + (em === selectedAvatar ? 'var(--gold)' : 'transparent') + '; border-radius:10px; padding:4px 7px; cursor:pointer;';
+    b.addEventListener('click', () => {
+      selectedAvatar = em;
+      avatarRow.querySelectorAll('button').forEach(bb => bb.style.borderColor = bb.textContent === em ? 'var(--gold)' : 'transparent');
+    });
+    avatarRow.appendChild(b);
+  });
+  wrap.appendChild(avatarRow);
+
+  const nameInput = document.createElement('input');
+  nameInput.className = 'set-input';
+  nameInput.placeholder = "Learner's name";
+  nameInput.value = nameVal;
+  nameInput.maxLength = 20;
+  nameInput.style.marginBottom = '8px';
+  wrap.appendChild(nameInput);
+
+  const ageInput = document.createElement('input');
+  ageInput.className = 'set-input';
+  ageInput.type = 'number';
+  ageInput.min = 2; ageInput.max = 12;
+  ageInput.placeholder = 'Age (optional)';
+  ageInput.value = ageVal;
+  ageInput.style.marginBottom = '10px';
+  wrap.appendChild(ageInput);
+
+  const btnRow = document.createElement('div');
+  btnRow.className = 'set-row';
+  btnRow.style.marginBottom = '0';
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'set-save-btn';
+  saveBtn.textContent = isNew ? 'Add Learner' : 'Save';
+  saveBtn.addEventListener('click', () => {
+    const name = nameInput.value.trim() || 'Explorer';
+    const age = ageInput.value;
+    if (isNew) {
+      const newId = createProfile(name, selectedAvatar);
+      if (!newId) { alert(`Up to ${MAX_PROFILES} learners per device.`); return; }
+      updateProfile(newId, { age });
+      lmAdding = false;
+      const switchNow = confirm(`${name} was added! Switch to their profile now so they can pick their starting world?`);
+      if (switchNow) { setActiveProfileId(newId); location.reload(); return; }
+    } else {
+      updateProfile(prof.id, { name, age, avatar: selectedAvatar });
+      lmEditingId = null;
+      if (prof.id === getActiveProfileId()) refreshProfileChip();
+    }
+    buildSettings();
+  });
+  btnRow.appendChild(saveBtn);
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'set-future-btn';
+  cancelBtn.style.cursor = 'pointer';
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.addEventListener('click', () => { lmAdding = false; lmEditingId = null; buildSettings(); });
+  btnRow.appendChild(cancelBtn);
+  wrap.appendChild(btnRow);
+
+  return wrap;
+}
+
+/* ════════════════════════════════════════════
    SETTINGS
 ════════════════════════════════════════════ */
 function openSettings() {
@@ -7405,23 +7853,9 @@ function buildSettings() {
   const body = document.getElementById('settings-body');
   body.innerHTML = '';
   const p = getProgress();
-  const profile = p.childProfile || { name: '', age: '' };
 
-  // Child Profile
-  const profileCard = document.createElement('div');
-  profileCard.className = 'pd-section-card';
-  profileCard.innerHTML = `
-    <div class="pd-section-title">🧒 Child Profile</div>
-    <div class="set-row"><label class="set-label">Name</label><input class="set-input" id="set-child-name" value="${(profile.name||'').replace(/"/g,'&quot;')}" placeholder="Child's name"></div>
-    <div class="set-row" style="margin-bottom:0;"><label class="set-label">Age</label><input class="set-input" id="set-child-age" type="number" min="2" max="12" value="${profile.age||''}" placeholder="Age"></div>
-    <button class="set-save-btn" id="set-profile-save">Save</button>
-  `;
-  profileCard.querySelector('#set-profile-save').addEventListener('click', () => {
-    const p2 = getProgress();
-    p2.childProfile = { name: document.getElementById('set-child-name').value.trim(), age: document.getElementById('set-child-age').value };
-    saveProgress(p2);
-  });
-  body.appendChild(profileCard);
+  // Manage Learners (multi-child profiles)
+  body.appendChild(buildManageLearnersCard());
 
   // Starting world
   const swCard = document.createElement('div');
@@ -7430,29 +7864,26 @@ function buildSettings() {
   body.appendChild(swCard);
   buildWorldPicker(swCard.querySelector('#set-ws-list'), id => { setStartWorld(id); buildSettings(); });
 
-  // Parent PIN
+  // Parent PIN (shared across every learner on this device)
   const pinCard = document.createElement('div');
   pinCard.className = 'pd-section-card';
+  const curPin = getParentPin();
   pinCard.innerHTML = `
     <div class="pd-section-title">🔒 Parent PIN</div>
-    <div style="font-size:0.72rem; color:#7a9cc0; margin-bottom:8px;">${p.parentPin ? 'A PIN is currently protecting the Parent Dashboard and Settings.' : 'No PIN set — anyone can open the Parent Dashboard and Settings.'}</div>
+    <div style="font-size:0.72rem; color:#7a9cc0; margin-bottom:8px;">${curPin ? 'A PIN is currently protecting the Parent Dashboard and Settings — the same PIN covers every learner on this device.' : 'No PIN set — anyone can open the Parent Dashboard and Settings.'}</div>
     <div class="set-row" style="margin-bottom:8px;"><input class="set-input" id="set-pin-input" type="password" inputmode="numeric" maxlength="4" placeholder="4-digit PIN"></div>
-    <button class="set-save-btn" id="set-pin-save">${p.parentPin ? 'Change PIN' : 'Set PIN'}</button>
-    ${p.parentPin ? '<button class="set-danger-btn" id="set-pin-remove" style="margin-left:8px;">Remove PIN</button>' : ''}
+    <button class="set-save-btn" id="set-pin-save">${curPin ? 'Change PIN' : 'Set PIN'}</button>
+    ${curPin ? '<button class="set-danger-btn" id="set-pin-remove" style="margin-left:8px;">Remove PIN</button>' : ''}
   `;
   pinCard.querySelector('#set-pin-save').addEventListener('click', () => {
     const val = document.getElementById('set-pin-input').value;
     if (!/^\d{4}$/.test(val)) { alert('PIN must be exactly 4 digits.'); return; }
-    const p2 = getProgress();
-    p2.parentPin = val;
-    saveProgress(p2);
+    setParentPin(val);
     buildSettings();
   });
   const removeBtn = pinCard.querySelector('#set-pin-remove');
   if (removeBtn) removeBtn.addEventListener('click', () => {
-    const p2 = getProgress();
-    delete p2.parentPin;
-    saveProgress(p2);
+    setParentPin('');
     buildSettings();
   });
   body.appendChild(pinCard);
@@ -7508,7 +7939,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 50;
+const APP_VERSION = 51;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -7856,8 +8287,10 @@ function runAchievementAudit() {
 }
 
 function resetProgress() {
-  if (!confirm('Reset all progress? This cannot be undone.')) return;
-  try { localStorage.removeItem('ls_progress'); } catch {}
+  const name = getActiveProfile() ? getActiveProfile().name : 'this learner';
+  if (!confirm(`Reset all progress for ${name}? This cannot be undone. (Other learners on this device are not affected.)`)) return;
+  const id = getActiveProfileId();
+  try { localStorage.removeItem('ls_progress::' + id); } catch {}
   updateHomeProgress();
   goHome();
 }
@@ -8867,10 +9300,13 @@ function wbSpeak(q, onDone) {
 /* ════════════════════════════════════════════
    INIT — runs last, after every const/function above is declared
 ════════════════════════════════════════════ */
+ensureProfilesMigrated();
+refreshProfileChip();
 runAchievementAudit();
 updateHomeProgress();
 maybeShowWelcome();
-if (getProgress().setupDone && !_skipSplashOnce()) showLumiSplash();
+if (getProgress().setupDone && !_skipSplashOnce()) showLumiSplash(maybeShowMigrationRename);
+else maybeShowMigrationRename();
 
 </script>
 <script>
