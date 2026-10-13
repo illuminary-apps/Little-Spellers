@@ -1964,11 +1964,11 @@ html, body {
 .ch-review-word { flex: 1; }
 .ch-review-typed { opacity: 0.6; font-size: 0.78rem; }
 .ch-review-blocks { color: var(--lavender); font-weight: 700; letter-spacing: 0.02em; }
-.ch-review-nav { display: flex; justify-content: space-between; margin-top: 14px; }
+.ch-review-nav { display: flex; justify-content: center; margin-top: 14px; }
 .ch-review-nav button {
   background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.25);
   border-radius: 99px; padding: 10px 22px; font-family: var(--ff-head); font-size: 0.9rem;
-  color: var(--white); cursor: pointer;
+  color: var(--white); cursor: pointer; min-width: 180px;
 }
 .ch-review-nav .ch-continue-btn { background: var(--gold); border-color: var(--gold); color: var(--navy); }
 
@@ -6199,12 +6199,12 @@ function renderComplete(body) {
       </div>
     </div>
 
-    <div class="badge-earned">
-      <span class="badge-earned-icon">${lessonThemeIcon(l)}</span>
-      <div class="badge-earned-name">🏅 "${l.name}" unlocked!</div>
-    </div>
   `;
 
+  // No separate "Back to star map" button here — the header's own back
+  // arrow (top-left) already does exactly that, and a kid can gesture-back
+  // too, so a second one just added clutter. Same reasoning removed the
+  // "My Achievements" shortcut and the badge-earned callout box below.
   const nextLesson = findNextLesson();
   if (nextLesson) {
     const nextBtn = document.createElement('button');
@@ -6213,18 +6213,6 @@ function renderComplete(body) {
     nextBtn.addEventListener('click', () => startLesson(nextLesson));
     wrap.appendChild(nextBtn);
   }
-
-  const mapBtn = document.createElement('button');
-  mapBtn.className = 'action-btn secondary';
-  mapBtn.textContent = '← Back to star map';
-  mapBtn.addEventListener('click', backToMap);
-  wrap.appendChild(mapBtn);
-
-  const achBtn = document.createElement('button');
-  achBtn.className = 'ach-shortcut-btn';
-  achBtn.innerHTML = '🏆 My Achievements';
-  achBtn.addEventListener('click', openBadges);
-  wrap.appendChild(achBtn);
 
   body.appendChild(wrap);
   setTimeout(checkForNewAchievements, 700);
@@ -6738,19 +6726,9 @@ function ppShowResults() {
     replayBtn.addEventListener('click', () => openPlanetPatrol(ppCurrentLevel));
     body.appendChild(replayBtn);
   }
-
-  const backBtn = document.createElement('button');
-  backBtn.className = 'action-btn secondary';
-  backBtn.textContent = '← Back to Games';
-  backBtn.style.marginTop = '10px';
-  backBtn.addEventListener('click', openChallenges);
-  body.appendChild(backBtn);
-
-  const achBtn = document.createElement('button');
-  achBtn.className = 'ach-shortcut-btn';
-  achBtn.innerHTML = '🏆 My Achievements';
-  achBtn.addEventListener('click', openBadges);
-  body.appendChild(achBtn);
+  // No separate "Back to Games"/"My Achievements" buttons — the header's own
+  // back arrow already exits to Games, and badges are just a passing
+  // celebration now, not somewhere a kid navigates to from here.
 
   setTimeout(checkForNewAchievements, 700);
 }
@@ -7011,7 +6989,6 @@ function showAchievementPopup(newAchievements, index) {
       <div class="ach-popup-name">${a.popupName || a.name}</div>
       <div class="ach-popup-reason">${earnedText}</div>
       ${rewardText ? `<div class="ach-popup-reward">${rewardText}</div>` : ''}
-      <div class="ach-popup-tap">Tap the sticker to see your collection</div>
     </div>`;
   document.body.appendChild(overlay);
   confetti();
@@ -7020,29 +6997,23 @@ function showAchievementPopup(newAchievements, index) {
   const sticker = overlay.querySelector('.ach-popup-sticker');
   let dismissed = false;
 
-  function dismiss(goToAchievements) {
+  // Just a celebration — it shows itself off and fades away on its own (or on
+  // a tap, to skip ahead faster). It never navigates anywhere: taking a child
+  // to a different screen mid-lesson/mid-game, whose own Back button then
+  // dumps them at Home (not back where they were), was confusing.
+  function dismiss() {
     if (dismissed) return;
     dismissed = true;
-    const target = document.querySelector('.ach-shortcut-btn');
-    if (target) {
-      const cardRect = card.getBoundingClientRect();
-      const targetRect = target.getBoundingClientRect();
-      card.style.setProperty('--fly-x', ((targetRect.left + targetRect.width/2) - (cardRect.left + cardRect.width/2)) + 'px');
-      card.style.setProperty('--fly-y', ((targetRect.top + targetRect.height/2) - (cardRect.top + cardRect.height/2)) + 'px');
-    }
     card.classList.add('flying');
     setTimeout(() => {
       overlay.remove();
-      // Tapping the sticker should take a child to their own My Badges screen,
-      // never the parent-hub Achievements view (that one lives behind the PIN gate).
-      if (goToAchievements) openBadges();
-      else showAchievementPopup(newAchievements, index + 1);
+      showAchievementPopup(newAchievements, index + 1);
     }, 500);
   }
 
-  sticker.addEventListener('click', () => dismiss(true));
-  overlay.addEventListener('click', e => { if (e.target === overlay) dismiss(false); });
-  setTimeout(() => dismiss(false), 2600);
+  sticker.addEventListener('click', dismiss);
+  overlay.addEventListener('click', e => { if (e.target === overlay) dismiss(); });
+  setTimeout(dismiss, 2600);
 }
 
 function openAchievements() {
@@ -7535,7 +7506,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 47;
+const APP_VERSION = 48;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -8160,9 +8131,14 @@ function chRenderWordPrompt() {
   submitBtn.addEventListener('click', doSubmit);
   input.addEventListener('keydown', e => { if (e.key === 'Enter') doSubmit(); });
 
-  // Say the word automatically when the prompt appears
-  setTimeout(() => { hearBtn.classList.add('playing'); speak(wordObj.word, hearBtn, 0.75); }, 400);
-  setTimeout(() => input.focus(), 500);
+  // Say the word automatically when the prompt appears. The very first word
+  // of a round used to start speaking just 400ms after tapping a level/lesson
+  // card — barely time to see the new screen. Give that first word a real
+  // beat to land; later words in the round already follow the previous
+  // word's feedback pause, so they keep the shorter gap.
+  const sayDelay = chRoundIndex === 0 ? 2000 : 400;
+  setTimeout(() => { hearBtn.classList.add('playing'); speak(wordObj.word, hearBtn, 0.75); }, sayDelay);
+  setTimeout(() => input.focus(), sayDelay + 100);
 }
 
 function chSubmitAnswer(wordObj, typed, encourageEl) {
@@ -8254,22 +8230,15 @@ function chRenderReview() {
 
   const nav = document.createElement('div');
   nav.className = 'ch-review-nav';
-  const backBtn = document.createElement('button');
-  backBtn.textContent = '← Back';
-  backBtn.addEventListener('click', () => chOpenLevel(chCurrentLevel));
+  // No separate "← Back"/"My Achievements" here — the header's back arrow
+  // already goes to this same lesson list (chOpenLevel), and badges are a
+  // passing celebration now rather than a screen to navigate to.
   const continueBtn = document.createElement('button');
   continueBtn.className = 'ch-continue-btn';
   continueBtn.textContent = 'Continue →';
   continueBtn.addEventListener('click', chContinueChallenge);
-  nav.appendChild(backBtn);
   nav.appendChild(continueBtn);
   body.appendChild(nav);
-
-  const achBtn = document.createElement('button');
-  achBtn.className = 'ach-shortcut-btn';
-  achBtn.innerHTML = '🏆 My Achievements';
-  achBtn.addEventListener('click', openBadges);
-  body.appendChild(achBtn);
 
   if (complete) confetti();
   setTimeout(checkForNewAchievements, 700);
