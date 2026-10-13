@@ -800,6 +800,7 @@ html, body {
 .ws-icon { font-size: 2rem; flex-shrink: 0; }
 .ws-name { font-family: var(--ff-head); font-size: 1.1rem; }
 .ws-desc { font-size: .8rem; color: #9ab8d6; margin-top: 2px; }
+.ws-examples { font-size: .74rem; color: var(--gold); margin-top: 4px; }
 .constellation-card.recommended { box-shadow: 0 0 0 1.5px rgba(255,226,140,.35), 0 0 34px 8px rgba(255,214,102,.30); animation: start-breathe 3.4s ease-in-out infinite; }
 @keyframes start-breathe { 0%,100% { box-shadow: 0 0 0 1.5px rgba(255,226,140,.30), 0 0 26px 5px rgba(255,214,102,.22); } 50% { box-shadow: 0 0 0 1.5px rgba(255,226,140,.5), 0 0 44px 12px rgba(255,214,102,.38); } }
 .cc-start-tag { display:none; font-family: var(--ff-head); font-size:.62rem; letter-spacing:.08em; color: var(--gold); margin-left:6px; }
@@ -2422,7 +2423,7 @@ html, body {
   <div class="ws-wrap">
     <div class="ws-star">⭐</div>
     <h2 class="ws-title">Welcome to Little Spellers</h2>
-    <p class="ws-sub">A quick one-time question for the grown-up: where should your child start?<br>They can still explore every world, and you can change this later in Settings.</p>
+    <p class="ws-sub">A quick one-time question for the grown-up: where should your child start?<br>Try having them read each world's example words aloud — the world where they can read most of them comfortably is usually the right fit. They can still explore every world, and you can change this later in Settings.</p>
     <div class="ws-list" id="ws-list"></div>
     <div class="install-slot"></div>
   </div>
@@ -4011,10 +4012,10 @@ function showLumiSplash(onDone) {
 }
 
 const WORLD_SETUP = [
-  { id: 'foundation', desc: 'Just starting out: letter sounds, short vowels, first words' },
-  { id: 'building',   desc: 'Reads simple words: long vowels, Magic E, vowel teams' },
-  { id: 'expanding',  desc: 'Reading short sentences: silent letters, prefixes and suffixes' },
-  { id: 'mastery',    desc: 'Confident reader: Greek roots, complex endings, word origins' }
+  { id: 'foundation', desc: 'Just starting out: letter sounds, short vowels, first words', examples: ['cat', 'sun', 'hop'] },
+  { id: 'building',   desc: 'Reads simple words: long vowels, Magic E, vowel teams', examples: ['cake', 'boat', 'farm'] },
+  { id: 'expanding',  desc: 'Reading short sentences: silent letters, prefixes and suffixes', examples: ['knight', 'unhappy', 'careful'] },
+  { id: 'mastery',    desc: 'Confident reader: Greek roots, complex endings, word origins', examples: ['telephone', 'mysterious', 'library'] }
 ];
 function buildWorldPicker(container, onPick) {
   const cur = getProgress().startWorld;
@@ -4026,7 +4027,8 @@ function buildWorldPicker(container, onPick) {
     c.className = 'ws-card' + (cur === w.id ? ' current' : '');
     c.style.setProperty('--ws-c', COL[w.id][0]);
     c.style.setProperty('--ws-g', COL[w.id][1]);
-    c.innerHTML = `<span class="ws-icon">${WORLD_EMOJI[w.id]}</span><div><div class="ws-name">Level ${i + 1} · ${lv.name}${cur === w.id ? ' ✓' : ''}</div><div class="ws-desc">${w.desc}</div></div>`;
+    const exampleLine = w.examples ? `<div class="ws-examples">Try reading: <b>${w.examples.join(', ')}</b></div>` : '';
+    c.innerHTML = `<span class="ws-icon">${WORLD_EMOJI[w.id]}</span><div><div class="ws-name">Level ${i + 1} · ${lv.name}${cur === w.id ? ' ✓' : ''}</div><div class="ws-desc">${w.desc}</div>${exampleLine}</div>`;
     c.addEventListener('click', () => onPick(w.id));
     container.appendChild(c);
   });
@@ -7506,7 +7508,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 49;
+const APP_VERSION = 50;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -7546,6 +7548,53 @@ function uqStats(p){
   LEVELS.forEach(function(lv){var t=0,m=0,here={};chWordsFor(lv.id,null).forEach(function(w){var k=w.word.toLowerCase();if(seen[k]||here[k])return;here[k]=1;t++;if(best[k])m++;});
     Object.keys(here).forEach(function(k){seen[k]=1});out[lv.id]={t:t,m:m};tm+=m;tt+=t;});
   out.all={t:tt,m:tm};return out;}
+/* ── Level Check: periodically re-checks whether a child's assigned
+   starting world still fits, based on real quiz performance in it (not
+   just at first-run setup). Shown as a dismissible Parent Dashboard card,
+   never to the kid. ── */
+function levelCheckSuggestion() {
+  const p = getProgress();
+  const sw = p.startWorld;
+  if (!sw) return null;
+  const idx = LEVELS.findIndex(l => l.id === sw);
+  if (idx === -1) return null;
+  const level = LEVELS[idx];
+  const lessons = level.lessons;
+  const done = lessons.filter(l => !!p[l.id]);
+  if (done.length < 3) return null; // not enough data yet
+
+  const totalPossible = done.reduce((a, l) => a + l.quizzes.length, 0);
+  const totalScored = done.reduce((a, l) => a + (p[l.id].score || 0), 0);
+  const avgPct = totalPossible ? Math.round((totalScored / totalPossible) * 100) : 0;
+  const completionPct = Math.round((done.length / lessons.length) * 100);
+
+  let s = null;
+  if (idx < LEVELS.length - 1 && completionPct >= 60 && avgPct >= 90) {
+    s = { direction: 'up', fromName: level.name, toId: LEVELS[idx + 1].id, toName: LEVELS[idx + 1].name, avgPct, doneCount: done.length, totalCount: lessons.length };
+  } else if (idx > 0 && done.length >= 3 && avgPct < 50) {
+    s = { direction: 'down', fromName: level.name, toId: LEVELS[idx - 1].id, toName: LEVELS[idx - 1].name, avgPct, doneCount: done.length, totalCount: lessons.length };
+  }
+  if (!s) return null;
+
+  // Don't nag: once dismissed for this same target world, stay quiet for a
+  // couple of weeks rather than reappearing on every dashboard visit.
+  const dismissed = p.levelCheckDismissed;
+  if (dismissed && dismissed.toId === s.toId && (Date.now() - dismissed.at) < 14 * 86400000) return null;
+  return s;
+}
+function dismissLevelCheck(toId) {
+  const p = getProgress();
+  p.levelCheckDismissed = { toId, at: Date.now() };
+  saveProgress(p);
+}
+function applyLevelCheckMove(toId) {
+  const p = getProgress();
+  p.startWorld = toId;
+  delete p.levelCheckDismissed;
+  saveProgress(p);
+  buildParentDashboard();
+}
+
 function buildParentDashboard() {
   const body = document.getElementById('parent-body');
   body.innerHTML = '';
@@ -7593,6 +7642,28 @@ function buildParentDashboard() {
     tc('✅', rangeTotals.quizCorrect, 'Quiz Correct', 'Today: ' + todayTotals.quizCorrect, 'stars') +
     tc('✏️', rangeTotals.dictCorrect, 'Spelled Right', 'Today: ' + todayTotals.dictCorrect, 'spell');
   body.appendChild(cardsGrid);
+
+  // ── Level Check (periodic re-check of starting-world fit) ──
+  const levelCheck = levelCheckSuggestion();
+  if (levelCheck) {
+    const lcCard = document.createElement('div');
+    lcCard.className = 'pd-section-card';
+    const verb = levelCheck.direction === 'up' ? 'ready to move up to' : 'might be more comfortable in';
+    const reason = levelCheck.direction === 'up'
+      ? `${levelCheck.doneCount}/${levelCheck.totalCount} lessons done in ${levelCheck.fromName}, averaging ${levelCheck.avgPct}% on quizzes.`
+      : `Averaging ${levelCheck.avgPct}% on quizzes in ${levelCheck.fromName} so far — a gentler pace in ${levelCheck.toName} might build confidence.`;
+    lcCard.innerHTML = `
+      <div class="pd-section-title">📍 Level Check</div>
+      <div class="pd-sr-sub" style="margin-bottom:8px;">Your child looks ${verb} <b>${levelCheck.toName}</b>. ${reason}</div>
+      <div class="set-row">
+        <button class="set-save-btn" id="lc-move-btn">Move to ${levelCheck.toName}</button>
+        <button class="set-future-btn" id="lc-dismiss-btn" style="cursor:pointer;">Not now</button>
+      </div>
+    `;
+    lcCard.querySelector('#lc-move-btn').addEventListener('click', () => applyLevelCheckMove(levelCheck.toId));
+    lcCard.querySelector('#lc-dismiss-btn').addEventListener('click', () => { dismissLevelCheck(levelCheck.toId); buildParentDashboard(); });
+    body.appendChild(lcCard);
+  }
 
   // ── Games (overall scores) ──
   const _pp=p.planetPatrol||{}, _sw=(p.spellathon&&p.spellathon.byWorld)||{};
