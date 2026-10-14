@@ -1618,6 +1618,20 @@ html, body {
 /* ── Parent Dashboard v2 ── */
 .pd-subtitle { font-size: 0.72rem; color: #7a9cc0; margin-top: 1px; }
 .pd-header-top { display: flex; align-items: center; gap: 10px; }
+.pd-learner-chip {
+  display: none; /* shown via JS only when there's more than one learner */
+  align-items: center; gap: 5px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 999px;
+  padding: 5px 9px 5px 7px;
+  cursor: pointer;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.pd-learner-chip .plc-avatar { font-size: 1rem; line-height: 1; }
+.pd-learner-chip .plc-name { font-size: 0.72rem; color: var(--white); font-weight: 600; max-width: 76px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pd-learner-chip .plc-caret { font-size: 0.58rem; color: #7a9cc0; }
 .pd-header-titles { flex: 1; display: flex; flex-direction: column; }
 .pd-date-filter {
   background: var(--navy2); border: 1.5px solid var(--star-dim); border-radius: 99px;
@@ -2418,6 +2432,11 @@ html, body {
         <div class="lm-title" style="margin:0;">📊 Dashboard</div>
         <div class="pd-subtitle">Track your child's learning journey ✨</div>
       </div>
+      <div class="pd-learner-chip" id="pd-learner-chip" onclick="openProfileSwitcher('dashboard')" role="button" aria-label="Switch which learner this shows">
+        <span class="plc-avatar" id="pd-learner-avatar">🦊</span>
+        <span class="plc-name" id="pd-learner-name">Explorer</span>
+        <span class="plc-caret">▾</span>
+      </div>
       <select class="pd-date-filter" id="pd-date-filter" onchange="buildParentDashboard()">
         <option value="1">Today</option>
         <option value="7" selected>Last 7 Days</option>
@@ -2464,7 +2483,12 @@ html, body {
 <div id="timeline-screen" class="screen">
   <div class="lm-header">
     <button class="back-btn" onclick="openParentHub()">←</button>
-    <div class="lm-title">📈 Learning Timeline</div>
+    <div class="lm-title" style="flex:1; margin:0;">📈 Learning Timeline</div>
+    <div class="pd-learner-chip" id="tl-learner-chip" onclick="openProfileSwitcher('timeline')" role="button" aria-label="Switch which learner this shows">
+      <span class="plc-avatar" id="tl-learner-avatar">🦊</span>
+      <span class="plc-name" id="tl-learner-name">Explorer</span>
+      <span class="plc-caret">▾</span>
+    </div>
   </div>
   <div class="parent-body" id="timeline-body"></div>
 </div>
@@ -2845,18 +2869,29 @@ function setParentPin(pin) {
   } catch {}
 }
 
-/* Home-screen chip showing who's currently playing. Updated on load and
-   whenever the active profile might have changed. */
+/* Home-screen chip showing who's currently playing, plus the matching
+   chips on the Parent Dashboard and Learning Timeline (those two show
+   the active learner's name and double as a view-only switcher so a
+   parent can hop between kids' progress). All hidden until there's a
+   2nd learner — nothing to switch between otherwise. Call after load
+   and whenever the active profile (or its name/avatar) might change. */
 function refreshProfileChip() {
-  const chip = document.getElementById('profile-chip');
-  if (!chip) return;
   const profiles = listProfiles();
-  // Only one learner ever set up — no point showing a switcher for one.
-  if (profiles.length <= 1) { chip.style.display = 'none'; return; }
-  chip.style.display = 'flex';
+  const multi = profiles.length > 1;
   const prof = getActiveProfile();
-  document.getElementById('profile-chip-avatar').textContent = prof.avatar || '🦊';
-  document.getElementById('profile-chip-name').textContent = prof.name || 'Explorer';
+  [
+    ['profile-chip', 'profile-chip-avatar', 'profile-chip-name'],
+    ['pd-learner-chip', 'pd-learner-avatar', 'pd-learner-name'],
+    ['tl-learner-chip', 'tl-learner-avatar', 'tl-learner-name']
+  ].forEach(([chipId, avatarId, nameId]) => {
+    const chip = document.getElementById(chipId);
+    if (!chip) return;
+    chip.style.display = multi ? 'flex' : 'none';
+    if (multi && prof) {
+      document.getElementById(avatarId).textContent = prof.avatar || '🦊';
+      document.getElementById(nameId).textContent = prof.name || 'Explorer';
+    }
+  });
 }
 
 /* One-time prompt shown right after upgrading from a single-child install:
@@ -2909,8 +2944,13 @@ function maybeShowMigrationRename() {
 
 /* Lightweight "who's playing?" overlay — switching is not PIN-gated (it's
    just picking a save file, nothing sensitive), but adding/renaming/
-   deleting learners lives in Settings behind the parent PIN. */
-function openProfileSwitcher() {
+   deleting learners lives in Settings behind the parent PIN.
+   `resumeTo` ('dashboard' | 'timeline') is set when this is opened from
+   one of those parent-only screens, so the reload it triggers lands
+   straight back on that same screen (still showing the new learner's
+   data) instead of dumping the parent back out to Home and making them
+   re-enter the PIN to get back in. */
+function openProfileSwitcher(resumeTo) {
   const profiles = listProfiles();
   if (profiles.length <= 1) return;
   const activeId = getActiveProfileId();
@@ -2926,6 +2966,9 @@ function openProfileSwitcher() {
     row.innerHTML = `<span class="psr-avatar">${prof.avatar || '🦊'}</span><span class="psr-name">${prof.name}</span>${prof.id === activeId ? '<span class="psr-tag">PLAYING NOW</span>' : ''}`;
     row.addEventListener('click', () => {
       if (prof.id === activeId) { overlay.remove(); return; }
+      if (resumeTo) {
+        try { sessionStorage.setItem('ls_resume_after_switch', resumeTo); sessionStorage.setItem('ls_skip_splash', '1'); } catch (e) {}
+      }
       setActiveProfileId(prof.id);
       location.reload();
     });
@@ -7607,6 +7650,7 @@ function renderNeedsPractice(host,p){
   host.appendChild(card);
 }
 function buildTimeline() {
+  refreshProfileChip();
   const body = document.getElementById('timeline-body');
   body.innerHTML = '';
   const p = getProgress();
@@ -7939,7 +7983,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 51;
+const APP_VERSION = 52;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -8027,6 +8071,7 @@ function applyLevelCheckMove(toId) {
 }
 
 function buildParentDashboard() {
+  refreshProfileChip();
   const body = document.getElementById('parent-body');
   body.innerHTML = '';
   const p = getProgress();
@@ -9304,9 +9349,23 @@ ensureProfilesMigrated();
 refreshProfileChip();
 runAchievementAudit();
 updateHomeProgress();
-maybeShowWelcome();
-if (getProgress().setupDone && !_skipSplashOnce()) showLumiSplash(maybeShowMigrationRename);
-else maybeShowMigrationRename();
+
+// A reload triggered by switching learners from inside the Dashboard or
+// Timeline (openProfileSwitcher's resumeTo) lands straight back on that
+// same screen for the new learner, instead of dumping the parent out to
+// Home and making them re-enter the PIN — this isn't a fresh app open,
+// it's a mid-session continuation they're already authenticated for.
+let _resumeScreen = null;
+try { _resumeScreen = sessionStorage.getItem('ls_resume_after_switch'); sessionStorage.removeItem('ls_resume_after_switch'); sessionStorage.removeItem('ls_skip_splash'); } catch (e) {}
+if (_resumeScreen === 'dashboard') {
+  buildParentDashboard(); showScreen('parent');
+} else if (_resumeScreen === 'timeline') {
+  buildTimeline(); showScreen('timeline-screen');
+} else {
+  maybeShowWelcome();
+  if (getProgress().setupDone && !_skipSplashOnce()) showLumiSplash(maybeShowMigrationRename);
+  else maybeShowMigrationRename();
+}
 
 </script>
 <script>
