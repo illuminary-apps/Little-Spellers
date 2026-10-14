@@ -7631,19 +7631,22 @@ function needsPracticeStats(p){
   return out;
 }
 function renderNeedsPractice(host,p){
+  var ACHIEVE_LIMIT=100-NP_LIMIT; // 70% — below this, a lesson is flagged for more practice
   var st=needsPracticeStats(p), flagged=st.filter(function(x){x.qpct=x.qT?Math.round(x.qW/x.qT*100):0;x.lowQ=x.qpct>=NP_LIMIT;return x.pct>=NP_LIMIT||x.lowQ}).sort(function(a,b){return Math.max(b.pct,b.qpct)-Math.max(a.pct,a.qpct)});
   var ok=st.length-flagged.length;
   var card=document.createElement('div');card.className='pd-section-card';
-  var h='<div class="pd-section-title">🎯 Needs Practice</div><div class="np-sub">For each lesson we compare the words your child missed (Spell-a-thon and Planet Patrol) and the quiz answers they got wrong with everything they have tried. Under '+NP_LIMIT+'% missed is fine. '+NP_LIMIT+'% or more means it is worth doing the lesson again. A quiz with '+NP_LIMIT+'% or more wrong is flagged on its own, even if the overall figure is lower.</div>';
-  if(!st.length){h+='<div class="pd-sr-sub">Not enough practice yet. This appears once a lesson has at least '+NP_MIN_TRIED+' answers to look at (words tried or quiz questions).</div>';}
+  var h='<div class="pd-section-title">✅ Achievement by Lesson</div><div class="np-sub">For each lesson we show how many words (from Spell-a-thon and Planet Patrol) and quiz questions your child got right, out of everything they have tried. '+ACHIEVE_LIMIT+'% or higher is solid. Below '+ACHIEVE_LIMIT+'% is flagged as worth another round — including a quiz that is below '+ACHIEVE_LIMIT+'% on its own, even if the lesson overall looks fine.</div>';
+  if(!st.length){h+='<div class="pd-sr-sub">Not enough practice yet to show achievement. This appears once a lesson has at least '+NP_MIN_TRIED+' answers to look at (words tried or quiz questions).</div>';}
   else{
     flagged.forEach(function(x,i){
+      var achPct=100-x.pct, qAchPct=100-x.qpct, wordsRight=x.tried-x.weak.length;
       var chips=x.weak.slice(0,5).map(function(w){return '<span class="np-chip">'+w+'</span>'}).join('');
       var more=x.weak.length>5?'<span class="np-more">+'+(x.weak.length-5)+' more</span>':'';
-      h+='<div class="np-row"><div class="np-top"><span class="np-ic">'+lessonThemeIcon(x.lesson)+'</span><div class="np-info"><div class="np-name">'+x.lesson.name+'</div><div class="np-fig">'+(x.tried?'Words: '+x.weak.length+' of '+x.tried+' missed':'')+(x.tried&&x.qT?' · ':'')+(x.qT?'Quiz: '+x.qW+' of '+x.qT+' wrong ('+x.qpct+'%)':'')+'</div></div><div class="np-pct">'+x.pct+'%</div></div>'+(x.lowQ?'<div class="np-flag">⚠️ Low quiz score</div>':'')+'<div class="np-chips">'+chips+more+'</div><button class="pd-practice-btn np-btn" data-i="'+i+'">Redo this lesson</button></div>';
+      var chipsBlock=x.weak.length?'<div class="np-chips-label">Worth another look:</div><div class="np-chips">'+chips+more+'</div>':'';
+      h+='<div class="np-row"><div class="np-top"><span class="np-ic">'+lessonThemeIcon(x.lesson)+'</span><div class="np-info"><div class="np-name">'+x.lesson.name+'</div><div class="np-fig">'+(x.tried?'Words: '+wordsRight+' of '+x.tried+' correct':'')+(x.tried&&x.qT?' · ':'')+(x.qT?'Quiz: '+(x.qT-x.qW)+' of '+x.qT+' correct ('+qAchPct+'%)':'')+'</div></div><div class="np-pct">'+achPct+'% achieved</div></div>'+(x.lowQ?'<div class="np-flag">⚠️ Quiz score below '+ACHIEVE_LIMIT+'%</div>':'')+chipsBlock+'<button class="pd-practice-btn np-btn" data-i="'+i+'">Practice this lesson</button></div>';
     });
-    if(!flagged.length)h+='<div class="pd-sr-sub">Nothing to redo. Every lesson is under '+NP_LIMIT+'% missed. 🎉</div>';
-    if(ok)h+='<div class="np-ok">✅ '+ok+' lesson'+(ok===1?'':'s')+' on track (under '+NP_LIMIT+'% missed)</div>';
+    if(!flagged.length)h+='<div class="pd-sr-sub">Every lesson is at '+ACHIEVE_LIMIT+'% or higher. 🎉</div>';
+    if(ok)h+='<div class="np-ok">✅ '+ok+' lesson'+(ok===1?'':'s')+' at '+ACHIEVE_LIMIT+'% or higher — nicely on track</div>';
   }
   card.innerHTML=h;
   card.querySelectorAll('.np-btn').forEach(function(b){b.addEventListener('click',function(){var x=flagged[+b.dataset.i];goHome();openLevel(x.level.id);});});
@@ -7983,7 +7986,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 52;
+const APP_VERSION = 53;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -9695,6 +9698,7 @@ window.__wordTotal=n;
 .np-name{font-family:var(--ff-head);font-size:.85rem;color:#fff}
 .np-fig{font-size:.7rem;color:#7a9cc0}
 .np-pct{font-family:var(--ff-head);font-size:1.25rem;color:var(--coral)}
+.np-chips-label{font-size:.7rem;color:#7a9cc0;margin-bottom:2px}
 .np-chips{display:flex;flex-wrap:wrap;gap:6px}
 .np-chip{font-size:.72rem;padding:3px 9px;border-radius:99px;background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.35);color:#ffb3b3}
 .np-more{font-size:.7rem;color:#7a9cc0;align-self:center}
