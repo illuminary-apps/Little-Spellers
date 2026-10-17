@@ -8099,7 +8099,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 57;
+const APP_VERSION = 58;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -10029,22 +10029,28 @@ window.deleteProfile = function(id) {
 
 /* ── public surface used by the Settings "Account & Sync" card ── */
 window.LSSyncGetUser = function() { return _syncUser; };
+function _isMobileUA() { return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent); }
+
 window.LSSyncSignIn = async function() {
-  // Popup is the default — it reliably round-trips inside an installed
-  // PWA, where a full-page redirect can lose track of the sign-in on
-  // the way back (tried that in v56; it bounced back without
-  // completing). Redirect is kept only as a fallback for the cases
-  // popups genuinely can't handle (blocked by the browser, or an
-  // environment that doesn't support popups at all).
+  // Redirect on mobile, popup on desktop — Firebase's own guidance, and
+  // confirmed here directly: popup opened then closed itself before
+  // completing on mobile Chrome (a known mobile-popup reliability
+  // issue, not specific to an installed PWA). Redirect failed earlier
+  // (v56) for an unrelated reason — the service worker was swallowing
+  // the cross-origin navigation — which is now fixed (v57), so redirect
+  // should actually complete now. This app is used almost entirely on
+  // phones, so redirect is primary; popup only runs on desktop.
+  const useRedirect = _isMobileUA();
   try {
-    await signInWithPopup(fbAuth, googleProvider);
+    if (useRedirect) { await signInWithRedirect(fbAuth, googleProvider); }
+    else { await signInWithPopup(fbAuth, googleProvider); }
     return true;
   } catch (e) {
     const code = e && e.code;
     if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
       return false; // they backed out on purpose — no error, no fallback
     }
-    if (code === 'auth/popup-blocked' || code === 'auth/operation-not-supported-in-this-environment') {
+    if (!useRedirect && (code === 'auth/popup-blocked' || code === 'auth/operation-not-supported-in-this-environment')) {
       try {
         await signInWithRedirect(fbAuth, googleProvider);
         return true;
