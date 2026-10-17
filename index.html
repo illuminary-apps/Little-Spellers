@@ -7896,6 +7896,57 @@ function openSettings() {
   requireParentPin(() => { buildSettings(); showScreen('settings-screen'); });
 }
 
+/* Account & cloud sync card — Google sign-in backed by Firestore (see the
+   module-script sync block near the end of the file, which defines
+   window.LSSync*). Signing in is optional; everything still works
+   fully offline/local with no account. */
+function buildSyncCard() {
+  const card = document.createElement('div');
+  card.className = 'pd-section-card';
+  const ready = typeof window.LSSyncGetUser === 'function';
+  const user = ready ? window.LSSyncGetUser() : null;
+
+  if (!user) {
+    card.innerHTML = `
+      <div class="pd-section-title">☁️ Account &amp; Sync</div>
+      <div style="font-size:0.72rem; color:#7a9cc0; margin-bottom:10px;">Sign in with Google to back up progress and keep every learner's progress in sync across your family's devices.</div>
+      <button class="set-save-btn" id="set-signin-btn" ${ready ? '' : 'disabled'}>Sign in with Google</button>
+      <div class="set-future-note" id="set-sync-note"></div>
+    `;
+    const btn = card.querySelector('#set-signin-btn');
+    if (ready) {
+      btn.addEventListener('click', async () => {
+        const note = document.getElementById('set-sync-note');
+        btn.disabled = true;
+        if (note) note.textContent = 'Signing in…';
+        const ok = await window.LSSyncSignIn();
+        if (ok) { buildSettings(); } else { btn.disabled = false; if (note) note.textContent = ''; }
+      });
+    }
+  } else {
+    const lastOk = Number(localStorage.getItem('ls_sync_lastok') || 0);
+    const lastText = lastOk ? new Date(lastOk).toLocaleString() : 'not yet';
+    card.innerHTML = `
+      <div class="pd-section-title">☁️ Account &amp; Sync</div>
+      <div style="font-size:0.72rem; color:#7a9cc0; margin-bottom:8px;">Signed in as <b style="color:#fff;">${user.email || ''}</b>. Progress syncs automatically.</div>
+      <div style="font-size:0.68rem; color:#5f7fa3; margin-bottom:8px;" id="set-sync-note">Last synced: ${lastText}</div>
+      <button class="set-save-btn" id="set-sync-now-btn">Sync now</button>
+      <button class="set-future-btn" id="set-signout-btn" style="cursor:pointer; margin-left:8px;">Sign out</button>
+    `;
+    card.querySelector('#set-sync-now-btn').addEventListener('click', async () => {
+      const note = document.getElementById('set-sync-note');
+      if (note) note.textContent = 'Syncing…';
+      await window.LSSyncNow();
+      buildSettings();
+    });
+    card.querySelector('#set-signout-btn').addEventListener('click', async () => {
+      await window.LSSyncSignOut();
+      buildSettings();
+    });
+  }
+  return card;
+}
+
 function buildSettings() {
   const body = document.getElementById('settings-body');
   body.innerHTML = '';
@@ -7903,6 +7954,9 @@ function buildSettings() {
 
   // Manage Learners (multi-child profiles)
   body.appendChild(buildManageLearnersCard());
+
+  // Account & cloud sync
+  body.appendChild(buildSyncCard());
 
   // Starting world
   const swCard = document.createElement('div');
@@ -9708,5 +9762,193 @@ window.__wordTotal=n;
 .ach-popup-reason{font-size:.85rem;color:#fff;opacity:.92;margin-top:4px;line-height:1.4;max-width:270px;padding:0 10px}
 .ach-popup-reward{font-size:.8rem;color:var(--gold);margin-top:6px;font-weight:700;max-width:270px;padding:0 10px}
 </style>
+<script type="module">
+/* ════════════════════════════════════════════
+   CLOUD SYNC — optional Google sign-in + Firestore, so a parent can
+   keep progress backed up and in sync across devices. Nothing here is
+   required: with no sign-in the app works exactly as before, fully
+   local. Runs as a module so it loads after the classic script above
+   (which defines getProfilesMeta/saveProgress/etc as window globals) —
+   this block wraps those globals rather than replacing them, so every
+   existing call site keeps working unchanged.
+
+   Data shape in Firestore: families/{uid}/children/{childId} holds
+   {name, avatar, age, progress, updatedAt}. "updatedAt" is compared
+   against a per-child local timestamp (ls_sync_ts::<id>) to decide,
+   per child, whether the local or the cloud copy is newer — whichever
+   is newer wins and overwrites the other side. This is whole-document
+   last-write-wins, not field-level merging: fine for one family syncing
+   across a couple of devices, not built for concurrent simultaneous
+   editing.
+════════════════════════════════════════════ */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
+import {
+  getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
+import {
+  getFirestore, doc, setDoc, deleteDoc, collection, getDocs
+} from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAz4ySlMpvcbIos3rRE8Wi1NyGb2DMsdxo",
+  authDomain: "illuminary-apps.firebaseapp.com",
+  projectId: "illuminary-apps",
+  storageBucket: "illuminary-apps.firebasestorage.app",
+  messagingSenderId: "1000825756464",
+  appId: "1:1000825756464:web:1b14bfcc546fcb297186f5",
+  measurementId: "G-B7QJ03NG3T"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const fbAuth = getAuth(fbApp);
+const fbDb = getFirestore(fbApp);
+const googleProvider = new GoogleAuthProvider();
+
+let _syncUser = null;
+let _pushTimers = {};
+
+function childDocRef(uid, childId) {
+  return doc(fbDb, 'families', uid, 'children', childId);
+}
+function getSyncTs(childId) {
+  return Number(localStorage.getItem('ls_sync_ts::' + childId) || 0);
+}
+function bumpSyncTs(childId) {
+  try { localStorage.setItem('ls_sync_ts::' + childId, String(Date.now())); } catch {}
+}
+function markSyncedOk() {
+  try { localStorage.setItem('ls_sync_lastok', String(Date.now())); } catch {}
+}
+function refreshSyncUi() {
+  const settingsScreen = document.getElementById('settings-screen');
+  if (settingsScreen && settingsScreen.classList.contains('active') && typeof window.buildSettings === 'function') {
+    window.buildSettings();
+  }
+}
+
+async function pushChildToCloud(childId) {
+  if (!_syncUser) return;
+  const meta = window.getProfilesMeta && window.getProfilesMeta();
+  const prof = meta && meta.profiles.find(p => p.id === childId);
+  if (!prof) return;
+  let progress = {};
+  try { progress = JSON.parse(localStorage.getItem('ls_progress::' + childId) || '{}'); } catch {}
+  try {
+    await setDoc(childDocRef(_syncUser.uid, childId), {
+      name: prof.name, avatar: prof.avatar, age: prof.age || '',
+      progress, updatedAt: getSyncTs(childId) || Date.now()
+    });
+    markSyncedOk();
+  } catch (e) { console.warn('[LS sync] push failed for', childId, e); }
+}
+
+function schedulePush(childId) {
+  if (!_syncUser || !childId) return;
+  clearTimeout(_pushTimers[childId]);
+  _pushTimers[childId] = setTimeout(() => pushChildToCloud(childId), 1500);
+}
+
+async function pullAndMergeAll() {
+  if (!_syncUser) return;
+  const meta = window.getProfilesMeta() || window.ensureProfilesMigrated();
+  let changed = false;
+  let remoteDocs = {};
+  try {
+    const snap = await getDocs(collection(fbDb, 'families', _syncUser.uid, 'children'));
+    snap.forEach(d => { remoteDocs[d.id] = d.data(); });
+  } catch (e) { console.warn('[LS sync] pull failed', e); return; }
+
+  for (const [childId, remote] of Object.entries(remoteDocs)) {
+    const localTs = getSyncTs(childId);
+    const remoteTs = remote.updatedAt || 0;
+    let prof = meta.profiles.find(p => p.id === childId);
+    if (!prof) {
+      // a child that exists in the cloud but not on this device yet
+      meta.profiles.push({ id: childId, name: remote.name || 'Explorer', avatar: remote.avatar || '🦊', age: remote.age || '', createdAt: Date.now() });
+      localStorage.setItem('ls_progress::' + childId, JSON.stringify(remote.progress || {}));
+      localStorage.setItem('ls_sync_ts::' + childId, String(remoteTs));
+      changed = true;
+    } else if (remoteTs > localTs) {
+      localStorage.setItem('ls_progress::' + childId, JSON.stringify(remote.progress || {}));
+      localStorage.setItem('ls_sync_ts::' + childId, String(remoteTs));
+      prof.name = remote.name || prof.name;
+      prof.avatar = remote.avatar || prof.avatar;
+      if (remote.age) prof.age = remote.age;
+      changed = true;
+    }
+  }
+  if (changed) window.saveProfilesMeta(meta);
+
+  // anything local that's newer than (or missing from) the cloud goes up
+  for (const prof of meta.profiles) {
+    const remote = remoteDocs[prof.id];
+    const localTs = getSyncTs(prof.id);
+    if (!remote || localTs >= (remote.updatedAt || 0)) {
+      if (!remote && !localTs) bumpSyncTs(prof.id); // never-synced local profile needs a timestamp to push
+      await pushChildToCloud(prof.id);
+    }
+  }
+  markSyncedOk();
+  if (typeof window.refreshProfileChip === 'function') window.refreshProfileChip();
+  refreshSyncUi();
+}
+
+/* ── wrap the existing globals so every existing call site (unchanged)
+   now also keeps the cloud copy current, with no local behavior change
+   when signed out ── */
+const _origSaveProgress = window.saveProgress;
+window.saveProgress = function(data) {
+  _origSaveProgress(data);
+  const id = window.getActiveProfileId && window.getActiveProfileId();
+  if (id) { bumpSyncTs(id); schedulePush(id); }
+};
+
+const _origCreateProfile = window.createProfile;
+window.createProfile = function(name, avatar) {
+  const id = _origCreateProfile(name, avatar);
+  if (id) { bumpSyncTs(id); schedulePush(id); }
+  return id;
+};
+
+const _origUpdateProfile = window.updateProfile;
+window.updateProfile = function(id, updates) {
+  _origUpdateProfile(id, updates);
+  if (id) { bumpSyncTs(id); schedulePush(id); }
+};
+
+const _origDeleteProfile = window.deleteProfile;
+window.deleteProfile = function(id) {
+  const ok = _origDeleteProfile(id);
+  if (ok && _syncUser) {
+    clearTimeout(_pushTimers[id]);
+    deleteDoc(childDocRef(_syncUser.uid, id)).catch(() => {});
+  }
+  try { localStorage.removeItem('ls_sync_ts::' + id); } catch {}
+  return ok;
+};
+
+/* ── public surface used by the Settings "Account & Sync" card ── */
+window.LSSyncGetUser = function() { return _syncUser; };
+window.LSSyncSignIn = async function() {
+  try {
+    await signInWithPopup(fbAuth, googleProvider);
+    return true;
+  } catch (e) {
+    console.warn('[LS sync] sign-in failed', e);
+    alert('Sign-in failed: ' + (e && e.message ? e.message : 'please try again.'));
+    return false;
+  }
+};
+window.LSSyncSignOut = async function() {
+  try { await signOut(fbAuth); } catch (e) {}
+};
+window.LSSyncNow = async function() { await pullAndMergeAll(); };
+
+onAuthStateChanged(fbAuth, async (user) => {
+  _syncUser = user;
+  if (user) await pullAndMergeAll();
+  refreshSyncUi();
+});
+</script>
 </body>
 </html>
