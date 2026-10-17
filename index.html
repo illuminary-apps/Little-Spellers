@@ -8099,7 +8099,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 58;
+const APP_VERSION = 59;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -10029,28 +10029,30 @@ window.deleteProfile = function(id) {
 
 /* ── public surface used by the Settings "Account & Sync" card ── */
 window.LSSyncGetUser = function() { return _syncUser; };
-function _isMobileUA() { return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent); }
-
 window.LSSyncSignIn = async function() {
-  // Redirect on mobile, popup on desktop — Firebase's own guidance, and
-  // confirmed here directly: popup opened then closed itself before
-  // completing on mobile Chrome (a known mobile-popup reliability
-  // issue, not specific to an installed PWA). Redirect failed earlier
-  // (v56) for an unrelated reason — the service worker was swallowing
-  // the cross-origin navigation — which is now fixed (v57), so redirect
-  // should actually complete now. This app is used almost entirely on
-  // phones, so redirect is primary; popup only runs on desktop.
-  const useRedirect = _isMobileUA();
+  // Popup first, always. Every earlier failure (popup looking like it
+  // backgrounded the app, then later actually opening but closing
+  // itself immediately) tracked back to the Google provider not
+  // actually being saved as enabled in the Firebase console — not to
+  // popup itself being unreliable. Redirect was tried as a primary
+  // method (v58) and, with the provider now genuinely enabled, got
+  // further (account picker completes) but still doesn't land back
+  // signed in — consistent with the known issue where a redirect
+  // round-trip through a *different* site (github.io app, firebaseapp.com
+  // auth handler) loses its result to storage partitioning in some
+  // browsers. Popup avoids that because it talks to the opener window
+  // directly rather than relying on storage surviving a real navigation
+  // away and back. Redirect is kept only as the fallback for an actually
+  // blocked popup.
   try {
-    if (useRedirect) { await signInWithRedirect(fbAuth, googleProvider); }
-    else { await signInWithPopup(fbAuth, googleProvider); }
+    await signInWithPopup(fbAuth, googleProvider);
     return true;
   } catch (e) {
     const code = e && e.code;
     if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
       return false; // they backed out on purpose — no error, no fallback
     }
-    if (!useRedirect && (code === 'auth/popup-blocked' || code === 'auth/operation-not-supported-in-this-environment')) {
+    if (code === 'auth/popup-blocked' || code === 'auth/operation-not-supported-in-this-environment') {
       try {
         await signInWithRedirect(fbAuth, googleProvider);
         return true;
