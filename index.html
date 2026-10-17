@@ -9855,7 +9855,7 @@ window.__wordTotal=n;
 ════════════════════════════════════════════ */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
 import {
-  getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
+  getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
 import {
   getFirestore, doc, setDoc, deleteDoc, collection, getDocs
@@ -10027,9 +10027,13 @@ window.deleteProfile = function(id) {
 /* ── public surface used by the Settings "Account & Sync" card ── */
 window.LSSyncGetUser = function() { return _syncUser; };
 window.LSSyncSignIn = async function() {
+  // redirect, not a popup: a popup backgrounds the main app page on
+  // mobile (and especially inside a home-screen-installed PWA), which
+  // looks and behaves exactly like locking the screen or switching
+  // tabs. Redirect navigates the whole page to Google and back instead.
   try {
-    await signInWithPopup(fbAuth, googleProvider);
-    return true;
+    await signInWithRedirect(fbAuth, googleProvider);
+    return true; // page is navigating away now; nothing more happens here
   } catch (e) {
     console.warn('[LS sync] sign-in failed', e);
     alert('Sign-in failed: ' + (e && e.message ? e.message : 'please try again.'));
@@ -10088,6 +10092,16 @@ if (signinBtn) {
     // on success, onAuthStateChanged fires and takes it from here
   });
 }
+
+// Catches a failed redirect round-trip (e.g. a misconfigured authorized
+// domain) so it surfaces as a message instead of silently stranding the
+// gate. A successful sign-in is picked up by onAuthStateChanged below,
+// not here.
+getRedirectResult(fbAuth).catch((e) => {
+  console.warn('[LS sync] redirect sign-in failed', e);
+  const note = document.getElementById('authgate-note');
+  if (note) note.textContent = 'Sign-in failed: ' + (e && e.message ? e.message : 'please try again.');
+});
 
 onAuthStateChanged(fbAuth, async (user) => {
   const wasSignedIn = !!_syncUser;
