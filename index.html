@@ -8099,7 +8099,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 59;
+const APP_VERSION = 60;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -9483,6 +9483,12 @@ function proceedToApp() {
   } else if (_resumeScreen === 'timeline') {
     buildTimeline(); showScreen('timeline-screen');
   } else {
+    // Home used to just be the screen marked active by default in the raw
+    // HTML, so nothing needed to say so explicitly. The sign-in gate took
+    // that default over (it has to be the one shown first) — Home no
+    // longer activates itself, so say so here. maybeShowWelcome() still
+    // overrides this to 'welcome-setup' when first-run setup isn't done.
+    showScreen('home');
     maybeShowWelcome();
     if (getProgress().setupDone && !_skipSplashOnce()) showLumiSplash(maybeShowMigrationRename);
     else maybeShowMigrationRename();
