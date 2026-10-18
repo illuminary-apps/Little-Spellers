@@ -886,8 +886,8 @@ html, body {
   text-underline-offset: 3px; padding: 4px;
 }
 .ag-text-btn:active { color: #9ab8d6; }
-.ag-trust-row { display: flex; align-items: center; justify-content: center; gap: 7px; margin-top: 18px; color: #6f8fb5; font-size: .76rem; }
-.ag-trust-row svg { width: 13px; height: 13px; flex-shrink: 0; opacity: .8; }
+.ag-trust-row { display: flex; flex-direction: column; align-items: center; gap: 5px; margin-top: 18px; color: #6f8fb5; font-size: .76rem; line-height: 1.4; text-align: center; }
+.ag-trust-row svg { width: 14px; height: 14px; flex-shrink: 0; opacity: .8; }
 .ws-list { display: flex; flex-direction: column; gap: 12px; text-align: left; }
 .ws-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 20px; background: rgba(255,255,255,.05); border: 1.5px solid var(--ws-c, rgba(255,255,255,.15)); color: var(--white); cursor: pointer; transition: transform .15s, box-shadow .2s; font-family: var(--ff-body); }
 .ws-card:active { transform: scale(.98); }
@@ -8147,7 +8147,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 62;
+const APP_VERSION = 63;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
