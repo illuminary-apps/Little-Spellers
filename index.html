@@ -8058,31 +8058,23 @@ function buildSyncCard() {
    email, etc.) so a parent can pick exactly who to send it to — no
    contacts access needed on our side at all. Falls back to copying the
    link (desktop browsers, or a mobile browser without the Web Share
-   API) rather than failing silently. ── */
+   API) rather than failing silently. Lives as a Parent Hub ribbon (same
+   list as Dashboard/Timeline/Settings/Refresh) rather than inside
+   Settings, so it's one tap away instead of buried a level deeper. ── */
 const LS_SHARE_URL = 'https://illuminary-apps.github.io/Little-Spellers/';
 const LS_SHARE_TEXT = "My child's been loving Little Spellers — a sweet little phonics app for learning to read. Thought you might like it too!";
-function buildShareCard() {
-  const card = document.createElement('div');
-  card.className = 'pd-section-card';
-  card.innerHTML = `
-    <div class="pd-section-title">💌 Share Little Spellers</div>
-    <div style="font-size:0.72rem; color:#7a9cc0; margin-bottom:10px;">Know another family who'd like it? Share the app with them.</div>
-    <button class="set-save-btn" id="set-share-btn">Share</button>
-  `;
-  card.querySelector('#set-share-btn').addEventListener('click', async () => {
-    const shareData = { title: 'Little Spellers', text: LS_SHARE_TEXT, url: LS_SHARE_URL };
-    if (navigator.share) {
-      try { await navigator.share(shareData); } catch (e) { /* cancelled — not an error */ }
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(LS_SHARE_TEXT + ' ' + LS_SHARE_URL);
-      _navToast('Link copied!');
-    } catch (e) {
-      _navToast(LS_SHARE_URL);
-    }
-  });
-  return card;
+async function shareLittleSpellers() {
+  const shareData = { title: 'Little Spellers', text: LS_SHARE_TEXT, url: LS_SHARE_URL };
+  if (navigator.share) {
+    try { await navigator.share(shareData); } catch (e) { /* cancelled — not an error */ }
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(LS_SHARE_TEXT + ' ' + LS_SHARE_URL);
+    _navToast('Link copied!');
+  } catch (e) {
+    _navToast(LS_SHARE_URL);
+  }
 }
 
 function buildSettings() {
@@ -8095,9 +8087,6 @@ function buildSettings() {
 
   // Account & cloud sync
   body.appendChild(buildSyncCard());
-
-  // Share with another family
-  body.appendChild(buildShareCard());
 
   // Starting world
   const swCard = document.createElement('div');
@@ -8181,7 +8170,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 64;
+const APP_VERSION = 65;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -8191,6 +8180,7 @@ function buildParentHub() {
     { icon: '📈', name: 'Learning Timeline', sub: "This week's story", fn: openTimeline },
     { icon: '📚', name: 'Spelling Secrets', sub: 'Every rule, explained', fn: openSpellingSecrets },
     { icon: '⚙️', name: 'Settings', sub: 'Profile, PIN & sound', fn: openSettings },
+    { icon: '💌', name: 'Share Little Spellers', sub: 'Tell another family about the app', fn: shareLittleSpellers },
     { icon: '🔄', name: 'Refresh app (v' + APP_VERSION + ')', sub: 'Get the newest version. Your progress stays saved.', fn: checkForUpdates },
   ];
   sections.forEach(s => {
