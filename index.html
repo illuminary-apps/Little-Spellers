@@ -837,9 +837,32 @@ html, body {
 .tier-dot { width:9px; height:9px; border-radius:50%; border:1.5px solid rgba(255,255,255,.35); background:transparent; }
 .tier-dot.on.t1 { background:#cd7f32; border-color:#cd7f32; } .tier-dot.on.t2 { background:#c9d3e0; border-color:#c9d3e0; } .tier-dot.on.t3 { background:#ffd166; border-color:#ffd166; box-shadow:0 0 6px rgba(255,209,102,.7); }
 .ws-wrap { max-width: 520px; margin: 0 auto; padding: 28px 18px 40px; text-align: center; }
-.ws-star { font-size: 2.6rem; filter: drop-shadow(0 0 14px rgba(255,209,102,.8)); animation: wbob 2.8s ease-in-out infinite; }
+/* ── Lumi, sized down for a header spot (welcome/sign-in screens) instead
+   of her full home-screen size. Reuses the same path + the same wbob/
+   wglow/wblink keyframes defined above her home-screen markup, so any
+   future redesign of her face only has to happen in one place. ── */
+.ws-lumi { position: relative; width: 150px; height: 150px; margin: 0 auto 2px; display: flex; align-items: center; justify-content: center; }
+.ws-lumi-svg { width: 118px; height: 118px; overflow: visible; animation: wbob 2.8s ease-in-out infinite, wglow 2.8s ease-in-out infinite; transform-origin: 50% 60%; }
+.ws-lumi .w-eyes { transform-origin: 100px 98px; animation: wblink 4.5s infinite; }
+.ws-lumi i { position: absolute; border-radius: 50%; background: #fff3c4; opacity: 0; box-shadow: 0 0 6px #ffd166; animation: wdust 3.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .ws-lumi-svg, .ws-lumi .w-eyes, .ws-lumi i { animation: none; } }
 .ws-title { font-family: var(--ff-head); color: var(--gold); font-size: 1.5rem; margin: 6px 0 8px; }
 .ws-sub { color: #9ab8d6; font-size: .9rem; line-height: 1.5; margin-bottom: 18px; }
+/* ── Sign-in gate card: a soft glass panel so the gate reads as one
+   deliberate "welcome" moment instead of text floating loose over the
+   starfield. ── */
+.ag-card {
+  background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.02));
+  border: 1px solid rgba(255,209,102,.16);
+  border-radius: 30px;
+  padding: 36px 24px 30px;
+  margin-top: 6vh;
+  box-shadow: 0 18px 50px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
+  backdrop-filter: blur(8px);
+  animation: agCardIn .6s cubic-bezier(.2,.9,.3,1.1) both;
+}
+@keyframes agCardIn { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.ag-byline { color: #6f8fb5; font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; margin: -4px 0 20px; }
 .ag-loading { margin-top: 18px; }
 .ag-loading-text { color: #7a9cc0; font-size: .82rem; margin-top: 10px; }
 .ag-dots { display: flex; gap: 8px; justify-content: center; }
@@ -848,11 +871,17 @@ html, body {
 .ag-dots span:nth-child(3) { animation-delay: .3s; }
 @keyframes agbounce { 0%,80%,100% { transform: scale(.6); opacity: .5; } 40% { transform: scale(1); opacity: 1; } }
 .ag-signin-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
   background: var(--gold); color: var(--navy); border: none; border-radius: 99px;
-  padding: 13px 30px; font-family: var(--ff-head); font-size: .95rem; font-weight: 700;
+  padding: 14px 32px; font-family: var(--ff-head); font-size: .95rem; font-weight: 700;
   cursor: pointer; margin-top: 4px; box-shadow: 0 0 18px rgba(255,209,102,.35);
+  transition: transform .15s ease, box-shadow .2s ease;
 }
-.ag-signin-btn:disabled { opacity: .6; cursor: default; }
+.ag-signin-btn:active { transform: scale(.97); box-shadow: 0 0 10px rgba(255,209,102,.3); }
+.ag-signin-btn:disabled { opacity: .6; cursor: default; transform: none; }
+.ag-signin-ico { width: 18px; height: 18px; flex-shrink: 0; }
+.ag-trust-row { display: flex; align-items: center; justify-content: center; gap: 7px; margin-top: 18px; color: #6f8fb5; font-size: .76rem; }
+.ag-trust-row svg { width: 13px; height: 13px; flex-shrink: 0; opacity: .8; }
 .ws-list { display: flex; flex-direction: column; gap: 12px; text-align: left; }
 .ws-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 20px; background: rgba(255,255,255,.05); border: 1.5px solid var(--ws-c, rgba(255,255,255,.15)); color: var(--white); cursor: pointer; transition: transform .15s, box-shadow .2s; font-family: var(--ff-body); }
 .ws-card:active { transform: scale(.98); }
@@ -2225,21 +2254,24 @@ html, body {
 ══════════════════════════════════ -->
 <div id="authgate-screen" class="screen active">
   <div class="ws-wrap">
-    <div class="ws-star">⭐</div>
-    <h2 class="ws-title">Little Spellers</h2>
-    <p class="ws-sub" style="margin-bottom:4px;">by Illuminary</p>
-    <div id="authgate-loading" class="ag-loading">
-      <div class="ag-dots"><span></span><span></span><span></span></div>
-      <div class="ag-loading-text">Just a moment…</div>
-    </div>
-    <div id="authgate-btn-wrap" style="display:none;">
-      <p class="ws-sub">Sign in with Google to save and sync your child's progress across every device.</p>
-      <button class="ag-signin-btn" id="authgate-signin-btn">Sign in with Google</button>
-      <div class="set-future-note" id="authgate-note"></div>
-    </div>
-    <div id="authgate-error" style="display:none;">
-      <p class="ws-sub" style="color:#ffb3b3;">Couldn't connect right now. Check your internet connection and try again.</p>
-      <button class="ag-signin-btn" onclick="location.reload()">Retry</button>
+    <div class="ag-card">
+      <div class="ws-lumi" aria-hidden="true"><svg class="ws-lumi-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M92.6,37.9 Q100.0,20.0 107.4,37.9 L116.1,59.2 Q123.0,76.0 141.0,76.0 L163.8,76.0 Q183.0,76.0 167.6,87.5 L149.4,101.2 Q135.0,112.0 140.4,129.4 L147.2,151.4 Q153.0,170.0 136.0,158.8 L115.9,145.5 Q100.0,135.0 84.1,145.5 L64.0,158.8 Q47.0,170.0 52.8,151.4 L59.6,129.4 Q65.0,112.0 50.6,101.2 L32.4,87.5 Q17.0,76.0 36.2,76.0 L59.0,76.0 Q77.0,76.0 83.9,59.2 Z" fill="#ffd166" stroke="#f4a637" stroke-width="4" stroke-linejoin="round"/><g class="w-eyes"><ellipse cx="82" cy="98" rx="7" ry="7" fill="#2c2410"/><ellipse cx="118" cy="98" rx="7" ry="7" fill="#2c2410"/><circle cx="84.5" cy="95.5" r="2.5" fill="#fff8e8"/><circle cx="120.5" cy="95.5" r="2.5" fill="#fff8e8"/></g><path d="M85 115 Q100 128 115 115" fill="none" stroke="#2c2410" stroke-width="4" stroke-linecap="round"/><ellipse cx="68" cy="112" rx="7" ry="4.5" fill="#ff9aa2" opacity=".55"/><ellipse cx="132" cy="112" rx="7" ry="4.5" fill="#ff9aa2" opacity=".55"/></svg></div>
+      <h2 class="ws-title">Little Spellers</h2>
+      <p class="ag-byline">by Illuminary</p>
+      <div id="authgate-loading" class="ag-loading">
+        <div class="ag-dots"><span></span><span></span><span></span></div>
+        <div class="ag-loading-text">Just a moment…</div>
+      </div>
+      <div id="authgate-btn-wrap" style="display:none;">
+        <p class="ws-sub">Sign in with Google to save and sync your child's progress across every device.</p>
+        <button class="ag-signin-btn" id="authgate-signin-btn"><svg class="ag-signin-ico" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.6H24v9h11.8c-.5 2.7-2.1 5.1-4.4 6.6v5.5h7.1c4.2-3.9 6.6-9.6 6.6-16.5z"/><path fill="#34A853" d="M24 46c6 0 11-2 14.6-5.4l-7.1-5.5c-2 1.3-4.5 2.1-7.5 2.1-5.8 0-10.7-3.9-12.4-9.1H4.3v5.7C7.9 41.1 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.6 28.1c-.4-1.3-.7-2.7-.7-4.1s.3-2.8.7-4.1v-5.7H4.3C2.8 17.2 2 20.5 2 24s.8 6.8 2.3 9.8l7.3-5.7z"/><path fill="#EA4335" d="M24 10.8c3.3 0 6.2 1.1 8.5 3.3l6.3-6.3C34.9 4.2 29.9 2 24 2 15.4 2 7.9 6.9 4.3 14.2l7.3 5.7c1.7-5.2 6.6-9.1 12.4-9.1z"/></svg>Sign in with Google</button>
+        <div class="set-future-note" id="authgate-note"></div>
+        <div class="ag-trust-row"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l8 3.5v5.5c0 5.2-3.4 9.9-8 11-4.6-1.1-8-5.8-8-11V5.5L12 2z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>Only used to save your child's progress securely</div>
+      </div>
+      <div id="authgate-error" style="display:none;">
+        <p class="ws-sub" style="color:#ffb3b3;">Couldn't connect right now. Check your internet connection and try again.</p>
+        <button class="ag-signin-btn" onclick="location.reload()">Retry</button>
+      </div>
     </div>
   </div>
 </div>
@@ -2554,7 +2586,7 @@ setTimeout(function () {
 ══════════════════════════════════ -->
 <div id="welcome-setup" class="screen">
   <div class="ws-wrap">
-    <div class="ws-star">⭐</div>
+    <div class="ws-lumi" aria-hidden="true"><svg class="ws-lumi-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M92.6,37.9 Q100.0,20.0 107.4,37.9 L116.1,59.2 Q123.0,76.0 141.0,76.0 L163.8,76.0 Q183.0,76.0 167.6,87.5 L149.4,101.2 Q135.0,112.0 140.4,129.4 L147.2,151.4 Q153.0,170.0 136.0,158.8 L115.9,145.5 Q100.0,135.0 84.1,145.5 L64.0,158.8 Q47.0,170.0 52.8,151.4 L59.6,129.4 Q65.0,112.0 50.6,101.2 L32.4,87.5 Q17.0,76.0 36.2,76.0 L59.0,76.0 Q77.0,76.0 83.9,59.2 Z" fill="#ffd166" stroke="#f4a637" stroke-width="4" stroke-linejoin="round"/><g class="w-eyes"><ellipse cx="82" cy="98" rx="7" ry="7" fill="#2c2410"/><ellipse cx="118" cy="98" rx="7" ry="7" fill="#2c2410"/><circle cx="84.5" cy="95.5" r="2.5" fill="#fff8e8"/><circle cx="120.5" cy="95.5" r="2.5" fill="#fff8e8"/></g><path d="M85 115 Q100 128 115 115" fill="none" stroke="#2c2410" stroke-width="4" stroke-linecap="round"/><ellipse cx="68" cy="112" rx="7" ry="4.5" fill="#ff9aa2" opacity=".55"/><ellipse cx="132" cy="112" rx="7" ry="4.5" fill="#ff9aa2" opacity=".55"/></svg></div>
     <h2 class="ws-title">Welcome to Little Spellers</h2>
     <p class="ws-sub">A quick one-time question for the grown-up: where should your child start?<br>Try having them read each world's example words aloud — the world where they can read most of them comfortably is usually the right fit. They can still explore every world, and you can change this later in Settings.</p>
     <div class="ws-list" id="ws-list"></div>
@@ -8099,7 +8131,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 60;
+const APP_VERSION = 61;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
