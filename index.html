@@ -880,6 +880,12 @@ html, body {
 .ag-signin-btn:active { transform: scale(.97); box-shadow: 0 0 10px rgba(255,209,102,.3); }
 .ag-signin-btn:disabled { opacity: .6; cursor: default; transform: none; }
 .ag-signin-ico { width: 18px; height: 18px; flex-shrink: 0; }
+.ag-text-btn {
+  display: block; margin: 14px auto 0; background: none; border: none; cursor: pointer;
+  color: #7a9cc0; font-family: var(--ff-body); font-size: .8rem; text-decoration: underline;
+  text-underline-offset: 3px; padding: 4px;
+}
+.ag-text-btn:active { color: #9ab8d6; }
 .ag-trust-row { display: flex; align-items: center; justify-content: center; gap: 7px; margin-top: 18px; color: #6f8fb5; font-size: .76rem; }
 .ag-trust-row svg { width: 13px; height: 13px; flex-shrink: 0; opacity: .8; }
 .ws-list { display: flex; flex-direction: column; gap: 12px; text-align: left; }
@@ -2263,10 +2269,18 @@ html, body {
         <div class="ag-loading-text">Just a moment…</div>
       </div>
       <div id="authgate-btn-wrap" style="display:none;">
-        <p class="ws-sub">Sign in with Google to save and sync your child's progress across every device.</p>
-        <button class="ag-signin-btn" id="authgate-signin-btn"><svg class="ag-signin-ico" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.6H24v9h11.8c-.5 2.7-2.1 5.1-4.4 6.6v5.5h7.1c4.2-3.9 6.6-9.6 6.6-16.5z"/><path fill="#34A853" d="M24 46c6 0 11-2 14.6-5.4l-7.1-5.5c-2 1.3-4.5 2.1-7.5 2.1-5.8 0-10.7-3.9-12.4-9.1H4.3v5.7C7.9 41.1 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.6 28.1c-.4-1.3-.7-2.7-.7-4.1s.3-2.8.7-4.1v-5.7H4.3C2.8 17.2 2 20.5 2 24s.8 6.8 2.3 9.8l7.3-5.7z"/><path fill="#EA4335" d="M24 10.8c3.3 0 6.2 1.1 8.5 3.3l6.3-6.3C34.9 4.2 29.9 2 24 2 15.4 2 7.9 6.9 4.3 14.2l7.3 5.7c1.7-5.2 6.6-9.1 12.4-9.1z"/></svg>Sign in with Google</button>
-        <div class="set-future-note" id="authgate-note"></div>
-        <div class="ag-trust-row"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l8 3.5v5.5c0 5.2-3.4 9.9-8 11-4.6-1.1-8-5.8-8-11V5.5L12 2z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>Only used to save your child's progress securely</div>
+        <div id="authgate-main-block">
+          <p class="ws-sub">Sign in with Google to save and sync your child's progress across every device.</p>
+          <button class="ag-signin-btn" id="authgate-signin-btn"><svg class="ag-signin-ico" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.6H24v9h11.8c-.5 2.7-2.1 5.1-4.4 6.6v5.5h7.1c4.2-3.9 6.6-9.6 6.6-16.5z"/><path fill="#34A853" d="M24 46c6 0 11-2 14.6-5.4l-7.1-5.5c-2 1.3-4.5 2.1-7.5 2.1-5.8 0-10.7-3.9-12.4-9.1H4.3v5.7C7.9 41.1 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.6 28.1c-.4-1.3-.7-2.7-.7-4.1s.3-2.8.7-4.1v-5.7H4.3C2.8 17.2 2 20.5 2 24s.8 6.8 2.3 9.8l7.3-5.7z"/><path fill="#EA4335" d="M24 10.8c3.3 0 6.2 1.1 8.5 3.3l6.3-6.3C34.9 4.2 29.9 2 24 2 15.4 2 7.9 6.9 4.3 14.2l7.3 5.7c1.7-5.2 6.6-9.1 12.4-9.1z"/></svg>Sign in with Google</button>
+          <div class="set-future-note" id="authgate-note"></div>
+          <div class="ag-trust-row"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l8 3.5v5.5c0 5.2-3.4 9.9-8 11-4.6-1.1-8-5.8-8-11V5.5L12 2z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>Only used to save your child's progress securely</div>
+          <button class="ag-text-btn" id="authgate-skip-link" type="button">Continue without an account</button>
+        </div>
+        <div id="authgate-skip-panel" style="display:none;">
+          <p class="ws-sub">Without an account, your child's progress is saved only on this device — it won't carry over if you switch phones, and it'll be lost if the browser's data or cache is ever cleared. You can always sign in with Google later from Settings to back it up.</p>
+          <button class="ag-signin-btn" id="authgate-skip-confirm-btn">Continue without an account</button>
+          <button class="ag-text-btn" id="authgate-skip-back-btn" type="button">Back</button>
+        </div>
       </div>
       <div id="authgate-error" style="display:none;">
         <p class="ws-sub" style="color:#ffb3b3;">Couldn't connect right now. Check your internet connection and try again.</p>
@@ -7998,9 +8012,11 @@ function buildSyncCard() {
   const user = ready ? window.LSSyncGetUser() : null;
 
   if (!user) {
+    let guestMode = false;
+    try { guestMode = localStorage.getItem('ls_guest_mode') === '1'; } catch (e) {}
     card.innerHTML = `
       <div class="pd-section-title">☁️ Account &amp; Sync</div>
-      <div style="font-size:0.72rem; color:#7a9cc0; margin-bottom:10px;">Sign in with Google to back up progress and keep every learner's progress in sync across your family's devices.</div>
+      <div style="font-size:0.72rem; color:#7a9cc0; margin-bottom:10px;">${guestMode ? "You're playing without an account — progress is saved only on this device and will be lost if its browser data or cache is cleared. Sign in anytime to back it up and sync it across devices." : "Sign in with Google to back up progress and keep every learner's progress in sync across your family's devices."}</div>
       <button class="set-save-btn" id="set-signin-btn" ${ready ? '' : 'disabled'}>Sign in with Google</button>
       <div class="set-future-note" id="set-sync-note"></div>
     `;
@@ -8131,7 +8147,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 61;
+const APP_VERSION = 62;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -10156,6 +10172,30 @@ if (signinBtn) {
   });
 }
 
+/* ── "Continue without an account" — an explicit opt-out of cloud sync
+   for a parent who doesn't have/want a Google account. Swaps the gate's
+   main block for a one-screen disclaimer (no native confirm() — it
+   wouldn't match the gate's own look) before actually committing to it,
+   since this is a real trade-off (local-only, lost on cache clear) and
+   not just a styling choice. ── */
+const skipLink = document.getElementById('authgate-skip-link');
+const mainBlock = document.getElementById('authgate-main-block');
+const skipPanel = document.getElementById('authgate-skip-panel');
+const skipConfirmBtn = document.getElementById('authgate-skip-confirm-btn');
+const skipBackBtn = document.getElementById('authgate-skip-back-btn');
+if (skipLink) skipLink.addEventListener('click', () => {
+  if (mainBlock) mainBlock.style.display = 'none';
+  if (skipPanel) skipPanel.style.display = '';
+});
+if (skipBackBtn) skipBackBtn.addEventListener('click', () => {
+  if (skipPanel) skipPanel.style.display = 'none';
+  if (mainBlock) mainBlock.style.display = '';
+});
+if (skipConfirmBtn) skipConfirmBtn.addEventListener('click', () => {
+  try { localStorage.setItem('ls_guest_mode', '1'); } catch (e) {}
+  startAppOnce();
+});
+
 // Catches a failed redirect round-trip (e.g. a misconfigured authorized
 // domain) so it surfaces as a message instead of silently stranding the
 // gate. A successful sign-in is picked up by onAuthStateChanged below,
@@ -10173,11 +10213,17 @@ onAuthStateChanged(fbAuth, async (user) => {
   window.__lsAuthResolved = true; // tells the network-independent fallback timer (see the gate's own inline script) that Firebase actually answered
 
   if (user) {
+    // Signing in clears guest mode — whether that's the normal gate flow,
+    // or a guest-mode parent signing in later from Settings to start
+    // backing up progress they already made locally (pullAndMergeAll
+    // below pushes that local data up, same as any never-synced profile).
+    try { localStorage.removeItem('ls_guest_mode'); } catch (e) {}
     if (!_appStarted) {
       showGateLoading();
       await pullAndMergeAll();
       startAppOnce();
     } else {
+      await pullAndMergeAll();
       refreshSyncUi();
     }
   } else if (_appStarted && wasSignedIn) {
@@ -10185,7 +10231,17 @@ onAuthStateChanged(fbAuth, async (user) => {
     // rather than leaving a live session with stale in-memory data
     location.reload();
   } else {
-    showGateSignInButton();
+    // No signed-in user. A parent who already chose "Continue without an
+    // account" skips straight past the gate on every later open — the
+    // choice was already made and explained once; re-asking every launch
+    // would just be annoying. Anyone else still sees the normal gate.
+    let guestMode = false;
+    try { guestMode = localStorage.getItem('ls_guest_mode') === '1'; } catch (e) {}
+    if (guestMode && !_appStarted) {
+      startAppOnce();
+    } else {
+      showGateSignInButton();
+    }
   }
 });
 </script>
