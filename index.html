@@ -1161,6 +1161,15 @@ html, body {
   width: 100%;
   gap: 1.1rem;
   animation: fade-up 0.4s ease;
+  /* ── structured container, matching the bordered-card look the Teach
+     phase uses (.teach-bubble) instead of floating loose on the
+     starfield like before — lavender-tinted to match this phase's
+     existing accent color (quiz-q-label, quiz-audio-btn). ── */
+  background: var(--navy2);
+  border: 1.5px solid rgba(199,125,255,0.4);
+  border-radius: var(--radius-lg);
+  padding: 1.4rem 1.2rem 1.6rem;
+  box-sizing: border-box;
 }
 
 .quiz-q-label {
@@ -1253,6 +1262,22 @@ html, body {
 }
 .quiz-feedback.correct-fb { color: var(--teal);  }
 .quiz-feedback.wrong-fb   { color: var(--coral); }
+
+/* ── Lumi's Q&A reaction — replaces the old plain "Brilliant!"/"Nearly!"
+   text feedback. A small standalone instance of Lumi (own small SVG +
+   animation set, same pattern as .ws-lumi for the sign-in gate) that
+   plays one of the existing tap-reaction animations automatically
+   instead of on tap, plus a short spoken caption. ── */
+.q-lumi-feedback { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.q-lumi { position: relative; width: 92px; height: 92px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
+.q-lumi-svg { width: 76px; height: 76px; overflow: visible; animation: wbob 2.8s ease-in-out infinite, wglow 2.8s ease-in-out infinite; transform-origin: 50% 60%; }
+.q-lumi .w-eyes { transform-origin: 100px 98px; animation: wblink 4.5s infinite; }
+.q-lumi-svg.st-t2 { animation: wglow 2.8s ease-in-out infinite, stSpin .7s ease-in-out 1 !important; }
+.q-lumi-svg.st-t4 { animation: wglow 2.8s ease-in-out infinite, stShake .5s ease-in-out 2 !important; }
+@media (prefers-reduced-motion: reduce) { .q-lumi-svg, .q-lumi .w-eyes { animation: none; } }
+.q-lumi-caption { font-family: var(--ff-head); font-size: 1.1rem; }
+.q-lumi-caption.correct-fb { color: var(--teal); }
+.q-lumi-caption.wrong-fb   { color: #ffd9a0; }
 
 /* Multi-select badge */
 .quiz-multi-badge {
@@ -6387,6 +6412,39 @@ function speakQuizAudio(audioText, onDone) {
 
 
 
+/* ── Q&A feedback: Lumi reacts instead of a plain "Brilliant!"/"Nearly!"
+   text line. Reuses two of the four existing tap-reaction animations
+   (tickleStar's st-t2 "spin" reads as a tumble, st-t4 "shake" as a
+   little rocking no) — but auto-triggered, not on tap, and the
+   giggle sounds that sometimes play on a tap are deliberately left
+   out here, especially for a wrong answer where a giggle would read
+   as mocking. Returns the SpeechSynthesisUtterance (or null) so the
+   caller can chain the "show Next button" step onto its end, same as
+   the old plain-text version did. ── */
+const Q_CORRECT_WORDS = ['Brilliant!', 'Fantastic!', 'Wonderful!', 'Amazing!', 'Super star!', 'Way to go!'];
+const Q_ENCOURAGE_WORDS = ["You'll get it!", 'Nice try!', 'Keep going!', 'Almost there!', 'Good effort!'];
+function renderQuizFeedback(el, correct) {
+  el.innerHTML = '';
+  el.className = 'quiz-feedback ' + (correct ? 'correct-fb' : 'wrong-fb');
+  const wrap = document.createElement('div');
+  wrap.className = 'q-lumi-feedback';
+  const lumi = document.createElement('div');
+  lumi.className = 'q-lumi';
+  lumi.innerHTML = '<svg class="q-lumi-svg ' + (correct ? 'st-t2' : 'st-t4') + '" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M92.6,37.9 Q100.0,20.0 107.4,37.9 L116.1,59.2 Q123.0,76.0 141.0,76.0 L163.8,76.0 Q183.0,76.0 167.6,87.5 L149.4,101.2 Q135.0,112.0 140.4,129.4 L147.2,151.4 Q153.0,170.0 136.0,158.8 L115.9,145.5 Q100.0,135.0 84.1,145.5 L64.0,158.8 Q47.0,170.0 52.8,151.4 L59.6,129.4 Q65.0,112.0 50.6,101.2 L32.4,87.5 Q17.0,76.0 36.2,76.0 L59.0,76.0 Q77.0,76.0 83.9,59.2 Z" fill="#ffd166" stroke="#f4a637" stroke-width="4" stroke-linejoin="round"/><g class="w-eyes"><ellipse cx="82" cy="98" rx="7" ry="7" fill="#2c2410"/><ellipse cx="118" cy="98" rx="7" ry="7" fill="#2c2410"/><circle cx="84.5" cy="95.5" r="2.5" fill="#fff8e8"/><circle cx="120.5" cy="95.5" r="2.5" fill="#fff8e8"/></g><path d="M85 115 Q100 128 115 115" fill="none" stroke="#2c2410" stroke-width="4" stroke-linecap="round"/><ellipse cx="68" cy="112" rx="7" ry="4.5" fill="#ff9aa2" opacity=".55"/><ellipse cx="132" cy="112" rx="7" ry="4.5" fill="#ff9aa2" opacity=".55"/></svg>';
+  const caption = document.createElement('div');
+  caption.className = 'q-lumi-caption ' + (correct ? 'correct-fb' : 'wrong-fb');
+  const word = correct
+    ? Q_CORRECT_WORDS[Math.floor(Math.random() * Q_CORRECT_WORDS.length)]
+    : Q_ENCOURAGE_WORDS[Math.floor(Math.random() * Q_ENCOURAGE_WORDS.length)];
+  caption.textContent = word;
+  wrap.appendChild(lumi);
+  wrap.appendChild(caption);
+  el.appendChild(wrap);
+  let utt = null;
+  try { utt = speak(word, null, correct ? 1.0 : 0.92); } catch (e) {}
+  return utt;
+}
+
 function renderQuiz(body) {
   const l = currentLesson;
   const q = l.quizzes[quizIndex];
@@ -6486,19 +6544,15 @@ function renderQuiz(body) {
       });
 
       if (allCorrect) {
-        feedback.textContent = '⭐ Brilliant! All correct!';
-        feedback.className = 'quiz-feedback correct-fb';
         quizScore++;
         burstStar(e.clientX, e.clientY);
-        speak('Brilliant! All correct!', null, 1.0);
+        renderQuizFeedback(feedback, true);
         setTimeout(() => {
           quizIndex++;
           lessonPhase = quizIndex < l.quizzes.length ? 'quiz' : 'complete';
           renderPhase();
         }, 1800);
       } else {
-        feedback.textContent = '💫 Nearly! The answers are: ' + correctAnswers.join(', ');
-        feedback.className = 'quiz-feedback wrong-fb';
         const nextBtn = document.createElement('button');
         nextBtn.className = 'quiz-next-btn';
         nextBtn.textContent = 'Next question →';
@@ -6509,7 +6563,7 @@ function renderQuiz(body) {
           lessonPhase = quizIndex < l.quizzes.length ? 'quiz' : 'complete';
           renderPhase();
         });
-        const utt = speak('Nearly! The answers are: ' + correctAnswers.join(', '), null, 0.85);
+        const utt = renderQuizFeedback(feedback, false);
         const showNext = () => { nextBtn.style.display = ''; };
         if (utt) { utt.onend = showNext; utt.onerror = showNext; }
         else { setTimeout(showNext, 1200); }
@@ -6533,11 +6587,9 @@ function renderQuiz(body) {
         const correct = opt === correctAnswers[0];
         btn.classList.add(correct ? 'correct' : 'wrong');
         if (correct) {
-          feedback.textContent = '⭐ Brilliant!';
-          feedback.className = 'quiz-feedback correct-fb';
           quizScore++;
           burstStar(e.clientX, e.clientY);
-          speak('Brilliant!', null, 1.0);
+          renderQuizFeedback(feedback, true);
           setTimeout(() => {
             quizIndex++;
             lessonPhase = quizIndex < l.quizzes.length ? 'quiz' : 'complete';
@@ -6547,8 +6599,6 @@ function renderQuiz(body) {
           opts.querySelectorAll('.quiz-opt').forEach((b, idx) => {
             if (visibleOptions[idx] === correctAnswers[0]) b.classList.add('correct');
           });
-          feedback.textContent = '💫 Nearly! The answer is ' + correctAnswers[0];
-          feedback.className = 'quiz-feedback wrong-fb';
           const nextBtn = document.createElement('button');
           nextBtn.className = 'quiz-next-btn';
           nextBtn.textContent = 'Next question →';
@@ -6559,7 +6609,7 @@ function renderQuiz(body) {
             lessonPhase = quizIndex < l.quizzes.length ? 'quiz' : 'complete';
             renderPhase();
           });
-          const utt = speak('Nearly! The answer is ' + correctAnswers[0], null, 0.85);
+          const utt = renderQuizFeedback(feedback, false);
           const showNext = () => { nextBtn.style.display = ''; };
           if (utt) { utt.onend = showNext; utt.onerror = showNext; }
           else { setTimeout(showNext, 1200); }
@@ -8170,7 +8220,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 65;
+const APP_VERSION = 66;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
