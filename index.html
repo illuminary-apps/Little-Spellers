@@ -499,6 +499,13 @@ html, body {
 .station-node.locked  { opacity: 0.38; cursor: not-allowed; }
 .station-node.locked .station-planet { filter: grayscale(0.7); }
 
+/* Reached in sequence but needs Premium — kept inviting/clickable
+   (tapping explains the paywall) rather than dimmed like a plain
+   not-yet-reached lock. */
+.station-node.premium { cursor: pointer; }
+.station-node.premium .station-planet { border-color: var(--gold); background: rgba(255,209,102,0.08); }
+.station-node.premium .station-info { border-color: rgba(255,209,102,0.25); }
+
 .station-node.completed .station-planet {
   border-color: var(--gold);
   background: rgba(255,209,102,0.12);
@@ -569,6 +576,7 @@ html, body {
 .tag-done    { background: rgba(255,209,102,0.15); color: var(--gold); }
 .tag-current { background: rgba(6,214,160,0.15);   color: var(--teal); }
 .tag-locked  { background: rgba(255,255,255,0.05); color: #4a7a9b; }
+.tag-premium { background: rgba(255,209,102,0.15); color: var(--gold); }
 
 /* Connector dots between stations */
 .station-connector {
@@ -4561,7 +4569,14 @@ function buildJourneyMap() {
   lessons.forEach((lesson, idx) => {
     const done    = !!p[lesson.id];
     const isCurr  = idx === currentIdx;
-    const locked  = !done && !isCurr;
+    const seqLocked = !done && !isCurr;
+    // Paywall foundation: the first lesson in every world is always
+    // free; beyond that, a lesson the child hasn't finished yet needs
+    // premium (see LSIsPremiumUser — fails open until she actually
+    // turns the paywall on). A lesson already completed stays open for
+    // review even if premium status changes later, so finishing work
+    // never gets retroactively taken away.
+    const premiumLocked = !done && !seqLocked && idx > 0 && !(typeof window.LSIsPremiumUser === 'function' && window.LSIsPremiumUser());
     const score   = p[lesson.id]?.score || 0;
     const qTotal  = lesson.quizzes.length;
     const stars   = done ? (score === qTotal ? '⭐⭐⭐' : score >= qTotal * 0.6 ? '⭐⭐' : '⭐') : '';
@@ -4569,18 +4584,23 @@ function buildJourneyMap() {
 
     // Station node
     const node = document.createElement('div');
-    node.className = `station-node${done ? ' completed' : isCurr ? ' current' : ' locked'}`;
+    const stateClass = done ? 'completed' : seqLocked ? 'locked' : premiumLocked ? 'premium' : 'current';
+    node.className = `station-node ${stateClass}`;
 
     // Planet circle
     const planetEl = document.createElement('div');
     planetEl.className = 'station-planet';
-    planetEl.innerHTML = `${planet}${done ? `<div class="planet-stars">${stars}</div>` : isCurr ? '<div class="planet-stars" style="color:var(--teal)">▶ GO</div>' : '<div class="planet-stars" style="color:#4a7a9b">🔒</div>'}`;
+    const starsHtml = done ? `<div class="planet-stars">${stars}</div>`
+      : seqLocked ? '<div class="planet-stars" style="color:#4a7a9b">🔒</div>'
+      : premiumLocked ? '<div class="planet-stars" style="color:var(--gold)">🔒</div>'
+      : '<div class="planet-stars" style="color:var(--teal)">▶ GO</div>';
+    planetEl.innerHTML = `${planet}${starsHtml}`;
 
     // Info card
     const infoEl = document.createElement('div');
     infoEl.className = 'station-info';
-    const tagClass = done ? 'tag-done' : isCurr ? 'tag-current' : 'tag-locked';
-    const tagText  = done ? `✓ ${score}/${qTotal} stars` : isCurr ? '← next stop!' : 'locked';
+    const tagClass = done ? 'tag-done' : seqLocked ? 'tag-locked' : premiumLocked ? 'tag-premium' : 'tag-current';
+    const tagText  = done ? `✓ ${score}/${qTotal} stars` : seqLocked ? 'locked' : premiumLocked ? '🔒 Premium' : '← next stop!';
     infoEl.innerHTML = `
       <div class="si-name">${lesson.name}</div>
       <div class="si-desc">${lesson.desc}</div>
@@ -4590,8 +4610,10 @@ function buildJourneyMap() {
     node.appendChild(planetEl);
     node.appendChild(infoEl);
 
-    if (!locked) {
+    if (done || (!seqLocked && !premiumLocked)) {
       node.addEventListener('click', () => startLesson(lesson));
+    } else if (premiumLocked) {
+      node.addEventListener('click', () => showPaywallPrompt(lesson));
     }
 
     container.appendChild(node);
@@ -6674,10 +6696,19 @@ function renderComplete(body) {
   // "My Achievements" shortcut and the badge-earned callout box below.
   const nextLesson = findNextLesson();
   if (nextLesson) {
+    // This button always lands on a lesson beyond the first in its world
+    // (there's no "next" from index 0 that isn't index 1+), so it needs
+    // the same premium check the journey map's own nodes use — otherwise
+    // it'd be a backdoor around the paywall entirely.
+    const nextDone = !!getProgress()[nextLesson.id];
+    const nextPremiumLocked = !nextDone && !(typeof window.LSIsPremiumUser === 'function' && window.LSIsPremiumUser());
     const nextBtn = document.createElement('button');
     nextBtn.className = 'action-btn primary';
-    nextBtn.textContent = 'Next lesson: ' + nextLesson.name + ' →';
-    nextBtn.addEventListener('click', () => startLesson(nextLesson));
+    nextBtn.textContent = nextPremiumLocked ? '🔒 Next lesson: ' + nextLesson.name : 'Next lesson: ' + nextLesson.name + ' →';
+    nextBtn.addEventListener('click', () => {
+      if (nextPremiumLocked) showPaywallPrompt(nextLesson);
+      else startLesson(nextLesson);
+    });
     wrap.appendChild(nextBtn);
   }
 
@@ -6692,6 +6723,18 @@ function findNextLesson() {
   if (!currentLevel || !currentLesson) return null;
   const idx = currentLevel.lessons.findIndex(l => l.id === currentLesson.id);
   return currentLevel.lessons[idx + 1] || null;
+}
+
+/* Reuses the existing install-prompt bottom-sheet (_showInstall/closeInstall,
+   defined near the end of the file) rather than building a separate modal,
+   so this matches the rest of the app's look without new chrome. */
+function showPaywallPrompt(lesson) {
+  if (typeof _showInstall !== 'function') { alert('"' + lesson.name + '" is a Premium lesson.'); return; }
+  _showInstall('🔒 Premium Lesson', `
+    <p>"${lesson.name}" is part of Little Spellers Premium.</p>
+    <p>The first lesson in every world is always free to try — a Premium subscription unlocks the rest.</p>
+    <p style="margin-top:10px;color:#9ab8d6;font-size:0.85rem;">Subscriptions are launching soon!</p>
+  `);
 }
 
 /* ════════════════════════════════════════════
@@ -8220,7 +8263,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 66;
+const APP_VERSION = 67;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -9989,7 +10032,7 @@ import {
   getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js";
 import {
-  getFirestore, doc, setDoc, deleteDoc, collection, getDocs
+  getFirestore, doc, setDoc, deleteDoc, collection, getDocs, getDoc
 } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -10028,6 +10071,51 @@ function refreshSyncUi() {
     window.buildSettings();
   }
 }
+
+/* ── Premium/paywall foundation ──
+   No real payment processor is wired up yet (Stripe/Play Billing —
+   decided later), so this only builds the SCAFFOLDING: a single
+   Firestore doc (config/access) with two fields she edits by hand in
+   the Firebase console, no app redeploy needed:
+     - paywallEnabled (bool) — the master switch. Missing/false means
+       every lesson stays open for everyone, exactly like today. She
+       flips this true only once a real way to actually pay/upgrade
+       exists — until then, turning it on would just dead-end real
+       users on a locked lesson with no way to unlock it.
+     - compEmails (array of strings) — email addresses that always get
+       full access regardless of paywallEnabled, e.g. her own account,
+       family, reviewers.
+   Fails OPEN on any doubt (missing doc, denied by security rules not
+   yet updated, offline, never fetched) — every lesson stays unlocked
+   rather than risk locking someone out by accident. */
+async function refreshPremiumStatus() {
+  if (!_syncUser) { window.__lsPremiumKnown = false; return; }
+  try {
+    const snap = await getDoc(doc(fbDb, 'config', 'access'));
+    const data = snap.exists() ? snap.data() : {};
+    const emails = Array.isArray(data.compEmails) ? data.compEmails.map(e => String(e).toLowerCase().trim()) : [];
+    try { localStorage.setItem('ls_access_cfg', JSON.stringify({ paywallEnabled: !!data.paywallEnabled, compEmails: emails })); } catch (e) {}
+    window.__lsPaywallEnabled = !!data.paywallEnabled;
+    window.__lsIsComped = !!(_syncUser.email && emails.includes(_syncUser.email.toLowerCase()));
+    window.__lsPremiumKnown = true;
+  } catch (e) {
+    console.warn('[LS premium] could not fetch access config — defaulting open', e);
+    let cached = null;
+    try { cached = JSON.parse(localStorage.getItem('ls_access_cfg') || 'null'); } catch (e2) {}
+    if (cached) {
+      window.__lsPaywallEnabled = !!cached.paywallEnabled;
+      window.__lsIsComped = !!(_syncUser.email && (cached.compEmails || []).includes(_syncUser.email.toLowerCase()));
+      window.__lsPremiumKnown = true;
+    } else {
+      window.__lsPremiumKnown = false; // genuinely unknown — LSIsPremiumUser() below stays fail-open
+    }
+  }
+}
+window.LSIsPremiumUser = function() {
+  if (!window.__lsPremiumKnown) return true; // never confirmed one way or the other — fail open
+  if (!window.__lsPaywallEnabled) return true; // master switch is off — everything's free right now
+  return !!window.__lsIsComped;
+};
 
 async function pushChildToCloud(childId) {
   if (!_syncUser) return;
@@ -10294,10 +10382,10 @@ onAuthStateChanged(fbAuth, async (user) => {
     try { localStorage.removeItem('ls_guest_mode'); } catch (e) {}
     if (!_appStarted) {
       showGateLoading();
-      await pullAndMergeAll();
+      await Promise.all([pullAndMergeAll(), refreshPremiumStatus()]);
       startAppOnce();
     } else {
-      await pullAndMergeAll();
+      await Promise.all([pullAndMergeAll(), refreshPremiumStatus()]);
       refreshSyncUi();
     }
   } else if (_appStarted && wasSignedIn) {
