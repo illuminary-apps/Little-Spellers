@@ -8263,7 +8263,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 67;
+const APP_VERSION = 68;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -10074,29 +10074,52 @@ function refreshSyncUi() {
 
 /* ── Premium/paywall foundation ──
    No real payment processor is wired up yet (Stripe/Play Billing —
-   decided later), so this only builds the SCAFFOLDING: a single
-   Firestore doc (config/access) with two fields she edits by hand in
-   the Firebase console, no app redeploy needed:
-     - paywallEnabled (bool) — the master switch. Missing/false means
-       every lesson stays open for everyone, exactly like today. She
-       flips this true only once a real way to actually pay/upgrade
-       exists — until then, turning it on would just dead-end real
-       users on a locked lesson with no way to unlock it.
-     - compEmails (array of strings) — email addresses that always get
-       full access regardless of paywallEnabled, e.g. her own account,
-       family, reviewers.
-   Fails OPEN on any doubt (missing doc, denied by security rules not
-   yet updated, offline, never fetched) — every lesson stays unlocked
-   rather than risk locking someone out by accident. */
+   decided later), so this only builds the SCAFFOLDING, controlled by
+   two Firestore docs she edits by hand in the Firebase console, no
+   app redeploy needed:
+     - config/accessFlags: { paywallEnabled: bool } — the master
+       switch, PUBLIC read (no sign-in required). It has to be
+       public: a "Continue without an account" guest (see the sign-in
+       gate) has no identity Firestore can check, but still needs to
+       know whether the paywall is even on — otherwise a guest would
+       be a permanent, silent backdoor around it regardless of this
+       flag. Missing/false means every lesson stays open for everyone,
+       exactly like today. She flips this true only once a real way to
+       actually pay/upgrade exists — until then, turning it on would
+       just dead-end real users on a locked lesson with no way to
+       unlock it.
+     - config/access: { compEmails: [...] } — email addresses that
+       always get full access regardless of paywallEnabled, e.g. her
+       own account, family, reviewers. Kept SEPARATE from the flag and
+       readable only by signed-in users: a guest has no email to check
+       against this list anyway (so can never be comped — correct,
+       since there's no identity to enforce a subscription against),
+       and this way the list of who's comped isn't sitting world-
+       readable for anyone to query.
+   Fails OPEN on any doubt (missing doc, security rules not updated
+   yet, offline, never fetched, a guest with a failed/old cache) —
+   every lesson stays unlocked rather than risk locking someone out by
+   accident. Called for both signed-in users AND guests (see the gate's
+   "Continue without an account" handler and its guest-return path
+   below) — _syncUser may legitimately be null here. */
 async function refreshPremiumStatus() {
-  if (!_syncUser) { window.__lsPremiumKnown = false; return; }
   try {
-    const snap = await getDoc(doc(fbDb, 'config', 'access'));
-    const data = snap.exists() ? snap.data() : {};
-    const emails = Array.isArray(data.compEmails) ? data.compEmails.map(e => String(e).toLowerCase().trim()) : [];
-    try { localStorage.setItem('ls_access_cfg', JSON.stringify({ paywallEnabled: !!data.paywallEnabled, compEmails: emails })); } catch (e) {}
-    window.__lsPaywallEnabled = !!data.paywallEnabled;
-    window.__lsIsComped = !!(_syncUser.email && emails.includes(_syncUser.email.toLowerCase()));
+    const flagSnap = await getDoc(doc(fbDb, 'config', 'accessFlags'));
+    const paywallEnabled = !!(flagSnap.exists() && flagSnap.data().paywallEnabled);
+    let isComped = false;
+    if (_syncUser) {
+      // Let a failure here fall through to the outer catch too, rather
+      // than quietly treating "couldn't check the comp list" as "not
+      // comped" — a flaky fetch for an otherwise-legitimate comped
+      // account should fail open, not fail closed.
+      const accessSnap = await getDoc(doc(fbDb, 'config', 'access'));
+      const emails = (accessSnap.exists() && Array.isArray(accessSnap.data().compEmails))
+        ? accessSnap.data().compEmails.map(e => String(e).toLowerCase().trim()) : [];
+      isComped = !!(_syncUser.email && emails.includes(_syncUser.email.toLowerCase()));
+    }
+    try { localStorage.setItem('ls_access_cfg', JSON.stringify({ paywallEnabled, isComped })); } catch (e) {}
+    window.__lsPaywallEnabled = paywallEnabled;
+    window.__lsIsComped = isComped;
     window.__lsPremiumKnown = true;
   } catch (e) {
     console.warn('[LS premium] could not fetch access config — defaulting open', e);
@@ -10104,7 +10127,7 @@ async function refreshPremiumStatus() {
     try { cached = JSON.parse(localStorage.getItem('ls_access_cfg') || 'null'); } catch (e2) {}
     if (cached) {
       window.__lsPaywallEnabled = !!cached.paywallEnabled;
-      window.__lsIsComped = !!(_syncUser.email && (cached.compEmails || []).includes(_syncUser.email.toLowerCase()));
+      window.__lsIsComped = !!cached.isComped;
       window.__lsPremiumKnown = true;
     } else {
       window.__lsPremiumKnown = false; // genuinely unknown — LSIsPremiumUser() below stays fail-open
@@ -10353,8 +10376,14 @@ if (skipBackBtn) skipBackBtn.addEventListener('click', () => {
   if (skipPanel) skipPanel.style.display = 'none';
   if (mainBlock) mainBlock.style.display = '';
 });
-if (skipConfirmBtn) skipConfirmBtn.addEventListener('click', () => {
+if (skipConfirmBtn) skipConfirmBtn.addEventListener('click', async () => {
   try { localStorage.setItem('ls_guest_mode', '1'); } catch (e) {}
+  // Guest mode has no account for Firestore to check, but still needs
+  // to know whether the paywall is even on (see refreshPremiumStatus) —
+  // otherwise "Continue without an account" would be a silent, permanent
+  // backdoor around it, paywall-on or not.
+  showGateLoading();
+  await refreshPremiumStatus();
   startAppOnce();
 });
 
@@ -10400,6 +10429,12 @@ onAuthStateChanged(fbAuth, async (user) => {
     let guestMode = false;
     try { guestMode = localStorage.getItem('ls_guest_mode') === '1'; } catch (e) {}
     if (guestMode && !_appStarted) {
+      // Same reasoning as the initial "Continue without an account"
+      // confirm — re-check the paywall flag on every return visit too,
+      // not just the first time, so a guest's lock status stays current
+      // if she turns the paywall on after they already chose guest mode.
+      showGateLoading();
+      await refreshPremiumStatus();
       startAppOnce();
     } else {
       showGateSignInButton();
