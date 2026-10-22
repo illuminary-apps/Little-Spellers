@@ -380,6 +380,11 @@ html, body {
   transition: background 0.15s;
 }
 .back-btn:hover { background: #3a5570; }
+/* Mid-quiz (question 2+) the header back arrow is locked — stepping out
+   partway through would lose the child's place in the quiz, so it's
+   disabled rather than clickable. */
+.back-btn:disabled,
+.back-btn.back-btn-disabled { opacity: 0.35; pointer-events: none; cursor: default; }
 
 .lm-title {
   font-family: var(--ff-head);
@@ -1332,25 +1337,9 @@ html, body {
 .quiz-submit-btn:active { transform: scale(0.97); }
 .quiz-submit-btn:disabled { opacity: 0.5; pointer-events: none; }
 
-/* Next question button — appears after wrong answer once speech finishes */
-.quiz-next-btn {
-  background: rgba(255,107,107,0.15);
-  border: 2px solid var(--coral);
-  border-radius: var(--radius-md);
-  padding: 0.85rem 2rem;
-  font-family: var(--ff-head);
-  font-size: 1.05rem;
-  color: var(--coral);
-  font-weight: 800;
-  cursor: pointer;
-  width: 100%;
-  margin-top: 0.5rem;
-  transition: transform 0.15s cubic-bezier(.34,1.56,.64,1), background 0.15s;
-  letter-spacing: 0.02em;
-  animation: fade-up 0.35s ease;
-}
-.quiz-next-btn:hover { background: rgba(255,107,107,0.28); transform: translateY(-2px); }
-.quiz-next-btn:active { transform: scale(0.97); }
+/* A wrong answer used to need a "Next question" button (tap-to-advance,
+   which she found sat too low on screen) — now it auto-advances the same
+   way a correct answer always has, so there's no button/position to fix. */
 
 @keyframes shake {
   0%,100% { transform: translateX(0); }
@@ -1374,14 +1363,35 @@ html, body {
   to   { transform: scale(1);   opacity: 1; }
 }
 
-.complete-star {
-  font-size: 5rem;
-  filter: drop-shadow(0 0 30px rgba(255,209,102,0.8));
+/* Lesson Complete's hero image used to be a plain star emoji standing in
+   for Lumi — replaced with the real mascot (same SVG used everywhere
+   else) so it's actually her, reacting to how the quiz went. */
+.complete-lumi {
+  position: relative; width: 168px; height: 168px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: center;
   animation: star-spin 0.6s cubic-bezier(.34,1.56,.64,1);
 }
+.complete-lumi-svg {
+  width: 140px; height: 140px; overflow: visible;
+  animation: wbob 2.8s ease-in-out infinite, wglow 2.8s ease-in-out infinite;
+  transform-origin: 50% 60%;
+  filter: drop-shadow(0 0 30px rgba(255,209,102,0.7));
+}
+.complete-lumi .w-eyes { transform-origin: 100px 98px; animation: wblink 4.5s infinite; }
+.complete-lumi-svg.st-t1 { animation: wglow 2.8s ease-in-out infinite, stWiggle .8s ease-in-out 1 !important; }
+.complete-lumi-svg.st-t2 { animation: wglow 2.8s ease-in-out infinite, stSpin .7s ease-in-out 1 !important; }
+.complete-lumi-svg.st-t3 { animation: wglow 2.8s ease-in-out infinite, stBounce .8s ease-in-out 1 !important; }
+@media (prefers-reduced-motion: reduce) { .complete-lumi-svg, .complete-lumi .w-eyes { animation: none; } }
 @keyframes star-spin {
   from { transform: rotate(-180deg) scale(0); }
   to   { transform: rotate(0deg) scale(1); }
+}
+/* Small star-rating row beneath Lumi, separate from her now — this is
+   just the 1-3 star score indicator, not a mascot. */
+.complete-stars-row {
+  font-size: 1.6rem;
+  letter-spacing: 4px;
+  filter: drop-shadow(0 0 12px rgba(255,209,102,0.6));
 }
 
 .complete-title {
@@ -2477,7 +2487,7 @@ setTimeout(function () {
 ══════════════════════════════════ -->
 <div id="lesson" class="screen">
   <div class="lesson-header">
-    <button class="back-btn" onclick="backToMap()">←</button>
+    <button class="back-btn" id="lesson-back-btn" onclick="handleLessonBack()">←</button>
     <div class="lesson-progress-bar-wrap">
       <div class="lesson-progress-bar" id="lesson-progress-bar"></div>
     </div>
@@ -4672,6 +4682,35 @@ function backToMap() {
   showScreen('levelmap');
 }
 
+// The lesson header's back arrow is shared across every phase (teach,
+// practice, word blocks, quiz, complete) since they all render into the
+// same #lesson-body. For most phases "back" means leave the lesson
+// entirely (backToMap). Quiz is the one exception: on the FIRST question
+// only, back steps one phase back to Word Blocks instead of exiting (and
+// effectively restarting) the whole lesson; on later questions it's
+// disabled (see updateLessonBackBtn) rather than letting a child bail
+// out mid-quiz and lose their place.
+function handleLessonBack() {
+  const btn = document.getElementById('lesson-back-btn');
+  if (btn && btn.disabled) return;
+  if (lessonPhase === 'quiz' && quizIndex === 0) {
+    lessonPhase = 'wordblocks';
+    renderPhase();
+    return;
+  }
+  backToMap();
+}
+
+// Called at the end of every renderPhase() so the header back arrow's
+// enabled/disabled state always matches the current phase + quiz position.
+function updateLessonBackBtn() {
+  const btn = document.getElementById('lesson-back-btn');
+  if (!btn) return;
+  const locked = lessonPhase === 'quiz' && quizIndex > 0;
+  btn.disabled = locked;
+  btn.classList.toggle('back-btn-disabled', locked);
+}
+
 /* ════════════════════════════════════════════
    LESSON FLOW
 ════════════════════════════════════════════ */
@@ -4699,6 +4738,8 @@ function renderPhase() {
   if (lessonPhase === 'wordblocks')  { renderWordBlocksLesson(body); setProgress(62, 'Word Blocks 🧩'); }
   if (lessonPhase === 'quiz')        { renderQuiz(body);        setProgress(70 + quizIndex * 10, 'Quiz ⭐'); }
   if (lessonPhase === 'complete')    { renderComplete(body);    setProgress(100, 'Done! 🎉'); }
+
+  updateLessonBackBtn();
 }
 
 /* ── TEACH ── */
@@ -6575,20 +6616,19 @@ function renderQuiz(body) {
           renderPhase();
         }, 1800);
       } else {
-        const nextBtn = document.createElement('button');
-        nextBtn.className = 'quiz-next-btn';
-        nextBtn.textContent = 'Next question →';
-        nextBtn.style.display = 'none';
-        wrap.appendChild(nextBtn);
-        nextBtn.addEventListener('click', () => {
+        // Auto-advances now instead of waiting for a tapped "Next
+        // question" button — same pattern as the correct-answer path,
+        // just with a longer pause so there's time to actually see
+        // Lumi's reaction and the highlighted correct answer(s).
+        const advance = () => {
           quizIndex++;
           lessonPhase = quizIndex < l.quizzes.length ? 'quiz' : 'complete';
           renderPhase();
-        });
+        };
         const utt = renderQuizFeedback(feedback, false);
-        const showNext = () => { nextBtn.style.display = ''; };
-        if (utt) { utt.onend = showNext; utt.onerror = showNext; }
-        else { setTimeout(showNext, 1200); }
+        const goNext = () => setTimeout(advance, 1000);
+        if (utt) { utt.onend = goNext; utt.onerror = goNext; }
+        else { setTimeout(advance, 2200); }
       }
     });
 
@@ -6621,20 +6661,19 @@ function renderQuiz(body) {
           opts.querySelectorAll('.quiz-opt').forEach((b, idx) => {
             if (visibleOptions[idx] === correctAnswers[0]) b.classList.add('correct');
           });
-          const nextBtn = document.createElement('button');
-          nextBtn.className = 'quiz-next-btn';
-          nextBtn.textContent = 'Next question →';
-          nextBtn.style.display = 'none';
-          wrap.appendChild(nextBtn);
-          nextBtn.addEventListener('click', () => {
+          // Auto-advances now instead of waiting for a tapped "Next
+          // question" button — same pattern as the correct-answer path,
+          // just with a longer pause so there's time to actually see
+          // Lumi's reaction and the highlighted correct answer.
+          const advance = () => {
             quizIndex++;
             lessonPhase = quizIndex < l.quizzes.length ? 'quiz' : 'complete';
             renderPhase();
-          });
+          };
           const utt = renderQuizFeedback(feedback, false);
-          const showNext = () => { nextBtn.style.display = ''; };
-          if (utt) { utt.onend = showNext; utt.onerror = showNext; }
-          else { setTimeout(showNext, 1200); }
+          const goNext = () => setTimeout(advance, 1000);
+          if (utt) { utt.onend = goNext; utt.onerror = goNext; }
+          else { setTimeout(advance, 2200); }
         }
       });
 
@@ -6663,7 +6702,13 @@ function renderComplete(body) {
   confetti();
 
   const pctScore = Math.round((quizScore / total) * 100);
-  const star = quizScore === total ? '⭐⭐⭐' : quizScore >= total * 0.6 ? '⭐⭐' : '⭐';
+  const starRating = quizScore === total ? 3 : quizScore >= total * 0.6 ? 2 : 1;
+  const starsHtml = '⭐'.repeat(starRating);
+  // Lumi's reaction mood — tumble (spin) for a perfect score, a happy
+  // bounce for a good one, a gentle wiggle otherwise. Never the "wrong
+  // answer" shake/rocking — finishing a lesson is worth celebrating
+  // regardless of score.
+  const lumiMood = quizScore === total ? 'st-t2' : quizScore >= total * 0.6 ? 'st-t3' : 'st-t1';
   const msg  = quizScore === total
     ? 'Perfect score! You\'re a star!'
     : quizScore >= total * 0.6
@@ -6673,7 +6718,8 @@ function renderComplete(body) {
   const wrap = document.createElement('div');
   wrap.className = 'complete-wrap';
   wrap.innerHTML = `
-    <div class="complete-star">${star}</div>
+    <div class="complete-lumi" aria-hidden="true"><svg class="complete-lumi-svg ${lumiMood}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M92.6,37.9 Q100.0,20.0 107.4,37.9 L116.1,59.2 Q123.0,76.0 141.0,76.0 L163.8,76.0 Q183.0,76.0 167.6,87.5 L149.4,101.2 Q135.0,112.0 140.4,129.4 L147.2,151.4 Q153.0,170.0 136.0,158.8 L115.9,145.5 Q100.0,135.0 84.1,145.5 L64.0,158.8 Q47.0,170.0 52.8,151.4 L59.6,129.4 Q65.0,112.0 50.6,101.2 L32.4,87.5 Q17.0,76.0 36.2,76.0 L59.0,76.0 Q77.0,76.0 83.9,59.2 Z" fill="#ffd166" stroke="#f4a637" stroke-width="4" stroke-linejoin="round"/><g class="w-eyes"><ellipse cx="82" cy="98" rx="7" ry="7" fill="#2c2410"/><ellipse cx="118" cy="98" rx="7" ry="7" fill="#2c2410"/><circle cx="84.5" cy="95.5" r="2.5" fill="#fff8e8"/><circle cx="120.5" cy="95.5" r="2.5" fill="#fff8e8"/></g><path d="M85 115 Q100 128 115 115" fill="none" stroke="#2c2410" stroke-width="4" stroke-linecap="round"/><ellipse cx="68" cy="112" rx="7" ry="4.5" fill="#ff9aa2" opacity=".55"/><ellipse cx="132" cy="112" rx="7" ry="4.5" fill="#ff9aa2" opacity=".55"/></svg></div>
+    <div class="complete-stars-row">${starsHtml}</div>
     <div class="complete-title">Lesson Complete!</div>
     <div class="complete-subtitle">${msg}</div>
 
@@ -8263,7 +8309,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 68;
+const APP_VERSION = 69;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
