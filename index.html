@@ -1525,8 +1525,22 @@ html, body {
   align-items: center;
   gap: 8px;
 }
-.complete-next-btn .cnb-arrow { display: inline-block; animation: cnbArrowNudge 1.4s ease-in-out infinite; }
-@keyframes cnbArrowNudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(5px); } }
+/* Round play-triangle badge, replacing the plain "→" text arrow —
+   matches the chunky play/pause icon language used elsewhere in the
+   app rather than a skinny typographic arrow. */
+.complete-next-btn .cnb-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(7,30,36,0.18);
+  flex-shrink: 0;
+  animation: cnbArrowNudge 1.4s ease-in-out infinite;
+}
+.complete-next-btn .cnb-play-icon { width: 13px; height: 13px; margin-left: 2px; }
+@keyframes cnbArrowNudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(4px); } }
 
 .complete-next-btn.premium-locked {
   background: linear-gradient(135deg, rgba(255,209,102,0.22), rgba(255,209,102,0.07));
@@ -1536,6 +1550,7 @@ html, body {
 .complete-next-btn.premium-locked:hover { box-shadow: 0 10px 26px rgba(255,209,102,0.35), inset 0 1px 0 rgba(255,255,255,0.12); }
 .complete-next-btn.premium-locked .cnb-label,
 .complete-next-btn.premium-locked .cnb-name { color: var(--gold); }
+.complete-next-btn.premium-locked .cnb-arrow { background: rgba(255,209,102,0.2); }
 
 @media (prefers-reduced-motion: reduce) { .complete-next-btn .cnb-arrow { animation: none; } }
 
@@ -6822,9 +6837,13 @@ function renderComplete(body) {
     const nextPremiumLocked = !nextDone && !(typeof window.LSIsPremiumUser === 'function' && window.LSIsPremiumUser());
     const nextBtn = document.createElement('button');
     nextBtn.className = 'complete-next-btn' + (nextPremiumLocked ? ' premium-locked' : '');
+    // A round play-triangle badge instead of a plain "→" character —
+    // matches the chunkier play/pause icon look used elsewhere rather
+    // than a skinny typographic arrow.
+    const playIconSvg = '<svg class="cnb-play-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon points="6,3 21,12 6,21" fill="currentColor"/></svg>';
     nextBtn.innerHTML = nextPremiumLocked
-      ? '<span class="cnb-label">🔒 Premium lesson</span><span class="cnb-name">' + nextLesson.name + '</span>'
-      : '<span class="cnb-label">Next up</span><span class="cnb-name">' + nextLesson.name + '<span class="cnb-arrow">→</span></span>';
+      ? '<span class="cnb-label">🔒 Premium lesson</span><span class="cnb-name">' + nextLesson.name + '<span class="cnb-arrow">' + playIconSvg + '</span></span>'
+      : '<span class="cnb-label">Next up</span><span class="cnb-name">' + nextLesson.name + '<span class="cnb-arrow">' + playIconSvg + '</span></span>';
     nextBtn.addEventListener('click', () => {
       if (nextPremiumLocked) showPaywallPrompt(nextLesson);
       else startLesson(nextLesson);
@@ -8383,7 +8402,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 71;
+const APP_VERSION = 72;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
