@@ -1493,7 +1493,7 @@ html, body {
 .complete-next-btn {
   width: 100%;
   margin-top: 0.4rem;
-  padding: 0.95rem 1.3rem;
+  padding: 0.8rem 1.3rem;
   border: none;
   border-radius: var(--radius-xl);
   cursor: pointer;
@@ -1502,7 +1502,7 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
   background: linear-gradient(135deg, var(--teal), #04a87e);
   box-shadow: 0 6px 24px rgba(6,214,160,0.4), inset 0 1px 0 rgba(255,255,255,0.28);
   transition: transform 0.15s cubic-bezier(.34,1.56,.64,1), box-shadow 0.15s;
@@ -1511,19 +1511,19 @@ html, body {
 .complete-next-btn:active { transform: scale(0.97); }
 .complete-next-btn .cnb-label {
   font-family: var(--ff-body);
-  font-size: 0.66rem;
+  font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(7,30,36,0.55);
+  color: rgba(7,30,36,0.6);
 }
 .complete-next-btn .cnb-name {
   font-family: var(--ff-head);
-  font-size: 1.15rem;
+  font-size: 1.4rem;
   color: var(--navy);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 /* Round play-triangle badge, replacing the plain "→" text arrow —
    matches the chunky play/pause icon language used elsewhere in the
@@ -1532,14 +1532,14 @@ html, body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background: rgba(7,30,36,0.18);
   flex-shrink: 0;
   animation: cnbArrowNudge 1.4s ease-in-out infinite;
 }
-.complete-next-btn .cnb-play-icon { width: 13px; height: 13px; margin-left: 2px; }
+.complete-next-btn .cnb-play-icon { width: 17px; height: 17px; margin-left: 2px; }
 @keyframes cnbArrowNudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(4px); } }
 
 .complete-next-btn.premium-locked {
@@ -8402,7 +8402,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 72;
+const APP_VERSION = 73;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
