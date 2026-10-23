@@ -1484,6 +1484,61 @@ html, body {
 }
 .action-btn.secondary:hover { border-color: var(--gold); }
 
+/* ── Lesson Complete's "Next lesson" button — its own distinct look
+   instead of the generic flat action-btn, since this is the finale of a
+   celebration screen (confetti + Lumi reacting), not just another list
+   item. A small "Next up" label over the lesson name, a gently nudging
+   arrow, and a soft glossy sheen; a separate gold "Premium" treatment
+   matches the journey map's own premium-lesson styling. ── */
+.complete-next-btn {
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 0.95rem 1.3rem;
+  border: none;
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: linear-gradient(135deg, var(--teal), #04a87e);
+  box-shadow: 0 6px 24px rgba(6,214,160,0.4), inset 0 1px 0 rgba(255,255,255,0.28);
+  transition: transform 0.15s cubic-bezier(.34,1.56,.64,1), box-shadow 0.15s;
+}
+.complete-next-btn:hover  { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(6,214,160,0.55), inset 0 1px 0 rgba(255,255,255,0.32); }
+.complete-next-btn:active { transform: scale(0.97); }
+.complete-next-btn .cnb-label {
+  font-family: var(--ff-body);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(7,30,36,0.55);
+}
+.complete-next-btn .cnb-name {
+  font-family: var(--ff-head);
+  font-size: 1.15rem;
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.complete-next-btn .cnb-arrow { display: inline-block; animation: cnbArrowNudge 1.4s ease-in-out infinite; }
+@keyframes cnbArrowNudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(5px); } }
+
+.complete-next-btn.premium-locked {
+  background: linear-gradient(135deg, rgba(255,209,102,0.22), rgba(255,209,102,0.07));
+  border: 2px solid var(--gold);
+  box-shadow: 0 6px 20px rgba(255,209,102,0.25), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.complete-next-btn.premium-locked:hover { box-shadow: 0 10px 26px rgba(255,209,102,0.35), inset 0 1px 0 rgba(255,255,255,0.12); }
+.complete-next-btn.premium-locked .cnb-label,
+.complete-next-btn.premium-locked .cnb-name { color: var(--gold); }
+
+@media (prefers-reduced-motion: reduce) { .complete-next-btn .cnb-arrow { animation: none; } }
+
 /* ════════════════════════════════════════════
    STAR BURST (tap celebration)
 ════════════════════════════════════════════ */
@@ -6749,8 +6804,10 @@ function renderComplete(body) {
     const nextDone = !!getProgress()[nextLesson.id];
     const nextPremiumLocked = !nextDone && !(typeof window.LSIsPremiumUser === 'function' && window.LSIsPremiumUser());
     const nextBtn = document.createElement('button');
-    nextBtn.className = 'action-btn primary';
-    nextBtn.textContent = nextPremiumLocked ? '🔒 Next lesson: ' + nextLesson.name : 'Next lesson: ' + nextLesson.name + ' →';
+    nextBtn.className = 'complete-next-btn' + (nextPremiumLocked ? ' premium-locked' : '');
+    nextBtn.innerHTML = nextPremiumLocked
+      ? '<span class="cnb-label">🔒 Premium lesson</span><span class="cnb-name">' + nextLesson.name + '</span>'
+      : '<span class="cnb-label">Next up</span><span class="cnb-name">' + nextLesson.name + '<span class="cnb-arrow">→</span></span>';
     nextBtn.addEventListener('click', () => {
       if (nextPremiumLocked) showPaywallPrompt(nextLesson);
       else startLesson(nextLesson);
@@ -8309,7 +8366,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 69;
+const APP_VERSION = 70;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
