@@ -4286,7 +4286,14 @@ function showScreen(id) {
   // Leaving a screen silences whatever was being read out on it
   try { if (synth) synth.cancel(); } catch (e) {}
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  const el = document.getElementById(id);
+  el.classList.add('active');
+  // .screen elements scroll internally (overflow-y: auto) and keep
+  // whatever scrollTop they had while hidden/display:none — toggling
+  // display back on does NOT reset it. Without this, reopening a screen
+  // you'd previously scrolled down on shows it already scrolled, with
+  // its top content cropped off above the fold until you scroll back up.
+  el.scrollTop = 0;
   _navOnScreen(id);
 }
 /* ── Phone/browser Back button: step back inside the app instead of leaving it ──
@@ -4793,6 +4800,16 @@ function renderPhase() {
   if (lessonPhase === 'wordblocks')  { renderWordBlocksLesson(body); setProgress(62, 'Word Blocks 🧩'); }
   if (lessonPhase === 'quiz')        { renderQuiz(body);        setProgress(70 + quizIndex * 10, 'Quiz ⭐'); }
   if (lessonPhase === 'complete')    { renderComplete(body);    setProgress(100, 'Done! 🎉'); }
+
+  // renderPhase() swaps content WITHOUT switching .screen (quiz question
+  // 1 -> 2 -> 3, teach -> practice, etc.), so showScreen()'s own scroll
+  // reset never fires here. If a question was scrolled down (e.g. to
+  // read the feedback/see the "correct" highlight) the next question
+  // would otherwise render still scrolled down, cropped at the top,
+  // until manually scrolled back up — this resets it on every phase/
+  // question change too, not just on entering the lesson screen.
+  const lessonScreen = document.getElementById('lesson');
+  if (lessonScreen) lessonScreen.scrollTop = 0;
 
   updateLessonBackBtn();
 }
@@ -8366,7 +8383,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 70;
+const APP_VERSION = 71;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
