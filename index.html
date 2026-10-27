@@ -727,7 +727,7 @@ html, body {
   font-family: var(--ff-head); font-size: 1.1rem; letter-spacing: 0.02em;
   color: var(--teal2); text-align: center;
 }
-.story-word-row { display: flex; gap: 6px; justify-content: center; }
+.story-word-row { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; row-gap: 10px; max-width: 100%; }
 .story-tile {
   width: 46px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
   background: var(--navy2); border: 2px solid var(--star-dim);
@@ -5469,7 +5469,10 @@ function renderRevealStory(container, lesson, onDone, finalLabel) {
           if (pair.talkIdx != null) row.children[pair.talkIdx].classList.add('vowel-talk');
         } },
       { text: `We still write "${silentLetters}", but we never ${multiple ? 'say them' : 'say it'} — like in "${pair.word}"!`,
-        followUpWord: pair.word, onEnter: () => {} },
+        followUpWord: pair.word, onEnter: () => {
+          silentIdxs.forEach(i => row.children[i].classList.remove('story-silent-letter'));
+          if (pair.talkIdx != null) row.children[pair.talkIdx].classList.remove('vowel-talk');
+        } },
     ];
 
     function showBeat() {
@@ -5652,6 +5655,8 @@ function renderSuffixStory(container, lesson, onDone, finalLabel) {
       { text: `Can you read this word?`, onEnter: () => {} },
       { text: `Yes! It's "${item.base}".`, followUpWord: item.base, onEnter: () => {} },
       { text: ruleWatchText(item.rule), onEnter: () => {
+          const twoLetterRules = item.rule === 'double' || item.rule === 'noDouble' || item.rule === 'yToI' || item.rule === 'yStays';
+          if (twoLetterRules && row.children[focusIdx - 1]) row.children[focusIdx - 1].classList.add('vowel-pair-highlight');
           row.children[focusIdx].classList.add('vowel-pair-highlight');
         } },
       { text: item.explanation, followUpWord: item.result, onEnter: () => {
@@ -8731,7 +8736,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 76;
+const APP_VERSION = 77;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
