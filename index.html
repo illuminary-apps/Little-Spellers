@@ -3692,6 +3692,45 @@ const LEVELS = [
 ]
       },
       {
+        id: 'v_never_alone',
+        name: 'V Never Alone',
+        icon: '🛡️',
+        desc: 'have, brave — why every V word ends in a silent E',
+        rule: 'English words never end in a bare V — a silent E always props it up! But that E doesn\'t always make the vowel say its name.',
+        example: 'brave (long A) · have (short A, exception!)',
+        storyType: 'reveal',
+        story: [
+          { word: 'brave', silentIdx: 4, talkIdx: 2, note: 'Because this word ends in V, it needs a silent E — and here, that E ALSO makes the A say its name: "brave"!' },
+          { word: 'have', silentIdx: 3, note: 'This word needs a silent E too, because it ends in V — but this time the A stays short. It says "hav", not "hayv"!' },
+          { word: 'five', silentIdx: 3, talkIdx: 1, note: 'The silent E is here because of the V — and it ALSO makes the I say its name: "five"!' },
+          { word: 'give', silentIdx: 3, note: 'This E is only here because of the V. The I stays short — it says "giv", not "gyve"!' },
+          { word: 'drove', silentIdx: 4, talkIdx: 2, note: 'The silent E is here because of the V — and it ALSO makes the O say its name: "drove"!' },
+          { word: 'love', silentIdx: 3, note: 'This E is only here because of the V. The O stays short — it says "luv", not "lohv"!' },
+        ],
+        exceptions: {
+          intro: 'Have, give and love are the trickiest — they look just like Magic E words, but the vowel stays short!',
+          words: ['have', 'give', 'love', 'live']
+        },
+        families: [
+          { label: 'Long vowel (V-rule + Magic E)', words: ['brave','five','drove','wave','drive','stove','shave','hive'] },
+          { label: 'Short vowel (V-rule only)', words: ['have','give','love','live','glove','shove','above','gave'] },
+        ],
+        quizzes: [
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. brave', options: ['brav','brave','braive','brive'], answer: 'brave' },
+          { q: 'Which word has a SHORT vowel sound, even though it ends in E?', audio: 'Which word has a short vowel sound, even though it ends in E?', options: ['brave','have','five','drove'], answer: 'have' },
+          { q: 'Which word has a LONG vowel sound?', audio: 'Which word has a long vowel sound?', options: ['give','love','brave','live'], answer: 'brave' },
+          { q: 'brave, five, drove — which word belongs with these words?', audio: 'brave, five, drove — which word belongs with these words?', options: ['have','wave','give','love'], answer: 'wave' },
+          { q: 'have, give, love — which word belongs with these words?', audio: 'have, give, love — which word belongs with these words?', options: ['brave','five','live','drove'], answer: 'live' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. have', options: ['hav','have','haive','hive'], answer: 'have' },
+          { q: 'Which word does NOT belong with brave, five, drove?', audio: 'Which word does not belong with brave, five, drove?', options: ['wave','drive','give','stove'], answer: 'give' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. give', options: ['giv','give','gyve','gife'], answer: 'give' },
+          { q: 'Why does "have" end in a silent E?', audio: 'Why does have end in a silent E?', options: ['To make the A say its name','Because words can\'t end in V','It is spelled wrong','No reason at all'], answer: 'Because words can\'t end in V' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. drove', options: ['drov','drove','droave','druve'], answer: 'drove' },
+          { q: 'Which word rhymes with GLOVE?', audio: 'Which word rhymes with glove?', options: ['stove','love','drove','wave'], answer: 'love' },
+          { q: 'Find ALL correctly spelled words in this list.', audio: 'Find all correctly spelled words in this list.', options: ['hav','have','giv','give'], answer: 'have, give' }
+]
+      },
+      {
         id: 'vowel_teams',
         name: 'Vowel Teams',
         icon: '👫',
@@ -4397,45 +4436,6 @@ const LEVELS = [
           { q: 'Find the word you hear.', audio: 'Find the word you hear. visible', options: ['visable','visible','vizible','visibel'], answer: 'visible' },
           { q: 'Which word does NOT end the same way as HORRIBLE?', audio: 'Which word does not end the same way as horrible?', options: ['possible','edible','drinkable','audible'], answer: 'drinkable' },
           { q: 'Find ALL correctly spelled words in this list.', audio: 'Find all correctly spelled words in this list.', options: ['posible','possible','terrable','terrible'], answer: 'possible, terrible' }
-]
-      },
-      {
-        id: 'v_never_alone',
-        name: 'V Never Alone',
-        icon: '🛡️',
-        desc: 'have, brave — why every V word ends in a silent E',
-        rule: 'English words never end in a bare V — a silent E always props it up! But that E doesn\'t always make the vowel say its name.',
-        example: 'brave (long A) · have (short A, exception!)',
-        storyType: 'reveal',
-        story: [
-          { word: 'brave', silentIdx: 4, talkIdx: 2, note: 'Because this word ends in V, it needs a silent E — and here, that E ALSO makes the A say its name: "brave"!' },
-          { word: 'have', silentIdx: 3, note: 'This word needs a silent E too, because it ends in V — but this time the A stays short. It says "hav", not "hayv"!' },
-          { word: 'five', silentIdx: 3, talkIdx: 1, note: 'The silent E is here because of the V — and it ALSO makes the I say its name: "five"!' },
-          { word: 'give', silentIdx: 3, note: 'This E is only here because of the V. The I stays short — it says "giv", not "gyve"!' },
-          { word: 'drove', silentIdx: 4, talkIdx: 2, note: 'The silent E is here because of the V — and it ALSO makes the O say its name: "drove"!' },
-          { word: 'love', silentIdx: 3, note: 'This E is only here because of the V. The O stays short — it says "luv", not "lohv"!' },
-        ],
-        exceptions: {
-          intro: 'Have, give and love are the trickiest — they look just like Magic E words, but the vowel stays short!',
-          words: ['have', 'give', 'love', 'live']
-        },
-        families: [
-          { label: 'Long vowel (V-rule + Magic E)', words: ['brave','five','drove','wave','drive','stove','shave','hive'] },
-          { label: 'Short vowel (V-rule only)', words: ['have','give','love','live','glove','shove','above','gave'] },
-        ],
-        quizzes: [
-          { q: 'Find the word you hear.', audio: 'Find the word you hear. brave', options: ['brav','brave','braive','brive'], answer: 'brave' },
-          { q: 'Which word has a SHORT vowel sound, even though it ends in E?', audio: 'Which word has a short vowel sound, even though it ends in E?', options: ['brave','have','five','drove'], answer: 'have' },
-          { q: 'Which word has a LONG vowel sound?', audio: 'Which word has a long vowel sound?', options: ['give','love','brave','live'], answer: 'brave' },
-          { q: 'brave, five, drove — which word belongs with these words?', audio: 'brave, five, drove — which word belongs with these words?', options: ['have','wave','give','love'], answer: 'wave' },
-          { q: 'have, give, love — which word belongs with these words?', audio: 'have, give, love — which word belongs with these words?', options: ['brave','five','live','drove'], answer: 'live' },
-          { q: 'Find the word you hear.', audio: 'Find the word you hear. have', options: ['hav','have','haive','hive'], answer: 'have' },
-          { q: 'Which word does NOT belong with brave, five, drove?', audio: 'Which word does not belong with brave, five, drove?', options: ['wave','drive','give','stove'], answer: 'give' },
-          { q: 'Find the word you hear.', audio: 'Find the word you hear. give', options: ['giv','give','gyve','gife'], answer: 'give' },
-          { q: 'Why does "have" end in a silent E?', audio: 'Why does have end in a silent E?', options: ['To make the A say its name','Because words can\'t end in V','It is spelled wrong','No reason at all'], answer: 'Because words can\'t end in V' },
-          { q: 'Find the word you hear.', audio: 'Find the word you hear. drove', options: ['drov','drove','droave','druve'], answer: 'drove' },
-          { q: 'Which word rhymes with GLOVE?', audio: 'Which word rhymes with glove?', options: ['stove','love','drove','wave'], answer: 'love' },
-          { q: 'Find ALL correctly spelled words in this list.', audio: 'Find all correctly spelled words in this list.', options: ['hav','have','giv','give'], answer: 'have, give' }
 ]
       },
       {
@@ -8732,7 +8732,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 74;
+const APP_VERSION = 75;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
