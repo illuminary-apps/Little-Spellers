@@ -1014,6 +1014,10 @@ html, body {
   0%, 100% { box-shadow: 0 0 0 rgba(6,214,160,0); transform: scale(1); }
   50%      { box-shadow: 0 0 20px 6px rgba(6,214,160,0.75); transform: scale(1.12); }
 }
+/* ── Syllable Splitting: dot divider between syllable chunks ── */
+.syllable-dot {
+  font-size: 1.6rem; color: var(--teal); opacity: 0.7; align-self: center;
+}
 
 
 .phoneme-display {
@@ -4252,6 +4256,226 @@ const LEVELS = [
 ]
       },
       {
+        id: 'doubling_rule',
+        name: '1·1·1 Doubling',
+        icon: '🎯',
+        desc: 'run → running, jump → jumping — when do we double?',
+        rule: '1 syllable + 1 short vowel + 1 consonant at the end → double it before adding an ending!',
+        example: 'run → running · jump → jumping',
+        storyType: 'suffixrules',
+        story: [
+          { rule: 'double', sectionTitle: 'When the word ends in 1 vowel + 1 consonant...', base: 'run', suffix: 'ing', result: 'running', explanation: 'One syllable, one short vowel, one consonant at the end — we DOUBLE the last letter!' },
+          { rule: 'double', base: 'hop', suffix: 'ing', result: 'hopping', explanation: 'One syllable, one short vowel, one consonant at the end — we DOUBLE the last letter!' },
+          { rule: 'double', base: 'swim', suffix: 'ing', result: 'swimming', explanation: 'One syllable, one short vowel, one consonant at the end — we DOUBLE the last letter!' },
+          { rule: 'double', base: 'sit', suffix: 'ing', result: 'sitting', explanation: 'One syllable, one short vowel, one consonant at the end — we DOUBLE the last letter!' },
+          { rule: 'noDouble', sectionTitle: 'But when the word already ends in 2 consonants...', base: 'jump', suffix: 'ing', result: 'jumping', explanation: 'This word already ends in TWO consonants — we just add the ending, no doubling needed!' },
+          { rule: 'noDouble', base: 'paint', suffix: 'ing', result: 'painting', explanation: 'This word already ends in TWO consonants — we just add the ending, no doubling needed!' },
+          { rule: 'noDouble', base: 'help', suffix: 'ing', result: 'helping', explanation: 'This word already ends in TWO consonants — we just add the ending, no doubling needed!' },
+          { rule: 'noDouble', base: 'rest', suffix: 'ing', result: 'resting', explanation: 'This word already ends in TWO consonants — we just add the ending, no doubling needed!' },
+        ],
+        families: [
+          { label: 'Double the last letter', words: ['running','hopping','swimming','sitting','clapping','stopping','planning','winning'] },
+          { label: 'Just add the ending', words: ['jumping','painting','helping','resting','jumped','painted','helped','rested'] },
+        ],
+        quizzes: [
+          { q: 'Which word rhymes with RUNNING?', audio: 'Which word rhymes with running?', options: ['jumping','stunning','painting','resting'], answer: 'stunning' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. hopping', options: ['hoping','hopping','hopeing','hoppping'], answer: 'hopping' },
+          { q: 'running, hopping, swimming — which word belongs with these words?', audio: 'running, hopping, swimming — which word belongs with these words?', options: ['painting','sitting','resting','helping'], answer: 'sitting' },
+          { q: 'Which word does NOT double its last letter?', audio: 'Which word does not double its last letter?', options: ['running','hopping','jumping','sitting'], answer: 'jumping' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. painting', options: ['panting','painting','paintting','paintng'], answer: 'painting' },
+          { q: 'jumping, painting, helping — which word belongs with these words?', audio: 'jumping, painting, helping — which word belongs with these words?', options: ['swimming','resting','sitting','hopping'], answer: 'resting' },
+          { q: 'Which word SHOULD double its last letter?', audio: 'Which word should double its last letter?', options: ['help', 'rest', 'swim', 'paint'], answer: 'swim' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. sitting', options: ['siting','sitting','sittng','sittting'], answer: 'sitting' },
+          { q: 'Which word does NOT belong with running, hopping, sitting?', audio: 'Which word does not belong with running, hopping, sitting?', options: ['swimming','jumping','planning','winning'], answer: 'jumping' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. resting', options: ['resting','restting','ressting','restng'], answer: 'resting' },
+          { q: 'Which word rhymes with WINNING?', audio: 'Which word rhymes with winning?', options: ['resting','beginning','jumping','helping'], answer: 'beginning' },
+          { q: 'Find ALL correctly spelled words in this list.', audio: 'Find all correctly spelled words in this list.', options: ['swimming','swiming','hopping','hoping'], answer: 'swimming, hopping' }
+]
+      },
+      {
+        id: 'drop_e_rule',
+        name: 'Drop the E',
+        icon: '✂️',
+        desc: 'hope → hoping, hope → hopeful — drop it or keep it?',
+        rule: 'Ending starts with a vowel → drop the silent E! Ending starts with a consonant → keep it!',
+        example: 'hope → hoping · hope → hopeful',
+        storyType: 'suffixrules',
+        story: [
+          { rule: 'dropE', sectionTitle: 'When the ending starts with a vowel...', base: 'hope', suffix: 'ing', result: 'hoping', explanation: 'This word ends in a silent E — we DROP the E before adding an ending that starts with a vowel!' },
+          { rule: 'dropE', base: 'bake', suffix: 'ing', result: 'baking', explanation: 'This word ends in a silent E — we DROP the E before adding an ending that starts with a vowel!' },
+          { rule: 'dropE', base: 'smile', suffix: 'ing', result: 'smiling', explanation: 'This word ends in a silent E — we DROP the E before adding an ending that starts with a vowel!' },
+          { rule: 'dropE', base: 'care', suffix: 'ing', result: 'caring', explanation: 'This word ends in a silent E — we DROP the E before adding an ending that starts with a vowel!' },
+          { rule: 'keepE', sectionTitle: 'But when the ending starts with a consonant...', base: 'hope', suffix: 'ful', result: 'hopeful', explanation: 'This ending starts with a CONSONANT, so the silent E stays right where it is!' },
+          { rule: 'keepE', base: 'care', suffix: 'ful', result: 'careful', explanation: 'This ending starts with a CONSONANT, so the silent E stays right where it is!' },
+          { rule: 'keepE', base: 'safe', suffix: 'ly', result: 'safely', explanation: 'This ending starts with a CONSONANT, so the silent E stays right where it is!' },
+          { rule: 'keepE', base: 'excite', suffix: 'ment', result: 'excitement', explanation: 'This ending starts with a CONSONANT, so the silent E stays right where it is!' },
+        ],
+        families: [
+          { label: 'Drop the E (+ing)', words: ['hoping','baking','smiling','caring','sharing','writing','riding','driving'] },
+          { label: 'Keep the E (+ful/+ly/+ment)', words: ['hopeful','careful','safely','excitement','lovely','likely','basement','purely'] },
+        ],
+        quizzes: [
+          { q: 'Which word rhymes with HOPING?', audio: 'Which word rhymes with hoping?', options: ['hopeful','coping','caring','safely'], answer: 'coping' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. baking', options: ['backing','baking','bakeing','bakking'], answer: 'baking' },
+          { q: 'hoping, baking, smiling — which word belongs with these words?', audio: 'hoping, baking, smiling — which word belongs with these words?', options: ['hopeful','caring','careful','safely'], answer: 'caring' },
+          { q: 'Which word KEEPS its silent E?', audio: 'Which word keeps its silent E?', options: ['hoping','baking','hopeful','smiling'], answer: 'hopeful' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. careful', options: ['carful','careful','careeful','carefull'], answer: 'careful' },
+          { q: 'hopeful, careful, safely — which word belongs with these words?', audio: 'hopeful, careful, safely — which word belongs with these words?', options: ['hoping','baking','excitement','smiling'], answer: 'excitement' },
+          { q: 'Which word DROPS its silent E?', audio: 'Which word drops its silent E?', options: ['hopeful', 'careful', 'baking', 'safely'], answer: 'baking' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. excitement', options: ['excitment','excitement','exciteement','excitemment'], answer: 'excitement' },
+          { q: 'Which word does NOT belong with hoping, baking, smiling?', audio: 'Which word does not belong with hoping, baking, smiling?', options: ['caring','careful','sharing','writing'], answer: 'careful' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. safely', options: ['safly','safely','saefly','safelly'], answer: 'safely' },
+          { q: 'Which word rhymes with CARING?', audio: 'Which word rhymes with caring?', options: ['hopeful','sharing','safely','excitement'], answer: 'sharing' },
+          { q: 'Find ALL correctly spelled words in this list.', audio: 'Find all correctly spelled words in this list.', options: ['hopeing','hoping','careful','carefull'], answer: 'hoping, careful' }
+]
+      },
+      {
+        id: 'y_to_i_rule',
+        name: 'Y → I Rule',
+        icon: '🔄',
+        desc: 'baby → babies, play → plays — change it or keep it?',
+        rule: 'Consonant before Y → change Y to I! Vowel before Y → keep the Y!',
+        example: 'baby → babies · play → plays',
+        storyType: 'suffixrules',
+        story: [
+          { rule: 'yToI', sectionTitle: 'When a consonant comes right before the Y...', base: 'baby', suffix: 'es', result: 'babies', explanation: 'A consonant comes right before the Y, so the Y CHANGES to I!' },
+          { rule: 'yToI', base: 'cry', suffix: 'ed', result: 'cried', explanation: 'A consonant comes right before the Y, so the Y CHANGES to I!' },
+          { rule: 'yToI', base: 'happy', suffix: 'est', result: 'happiest', explanation: 'A consonant comes right before the Y, so the Y CHANGES to I!' },
+          { rule: 'yToI', base: 'carry', suffix: 'ed', result: 'carried', explanation: 'A consonant comes right before the Y, so the Y CHANGES to I!' },
+          { rule: 'yStays', sectionTitle: 'But when a vowel comes right before the Y...', base: 'play', suffix: 's', result: 'plays', explanation: 'A vowel comes right before the Y, so the Y always STAYS THE SAME!' },
+          { rule: 'yStays', base: 'stay', suffix: 'ed', result: 'stayed', explanation: 'A vowel comes right before the Y, so the Y always STAYS THE SAME!' },
+          { rule: 'yStays', base: 'enjoy', suffix: 'ed', result: 'enjoyed', explanation: 'A vowel comes right before the Y, so the Y always STAYS THE SAME!' },
+          { rule: 'yStays', base: 'toy', suffix: 's', result: 'toys', explanation: 'A vowel comes right before the Y, so the Y always STAYS THE SAME!' },
+        ],
+        families: [
+          { label: 'Y changes to I', words: ['babies','cried','happiest','carried','tried','studied','hurried','worried'] },
+          { label: 'Y stays the same', words: ['plays','stayed','enjoyed','toys','boys','days','trays','monkeys'] },
+        ],
+        quizzes: [
+          { q: 'Which word rhymes with CRIED?', audio: 'Which word rhymes with cried?', options: ['played','tried','stayed','toys'], answer: 'tried' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. babies', options: ['babys','babies','baybies','babbies'], answer: 'babies' },
+          { q: 'babies, cried, happiest — which word belongs with these words?', audio: 'babies, cried, happiest — which word belongs with these words?', options: ['plays','stayed','carried','toys'], answer: 'carried' },
+          { q: 'Which word keeps its Y?', audio: 'Which word keeps its Y?', options: ['babies','cried','plays','carried'], answer: 'plays' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. carried', options: ['carryed','carried','carrid','caried'], answer: 'carried' },
+          { q: 'plays, stayed, enjoyed — which word belongs with these words?', audio: 'plays, stayed, enjoyed — which word belongs with these words?', options: ['babies','toys','cried','happiest'], answer: 'toys' },
+          { q: 'Which word changes its Y to I?', audio: 'Which word changes its Y to I?', options: ['stayed', 'enjoyed', 'studied', 'toys'], answer: 'studied' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. stayed', options: ['stayd','stayed','staied','steyed'], answer: 'stayed' },
+          { q: 'Which word does NOT belong with babies, cried, happiest?', audio: 'Which word does not belong with babies, cried, happiest?', options: ['carried','studied','stayed','worried'], answer: 'stayed' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. enjoyed', options: ['enjoied','enjoyed','enjoyd','enjoied'], answer: 'enjoyed' },
+          { q: 'Which word rhymes with TOYS?', audio: 'Which word rhymes with toys?', options: ['babies','boys','cried','stayed'], answer: 'boys' },
+          { q: 'Find ALL correctly spelled words in this list.', audio: 'Find all correctly spelled words in this list.', options: ['babys','babies','playes','plays'], answer: 'babies, plays' }
+]
+      },
+      {
+        id: 'able_ible_rule',
+        name: '-able & -ible',
+        icon: '🧩',
+        desc: 'comfortable, terrible — which ending fits?',
+        rule: 'Drop the ending — a real word left? Use -able! Just a piece left? Use -ible!',
+        example: 'comfort + able = comfortable · terr + ible = terrible',
+        storyType: 'decision',
+        story: [
+          { question: 'Drop the ending — is what\'s left a real word on its own?', hint: 'comfort is a real word', example: 'comfortable', ending: 'able', explanation: 'When dropping the ending leaves a REAL word, we use "-able"!' },
+          { question: 'Drop the ending — is what\'s left a real word on its own?', hint: 'wash is a real word', example: 'washable', ending: 'able', explanation: '"Wash" is a real word all by itself, so we use "-able"!' },
+          { question: 'Drop the ending — is what\'s left just a piece, not a real word?', hint: 'terr is not a word', example: 'terrible', ending: 'ible', explanation: '"Terr" isn\'t a real word on its own, so we use "-ible"!' },
+          { question: 'Drop the ending — is what\'s left just a piece, not a real word?', hint: 'horr is not a word', example: 'horrible', ending: 'ible', explanation: '"Horr" isn\'t a real word on its own, so we use "-ible"!' },
+        ],
+        families: [
+          { label: '-able words (real word left)', words: ['comfortable','washable','enjoyable','teachable','readable','breakable','drinkable','laughable'] },
+          { label: '-ible words (piece left)', words: ['terrible','horrible','possible','visible','flexible','sensible','edible','audible'] },
+        ],
+        quizzes: [
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. comfortable', options: ['comfirtable','comfortible','comfortable','comfertable'], answer: 'comfortable' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. terrible', options: ['terrable','terrible','terribel','terreble'], answer: 'terrible' },
+          { q: 'comfortable, washable, enjoyable — which word belongs with these words?', audio: 'comfortable, washable, enjoyable — which word belongs with these words?', options: ['terrible','teachable','possible','visible'], answer: 'teachable' },
+          { q: 'terrible, horrible, possible — which word belongs with these words?', audio: 'terrible, horrible, possible — which word belongs with these words?', options: ['washable','visible','enjoyable','readable'], answer: 'visible' },
+          { q: 'Which word ends in -ABLE?', audio: 'Which word ends in able?', options: ['terrible','possible','readable','visible'], answer: 'readable' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. possible', options: ['possable','possible','posseble','posible'], answer: 'possible' },
+          { q: 'Which word ends in -IBLE?', audio: 'Which word ends in ible?', options: ['washable','flexible','teachable','breakable'], answer: 'flexible' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. enjoyable', options: ['enjoyible','enjoyable','enjoiable','enjoyabel'], answer: 'enjoyable' },
+          { q: 'Which word does NOT belong with comfortable, washable, teachable?', audio: 'Which word does not belong with comfortable, washable, teachable?', options: ['readable','sensible','breakable','drinkable'], answer: 'sensible' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. visible', options: ['visable','visible','vizible','visibel'], answer: 'visible' },
+          { q: 'Which word does NOT end the same way as HORRIBLE?', audio: 'Which word does not end the same way as horrible?', options: ['possible','edible','drinkable','audible'], answer: 'drinkable' },
+          { q: 'Find ALL correctly spelled words in this list.', audio: 'Find all correctly spelled words in this list.', options: ['posible','possible','terrable','terrible'], answer: 'possible, terrible' }
+]
+      },
+      {
+        id: 'v_never_alone',
+        name: 'V Never Alone',
+        icon: '🛡️',
+        desc: 'have, brave — why every V word ends in a silent E',
+        rule: 'English words never end in a bare V — a silent E always props it up! But that E doesn\'t always make the vowel say its name.',
+        example: 'brave (long A) · have (short A, exception!)',
+        storyType: 'reveal',
+        story: [
+          { word: 'brave', silentIdx: 4, talkIdx: 2, note: 'Because this word ends in V, it needs a silent E — and here, that E ALSO makes the A say its name: "brave"!' },
+          { word: 'have', silentIdx: 3, note: 'This word needs a silent E too, because it ends in V — but this time the A stays short. It says "hav", not "hayv"!' },
+          { word: 'five', silentIdx: 3, talkIdx: 1, note: 'The silent E is here because of the V — and it ALSO makes the I say its name: "five"!' },
+          { word: 'give', silentIdx: 3, note: 'This E is only here because of the V. The I stays short — it says "giv", not "gyve"!' },
+          { word: 'drove', silentIdx: 4, talkIdx: 2, note: 'The silent E is here because of the V — and it ALSO makes the O say its name: "drove"!' },
+          { word: 'love', silentIdx: 3, note: 'This E is only here because of the V. The O stays short — it says "luv", not "lohv"!' },
+        ],
+        exceptions: {
+          intro: 'Have, give and love are the trickiest — they look just like Magic E words, but the vowel stays short!',
+          words: ['have', 'give', 'love', 'live']
+        },
+        families: [
+          { label: 'Long vowel (V-rule + Magic E)', words: ['brave','five','drove','wave','drive','stove','shave','hive'] },
+          { label: 'Short vowel (V-rule only)', words: ['have','give','love','live','glove','shove','above','gave'] },
+        ],
+        quizzes: [
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. brave', options: ['brav','brave','braive','brive'], answer: 'brave' },
+          { q: 'Which word has a SHORT vowel sound, even though it ends in E?', audio: 'Which word has a short vowel sound, even though it ends in E?', options: ['brave','have','five','drove'], answer: 'have' },
+          { q: 'Which word has a LONG vowel sound?', audio: 'Which word has a long vowel sound?', options: ['give','love','brave','live'], answer: 'brave' },
+          { q: 'brave, five, drove — which word belongs with these words?', audio: 'brave, five, drove — which word belongs with these words?', options: ['have','wave','give','love'], answer: 'wave' },
+          { q: 'have, give, love — which word belongs with these words?', audio: 'have, give, love — which word belongs with these words?', options: ['brave','five','live','drove'], answer: 'live' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. have', options: ['hav','have','haive','hive'], answer: 'have' },
+          { q: 'Which word does NOT belong with brave, five, drove?', audio: 'Which word does not belong with brave, five, drove?', options: ['wave','drive','give','stove'], answer: 'give' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. give', options: ['giv','give','gyve','gife'], answer: 'give' },
+          { q: 'Why does "have" end in a silent E?', audio: 'Why does have end in a silent E?', options: ['To make the A say its name','Because words can\'t end in V','It is spelled wrong','No reason at all'], answer: 'Because words can\'t end in V' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. drove', options: ['drov','drove','droave','druve'], answer: 'drove' },
+          { q: 'Which word rhymes with GLOVE?', audio: 'Which word rhymes with glove?', options: ['stove','love','drove','wave'], answer: 'love' },
+          { q: 'Find ALL correctly spelled words in this list.', audio: 'Find all correctly spelled words in this list.', options: ['hav','have','giv','give'], answer: 'have, give' }
+]
+      },
+      {
+        id: 'syllable_splitting',
+        name: 'Syllable Splitting',
+        icon: '🪓',
+        desc: 'im·por·tant — break big words into chunks!',
+        rule: 'Every syllable has one vowel sound. Clap the chunks to read any big word!',
+        example: 'im · por · tant',
+        storyType: 'syllable',
+        story: [
+          { word: 'basket', syllables: ['bas', 'ket'] },
+          { word: 'rabbit', syllables: ['rab', 'bit'] },
+          { word: 'window', syllables: ['win', 'dow'] },
+          { word: 'sunshine', syllables: ['sun', 'shine'] },
+          { word: 'umbrella', syllables: ['um', 'brel', 'la'] },
+          { word: 'important', syllables: ['im', 'por', 'tant'] },
+          { word: 'dinosaur', syllables: ['di', 'no', 'saur'] },
+          { word: 'elephant', syllables: ['el', 'e', 'phant'] },
+        ],
+        families: [
+          { label: '2-chunk words', words: ['basket','rabbit','window','sunshine','napkin','picnic','magnet','sunset'] },
+          { label: '3-chunk words', words: ['umbrella','important','dinosaur','elephant','butterfly','octopus','alligator','computer'] },
+        ],
+        quizzes: [
+          { q: 'How many chunks does BASKET have?', audio: 'How many chunks does basket have?', options: ['1','2','3','4'], answer: '2' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. rabbit', options: ['rabit','rabbit','rabbitt','rabbet'], answer: 'rabbit' },
+          { q: 'How many chunks does ELEPHANT have?', audio: 'How many chunks does elephant have?', options: ['2','3','4','1'], answer: '3' },
+          { q: 'basket, rabbit, window — which word belongs with these words?', audio: 'basket, rabbit, window — which word belongs with these words?', options: ['elephant','sunshine','umbrella','dinosaur'], answer: 'sunshine' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. umbrella', options: ['umbrela','umbrellaa','umbrella','umbrelah'], answer: 'umbrella' },
+          { q: 'umbrella, important, dinosaur — which word belongs with these words?', audio: 'umbrella, important, dinosaur — which word belongs with these words?', options: ['window','basket','elephant','sunshine'], answer: 'elephant' },
+          { q: 'Which word has 2 chunks: SUN·SHINE?', audio: 'Which word has two chunks, sun shine?', options: ['sunshine','elephant','umbrella','dinosaur'], answer: 'sunshine' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. important', options: ['importent','important','importint','improtant'], answer: 'important' },
+          { q: 'Which word does NOT belong with umbrella, important, dinosaur?', audio: 'Which word does not belong with umbrella, important, dinosaur?', options: ['elephant','window','butterfly','alligator'], answer: 'window' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. dinosaur', options: ['dinosor','dinosaur','dinosaurr','dinosuar'], answer: 'dinosaur' },
+          { q: 'How many chunks does WINDOW have?', audio: 'How many chunks does window have?', options: ['1','2','3','4'], answer: '2' },
+          { q: 'Find ALL correctly spelled words in this list.', audio: 'Find all correctly spelled words in this list.', options: ['rabbit','rabit','basket','baskit'], answer: 'rabbit, basket' }
+]
+      },
+      {
         id: 'sight_words_mastery',
         name: '⭐ Sight Words',
         icon: '⭐',
@@ -5200,7 +5424,7 @@ function renderRevealStory(container, lesson, onDone, finalLabel) {
 
     const label = document.createElement('div');
     label.className = 'story-intro-label';
-    label.textContent = isBossy ? 'The Bossy R Story' : 'The Silent Letter Story';
+    label.textContent = isBossy ? 'The Bossy R Story' : `The ${lesson.name} Story`;
     scene.appendChild(label);
 
     const row = document.createElement('div');
@@ -5280,8 +5504,8 @@ function renderRevealStory(container, lesson, onDone, finalLabel) {
         setTimeout(() => {
           if (pairIdx < pairs.length) startPair();
           else {
-            const titleText = isBossy ? 'The Bossy R Story' : 'The Silent Letter Story';
-            const secretText = isBossy ? 'Now you know the bossy R secret!' : 'Now you know the silent letter secret!';
+            const titleText = isBossy ? 'The Bossy R Story' : `${lesson.name}!`;
+            const secretText = isBossy ? 'Now you know the bossy R secret!' : `Now you know how ${lesson.name} works!`;
             finishStory(scene, lesson, titleText, secretText, onDone, finalLabel);
           }
         }, 700);
@@ -5309,7 +5533,7 @@ function renderDecisionStory(container, lesson, onDone, finalLabel) {
 
     const label = document.createElement('div');
     label.className = 'story-intro-label';
-    label.textContent = 'The Shun Sound Story';
+    label.textContent = `The ${lesson.name} Story`;
     scene.appendChild(label);
 
     const row = document.createElement('div');
@@ -5370,7 +5594,7 @@ function renderDecisionStory(container, lesson, onDone, finalLabel) {
         nodeIdx++;
         setTimeout(() => {
           if (nodeIdx < nodes.length) startNode();
-          else finishStory(scene, lesson, 'The Shun Sound Story', 'Now you know how to spell the shun sound!', onDone, finalLabel);
+          else finishStory(scene, lesson, `${lesson.name}!`, `Now you know how ${lesson.name} works!`, onDone, finalLabel);
         }, 700);
       }
     }
@@ -5386,6 +5610,8 @@ function ruleWatchText(rule) {
   if (rule === 'dropE')  return 'Watch closely — this word ends in a silent E!';
   if (rule === 'yToI')   return 'Watch closely — a consonant comes right before the Y!';
   if (rule === 'yStays') return 'Watch closely — a vowel comes right before the Y!';
+  if (rule === 'noDouble') return 'Watch closely — this word already ends in TWO consonants!';
+  if (rule === 'keepE') return 'Watch closely — this ending starts with a CONSONANT!';
   return 'Watch closely!';
 }
 
@@ -5406,7 +5632,7 @@ function renderSuffixStory(container, lesson, onDone, finalLabel) {
 
     const label = document.createElement('div');
     label.className = 'story-intro-label';
-    label.textContent = 'The Suffix Rules Story';
+    label.textContent = `The ${lesson.name} Story`;
     scene.appendChild(label);
 
     const row = document.createElement('div');
@@ -5481,7 +5707,7 @@ function renderSuffixStory(container, lesson, onDone, finalLabel) {
         itemIdx++;
         setTimeout(() => {
           if (itemIdx < items.length) startItem();
-          else finishStory(scene, lesson, 'The Suffix Rules Story', 'Now you know all the suffix rules!', onDone, finalLabel);
+          else finishStory(scene, lesson, `${lesson.name}!`, `Now you know how ${lesson.name} works!`, onDone, finalLabel);
         }, 700);
       }
     }
@@ -6166,6 +6392,109 @@ function renderWordPartStory(container, lesson, onDone, finalLabel) {
   else finishStory(scene, lesson, `${lesson.name}!`, `Now you know how ${lesson.name} work!`, onDone, finalLabel);
 }
 
+// Syllable Splitting: show the whole word, then break it into syllable chunks
+// separated by a small dot, narrating each chunk before blending back together.
+// lesson.story = [{ word, syllables: ['im','por','tant'] }, ...]
+function renderSyllableStory(container, lesson, onDone, finalLabel) {
+  const items = lesson.story || [];
+
+  const scene = document.createElement('div');
+  scene.className = 'story-scene';
+  container.appendChild(scene);
+  const label = document.createElement('div');
+  label.className = 'story-intro-label';
+  scene.appendChild(label);
+  const row = document.createElement('div');
+  row.className = 'story-word-row';
+  scene.appendChild(row);
+  const caption = document.createElement('div');
+  caption.className = 'story-caption';
+  scene.appendChild(caption);
+
+  function tile(text, cls) {
+    const t = document.createElement('div');
+    t.className = 'story-tile' + (text.length > 1 ? ' wide' : '') + (cls ? ' ' + cls : '');
+    t.textContent = text;
+    return t;
+  }
+  function dot() {
+    const d = document.createElement('div');
+    d.className = 'syllable-dot';
+    d.textContent = '·';
+    return d;
+  }
+  function showWhole(word, pulse) {
+    row.innerHTML = '';
+    row.appendChild(tile(word, 'wide chunk-block' + (pulse ? ' chunk-pulse' : '')));
+  }
+  function showChunks(syllables, activeIdx) {
+    row.innerHTML = '';
+    syllables.forEach((syl, i) => {
+      if (i > 0) row.appendChild(dot());
+      row.appendChild(tile(syl, 'wide chunk-block' + (i === activeIdx ? ' chunk-pulse' : '')));
+    });
+  }
+
+  const beats = [];
+  beats.push({
+    heading: 'Get Ready!',
+    caption: "Let's break a big word into chunks!",
+    say: "Let's break a big word into chunks!",
+    onEnter: () => { row.innerHTML = ''; row.appendChild(tile('✨')); }
+  });
+
+  items.forEach((it, ii) => {
+    const syls = it.syllables;
+    beats.push({
+      heading: ii === 0 ? 'A Big Word' : 'Try Another',
+      caption: `Can you read this big word?`,
+      say: `Can you read this big word?`,
+      onEnter: () => showWhole(it.word)
+    });
+    beats.push({
+      caption: `Yes! It's "${it.word}".`,
+      say: it.word,
+      onEnter: () => showWhole(it.word)
+    });
+    beats.push({
+      caption: `Big words break into smaller chunks called syllables!`,
+      say: `Big words break into smaller chunks called syllables!`,
+      onEnter: () => showChunks(syls, -1)
+    });
+    syls.forEach((syl, si) => {
+      beats.push({
+        caption: `Chunk ${si + 1}: "${syl}"`,
+        say: syl,
+        onEnter: () => showChunks(syls, si)
+      });
+    });
+    beats.push({
+      caption: `Put the chunks together: ${syls.join('·')} — "${it.word}"!`,
+      say: it.word,
+      onEnter: () => showWhole(it.word, true)
+    });
+  });
+
+  let beatIdx = 0;
+  function showBeat() {
+    if (!sceneAlive(scene)) return;
+    const beat = beats[beatIdx];
+    if (beat.heading) label.textContent = beat.heading;
+    caption.textContent = beat.caption;
+    beat.onEnter();
+    const goNext = () => setTimeout(advance, 1300);
+    const utt = beat.say ? speak(beat.say, null, 0.82) : null;
+    if (utt) utt.onend = goNext; else setTimeout(goNext, 1800);
+  }
+  function advance() {
+    beatIdx++;
+    if (beatIdx < beats.length) showBeat();
+    else finishStory(scene, lesson, `${lesson.name}!`, `Now you know how to split ${lesson.name.toLowerCase()}!`, onDone, finalLabel);
+  }
+  if (beats.length) showBeat();
+  else finishStory(scene, lesson, `${lesson.name}!`, `Now you know how to split ${lesson.name.toLowerCase()}!`, onDone, finalLabel);
+}
+
 // Several different spellings that all sound the same, each with its own meaning.
 function renderHomophoneStory(container, lesson, onDone, finalLabel) {
   const groups = lesson.storyGroups || [];
@@ -6277,6 +6606,7 @@ function getStoryRenderer(lesson) {
   if (lesson.storyType === 'soundchoice') return renderSoundChoiceStory;
   if (lesson.storyType === 'sightword') return renderSightWordStory;
   if (lesson.storyType === 'wordpart') return renderWordPartStory;
+  if (lesson.storyType === 'syllable') return renderSyllableStory;
   if (lesson.storyType === 'homophone') return renderHomophoneStory;
   return renderSpellingStory;
 }
@@ -8402,7 +8732,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 73;
+const APP_VERSION = 74;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
