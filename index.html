@@ -4044,22 +4044,22 @@ const LEVELS = [
         id: 'suffixes',
         name: 'Suffixes',
         icon: '🏗️',
-        desc: '-ing, -ed, -er, -ful, -less, -ly · running, helpful',
-        rule: 'A suffix changes the word — but sometimes the base word changes too!',
-        example: 'hop → hopping · hope → hoping · cry → cried',
+        desc: '-ing, -ed, -ful, -less, -ly · running, helpful',
+        rule: 'A suffix is added to the end of a word to change what it means!',
+        example: 'jump → jumping · help → helpful · care → careless',
         storyType: 'suffixrules',
         story: [
-          { rule: 'double', sectionTitle: 'Rule 1: Double the Last Letter!', base: 'hop', suffix: 'ing', result: 'hopping', explanation: 'Short word, one vowel, one consonant — we DOUBLE the last letter before adding the ending!' },
-          { rule: 'double', base: 'run', suffix: 'ing', result: 'running', explanation: 'Short word, one vowel, one consonant — we DOUBLE the last letter before adding the ending!' },
-          { rule: 'dropE', sectionTitle: 'Rule 2: Drop the Silent E!', base: 'hope', suffix: 'ing', result: 'hoping', explanation: 'This word ends in a silent E — we DROP the E before adding an ending that starts with a vowel!' },
-          { rule: 'dropE', base: 'bake', suffix: 'ing', result: 'baking', explanation: 'This word ends in a silent E — we DROP the E before adding an ending that starts with a vowel!' },
-          { rule: 'yToI', sectionTitle: 'Rule 3: Y or I?', base: 'cry', suffix: 'ed', result: 'cried', explanation: 'A consonant comes right before the Y, so the Y CHANGES to I!' },
-          { rule: 'yStays', base: 'play', suffix: 'ing', result: 'playing', explanation: 'A vowel comes right before the Y, so the Y always STAYS THE SAME!' },
+          { rule: 'addEnding', sectionTitle: 'What does -ING mean?', base: 'jump', suffix: 'ing', result: 'jumping', explanation: '"-ing" means it is happening right now!' },
+          { rule: 'addEnding', base: 'read', suffix: 'ing', result: 'reading', explanation: '"-ing" means it is happening right now!' },
+          { rule: 'addEnding', sectionTitle: 'What does -ED mean?', base: 'walk', suffix: 'ed', result: 'walked', explanation: '"-ed" means it already happened!' },
+          { rule: 'addEnding', base: 'help', suffix: 'ed', result: 'helped', explanation: '"-ed" means it already happened!' },
+          { rule: 'addEnding', sectionTitle: 'What does -FUL mean?', base: 'help', suffix: 'ful', result: 'helpful', explanation: '"-ful" means FULL of something — full of help!' },
+          { rule: 'addEnding', base: 'care', suffix: 'ful', result: 'careful', explanation: '"-ful" means FULL of something — full of care!' },
+          { rule: 'addEnding', sectionTitle: 'What does -LESS mean?', base: 'care', suffix: 'less', result: 'careless', explanation: '"-less" means WITHOUT something — the opposite of "-ful"!' },
+          { rule: 'addEnding', base: 'help', suffix: 'less', result: 'helpless', explanation: '"-less" means WITHOUT something!' },
+          { rule: 'addEnding', sectionTitle: 'What does -LY mean?', base: 'quick', suffix: 'ly', result: 'quickly', explanation: '"-ly" tells us HOW something is done!' },
+          { rule: 'addEnding', base: 'slow', suffix: 'ly', result: 'slowly', explanation: '"-ly" tells us HOW something is done!' },
         ],
-        exceptions: {
-          intro: 'A few words keep their silent E even before an ending like this, to protect a soft C or G sound!',
-          words: ['manageable', 'noticeable', 'courageous']
-        },
         families: [
           { label: '-ing words', words: ['running','jumping','clapping','swimming','reading','singing','flying','baking','diving','smiling'] },
           { label: '-ed words',  words: ['jumped','played','smiled','clapped','hopped','baked','danced','wished','stopped','walked'] },
@@ -4306,13 +4306,14 @@ const LEVELS = [
           { rule: 'double', base: 'hop', suffix: 'ing', result: 'hopping', explanation: 'One syllable, one short vowel, one consonant at the end — we DOUBLE the last letter!' },
           { rule: 'double', base: 'swim', suffix: 'ing', result: 'swimming', explanation: 'One syllable, one short vowel, one consonant at the end — we DOUBLE the last letter!' },
           { rule: 'double', base: 'sit', suffix: 'ing', result: 'sitting', explanation: 'One syllable, one short vowel, one consonant at the end — we DOUBLE the last letter!' },
+          { rule: 'double', sectionTitle: 'It\'s not just -ing — the same thing happens with -ed!', base: 'stop', suffix: 'ed', result: 'stopped', explanation: 'One syllable, one short vowel, one consonant at the end — we DOUBLE the last letter, even with -ed!' },
           { rule: 'noDouble', sectionTitle: 'But when the word already ends in 2 consonants...', base: 'jump', suffix: 'ing', result: 'jumping', explanation: 'This word already ends in TWO consonants — we just add the ending, no doubling needed!' },
           { rule: 'noDouble', base: 'paint', suffix: 'ing', result: 'painting', explanation: 'This word already ends in TWO consonants — we just add the ending, no doubling needed!' },
           { rule: 'noDouble', base: 'help', suffix: 'ing', result: 'helping', explanation: 'This word already ends in TWO consonants — we just add the ending, no doubling needed!' },
           { rule: 'noDouble', base: 'rest', suffix: 'ing', result: 'resting', explanation: 'This word already ends in TWO consonants — we just add the ending, no doubling needed!' },
         ],
         families: [
-          { label: 'Double the last letter', words: ['running','hopping','swimming','sitting','clapping','stopping','planning','winning'] },
+          { label: 'Double the last letter', words: ['running','hopping','swimming','sitting','clapping','stopping','planning','winning','stopped','grabbed'] },
           { label: 'Just add the ending', words: ['jumping','painting','helping','resting','jumped','painted','helped','rested'] },
         ],
         quizzes: [
@@ -4348,9 +4349,14 @@ const LEVELS = [
           { rule: 'keepE', base: 'safe', suffix: 'ly', result: 'safely', explanation: 'This ending starts with a CONSONANT, so the silent E stays right where it is!' },
           { rule: 'keepE', base: 'excite', suffix: 'ment', result: 'excitement', explanation: 'This ending starts with a CONSONANT, so the silent E stays right where it is!' },
         ],
+        exceptions: {
+          intro: 'A few words break the "drop the E before a vowel" rule on purpose — to protect a soft C or G sound!',
+          words: ['manageable', 'noticeable', 'courageous']
+        },
         families: [
           { label: 'Drop the E (+ing)', words: ['hoping','baking','smiling','caring','sharing','writing','riding','driving'] },
           { label: 'Keep the E (+ful/+ly/+ment)', words: ['hopeful','careful','safely','excitement','lovely','likely','basement','purely'] },
+          { label: 'Keep the E to protect soft C/G', words: ['manageable','noticeable','courageous','changeable','peaceable'] },
         ],
         quizzes: [
           { q: 'Which word rhymes with HOPING?', audio: 'Which word rhymes with hoping?', options: ['hopeful','coping','caring','safely'], answer: 'coping' },
@@ -5614,6 +5620,7 @@ function ruleWatchText(rule) {
   if (rule === 'yStays') return 'Watch closely — a vowel comes right before the Y!';
   if (rule === 'noDouble') return 'Watch closely — this word already ends in TWO consonants!';
   if (rule === 'keepE') return 'Watch closely — this ending starts with a CONSONANT!';
+  if (rule === 'addEnding') return 'Watch closely — a suffix is coming!';
   return 'Watch closely!';
 }
 
@@ -8736,7 +8743,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 77;
+const APP_VERSION = 78;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
