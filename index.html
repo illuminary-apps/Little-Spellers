@@ -3663,10 +3663,6 @@ const LEVELS = [
           { base: 'hop', long: 'hope' },
           { base: 'cub', long: 'cube' }
         ],
-        exceptions: {
-          intro: "But watch out! A few words look like Magic E, but they break the rule — you just have to remember them!",
-          words: ['have', 'give', 'love', 'come']
-        },
         families: [
           { label: 'a_e words', words: ['cake','name','cave','lane','fame','wave','brave','flame','grade','shape'] },
           { label: 'i_e words', words: ['kite','mine','pine','vine','bike','ride','smile','pride','shine','bride'] },
@@ -3692,41 +3688,44 @@ const LEVELS = [
 ]
       },
       {
-        id: 'v_never_alone',
-        name: 'V Never Alone',
+        id: 'silent_e',
+        name: 'Silent E',
         icon: '🛡️',
-        desc: 'have, brave — why every V word ends in a silent E',
-        rule: 'English words never end in a bare V — a silent E always props it up! But that E doesn\'t always make the vowel say its name.',
-        example: 'brave (long A) · have (short A, exception!)',
+        desc: 'have, true — silent E\'s that are NOT magic',
+        rule: 'Some words end in a silent E for a totally different reason — not to make the vowel say its name! English words aren\'t allowed to end in a bare V or U, so a silent E is added just to finish the word off. Most of the time, the vowel stays its normal short sound.',
+        example: 'have (short A, not magic!) · true (U needs it too!)',
         storyType: 'reveal',
         story: [
-          { word: 'brave', silentIdx: 4, talkIdx: 2, note: 'Because this word ends in V, it needs a silent E — and here, that E ALSO makes the A say its name: "brave"!' },
-          { word: 'have', silentIdx: 3, note: 'This word needs a silent E too, because it ends in V — but this time the A stays short. It says "hav", not "hayv"!' },
-          { word: 'five', silentIdx: 3, talkIdx: 1, note: 'The silent E is here because of the V — and it ALSO makes the I say its name: "five"!' },
-          { word: 'give', silentIdx: 3, note: 'This E is only here because of the V. The I stays short — it says "giv", not "gyve"!' },
-          { word: 'drove', silentIdx: 4, talkIdx: 2, note: 'The silent E is here because of the V — and it ALSO makes the O say its name: "drove"!' },
-          { word: 'love', silentIdx: 3, note: 'This E is only here because of the V. The O stays short — it says "luv", not "lohv"!' },
+          { word: 'have', silentIdx: 3, note: 'This word ends in V — and English words can\'t end in a bare V! The silent E is just there to finish it off. The A stays short: "hav", not "hayv".' },
+          { word: 'give', silentIdx: 3, note: 'Same reason here — it ends in V, so it needs the silent E. The I stays short too: "giv", not "gyve".' },
+          { word: 'love', silentIdx: 3, note: 'Ends in V again! The silent E is just a placeholder — the O stays short: "luv", not "lohv".' },
+          { word: 'solve', silentIdx: 4, note: 'Another V word. The silent E props it up, but the O still says its short sound.' },
+          { word: 'true', silentIdx: 3, note: 'English words can\'t end in a bare U either! This silent E is just there to finish the word — it doesn\'t change the sound at all.' },
+          { word: 'blue', silentIdx: 3, note: 'Same story — this word ends in U, so it needs a silent E to look "finished." No magic happening here!' },
         ],
         exceptions: {
-          intro: 'Have, give and love are the trickiest — they look just like Magic E words, but the vowel stays short!',
-          words: ['have', 'give', 'love', 'live']
+          intro: 'Careful — these words LOOK like Magic E words, but the silent E isn\'t making the vowel say its name!',
+          words: ['have', 'give', 'love', 'live', 'true', 'blue']
         },
         families: [
-          { label: 'Long vowel (V-rule + Magic E)', words: ['brave','five','drove','wave','drive','stove','shave','hive'] },
-          { label: 'Short vowel (V-rule only)', words: ['have','give','love','live','glove','shove','above','gave'] },
+          { label: 'Ends in V (vowel stays short)', words: ['have','give','love','live','glove','shove','dove','solve'] },
+          { label: 'Ends in U (sound stays the same)', words: ['true','blue','clue','glue','due'] },
+          { label: 'Compare: real Magic E (V + long vowel)', words: ['brave','five','drove','wave','drive','stove','shave','hive'] },
         ],
         quizzes: [
-          { q: 'Find the word you hear.', audio: 'Find the word you hear. brave', options: ['brav','brave','braive','brive'], answer: 'brave' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. have', options: ['hav','have','haive','hive'], answer: 'have' },
           { q: 'Which word has a SHORT vowel sound, even though it ends in E?', audio: 'Which word has a short vowel sound, even though it ends in E?', options: ['brave','have','five','drove'], answer: 'have' },
           { q: 'Which word has a LONG vowel sound?', audio: 'Which word has a long vowel sound?', options: ['give','love','brave','live'], answer: 'brave' },
-          { q: 'brave, five, drove — which word belongs with these words?', audio: 'brave, five, drove — which word belongs with these words?', options: ['have','wave','give','love'], answer: 'wave' },
-          { q: 'have, give, love — which word belongs with these words?', audio: 'have, give, love — which word belongs with these words?', options: ['brave','five','live','drove'], answer: 'live' },
-          { q: 'Find the word you hear.', audio: 'Find the word you hear. have', options: ['hav','have','haive','hive'], answer: 'have' },
-          { q: 'Which word does NOT belong with brave, five, drove?', audio: 'Which word does not belong with brave, five, drove?', options: ['wave','drive','give','stove'], answer: 'give' },
-          { q: 'Find the word you hear.', audio: 'Find the word you hear. give', options: ['giv','give','gyve','gife'], answer: 'give' },
           { q: 'Why does "have" end in a silent E?', audio: 'Why does have end in a silent E?', options: ['To make the A say its name','Because words can\'t end in V','It is spelled wrong','No reason at all'], answer: 'Because words can\'t end in V' },
-          { q: 'Find the word you hear.', audio: 'Find the word you hear. drove', options: ['drov','drove','droave','druve'], answer: 'drove' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. give', options: ['giv','give','gyve','gife'], answer: 'give' },
+          { q: 'Which word does NOT belong with brave, five, drove?', audio: 'Which word does not belong with brave, five, drove?', options: ['wave','drive','give','stove'], answer: 'give' },
           { q: 'Which word rhymes with GLOVE?', audio: 'Which word rhymes with glove?', options: ['stove','love','drove','wave'], answer: 'love' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. true', options: ['tru','true','troo','trough'], answer: 'true' },
+          { q: 'Why does "true" end in a silent E?', audio: 'Why does true end in a silent E?', options: ['To make a new sound','Because words can\'t end in U','It is spelled wrong','To rhyme with cute'], answer: 'Because words can\'t end in U' },
+          { q: 'true, blue, clue — which word belongs with these words?', audio: 'true, blue, clue — which word belongs with these words?', options: ['have','glue','give','love'], answer: 'glue' },
+          { q: 'Find the word you hear.', audio: 'Find the word you hear. blue', options: ['blu','blue','bloo','bluw'], answer: 'blue' },
+          { q: 'have, give, love — which word belongs with these words?', audio: 'have, give, love — which word belongs with these words?', options: ['brave','five','live','drove'], answer: 'live' },
+          { q: 'Which word rhymes with DUE?', audio: 'Which word rhymes with due?', options: ['do','dune','dove','day'], answer: 'do' },
           { q: 'Find ALL correctly spelled words in this list.', audio: 'Find all correctly spelled words in this list.', options: ['hav','have','giv','give'], answer: 'have, give' }
 ]
       },
@@ -8732,7 +8731,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 75;
+const APP_VERSION = 76;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
