@@ -727,7 +727,7 @@ html, body {
   font-family: var(--ff-head); font-size: 1.1rem; letter-spacing: 0.02em;
   color: var(--teal2); text-align: center;
 }
-.story-word-row { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; row-gap: 10px; max-width: 100%; }
+.story-word-row { display: flex; gap: 6px; justify-content: center; flex-wrap: nowrap; max-width: 100%; }
 .story-tile {
   width: 46px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
   background: var(--navy2); border: 2px solid var(--star-dim);
@@ -4632,6 +4632,69 @@ function sceneAlive(el) {
   const sc = el.closest('.screen');
   return !sc || sc.classList.contains('active');
 }
+/* ── Shrink-to-fit for story letter/word tiles ──
+   Long words (painting, manageable, comfortable...) must never spill off
+   the screen. Rather than wrapping to a second row, shrink the tiles down
+   until the whole word fits on one line — only as small as needed. Applied
+   automatically to every .story-word-row via the MutationObserver below,
+   so no render*Story function needs to call this itself. */
+function fitStoryRow(row) {
+  if (!row || !row.isConnected) return;
+  const tiles = Array.from(row.children).filter(c => c.classList && c.classList.contains('story-tile'));
+  if (!tiles.length) return;
+  const isWide = tiles[0].classList.contains('wide');
+  tiles.forEach(t => { t.style.width = ''; t.style.height = ''; t.style.fontSize = ''; t.style.padding = ''; t.style.minWidth = ''; t.style.flexShrink = ''; });
+  row.style.gap = '';
+  const containerEl = row.closest('.story-scene') || row.parentElement;
+  const available = Math.max(200, (containerEl ? containerEl.clientWidth : 340) - 8);
+  if (row.scrollWidth <= available) return;
+
+  if (!isWide) {
+    const n = tiles.length;
+    const gap = 4;
+    row.style.gap = gap + 'px';
+    let tileW = Math.floor((available - gap * (n - 1)) / n);
+    tileW = Math.max(20, Math.min(46, tileW));
+    const scale = tileW / 46;
+    tiles.forEach(t => {
+      t.style.width = tileW + 'px';
+      t.style.height = Math.round(52 * scale) + 'px';
+      t.style.fontSize = Math.max(0.6, 1.5 * scale).toFixed(2) + 'rem';
+      t.style.flexShrink = '0';
+    });
+  } else {
+    row.style.gap = '4px';
+    // flex-shrink:0 stops the flex layout from compressing a tile's box
+    // narrower than its own text — without this, the browser can shrink
+    // the box below its content width and the word spills into its
+    // neighbour instead of actually getting smaller.
+    tiles.forEach(t => { t.style.flexShrink = '0'; });
+    let scale = 1;
+    while (scale > 0.5 && row.scrollWidth > available) {
+      scale -= 0.05;
+      tiles.forEach(t => {
+        t.style.fontSize = (1.5 * scale).toFixed(2) + 'rem';
+        t.style.padding = '0 ' + Math.round(12 * scale) + 'px';
+        t.style.minWidth = Math.round(60 * scale) + 'px';
+        t.style.height = Math.round(52 * scale) + 'px';
+      });
+    }
+  }
+  // Absolute last resort if even the smallest legible size still overflows
+  // (shouldn't happen at normal phone widths): wrap rather than clip.
+  if (row.scrollWidth > available) row.style.flexWrap = 'wrap';
+}
+const _fitStoryRowsNow = () => {
+  document.querySelectorAll('.story-word-row').forEach(fitStoryRow);
+};
+let _fitStoryRowsScheduled = false;
+const _scheduleFitStoryRows = () => {
+  if (_fitStoryRowsScheduled) return;
+  _fitStoryRowsScheduled = true;
+  requestAnimationFrame(() => { _fitStoryRowsScheduled = false; _fitStoryRowsNow(); });
+};
+new MutationObserver(_scheduleFitStoryRows).observe(document.body, { childList: true, subtree: true, characterData: true });
+window.addEventListener('resize', _scheduleFitStoryRows);
 /* ── Keep the screen awake while a lesson, story or game is on screen, so the
    OS doesn't dim/lock it just because no taps are happening (reading/listening
    is normal, not idle). Standard Wake Lock API; released on Home, re-requested
@@ -8743,7 +8806,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 78;
+const APP_VERSION = 79;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
