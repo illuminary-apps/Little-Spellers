@@ -1765,9 +1765,13 @@ html, body {
 }
 .plr-icon  { font-size: 0.85rem; flex-shrink: 0; }
 .plr-name  { flex: 1; color: #7a9cc0; }
-.plr-score { color: var(--gold); font-weight: 700; font-size: 0.72rem; }
+.plr-score { color: var(--gold); font-weight: 700; font-size: 0.72rem; display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; position: relative; }
+.plr-score .plr-raw { color: #7a9cc0; font-weight: 600; font-size: 0.58rem; }
 .plr-done  { color: var(--teal); font-size: 0.8rem; }
 .plr-none  { color: var(--star-dim); font-size: 0.8rem; }
+.plc-lesson-colhead { font-size: 0.6rem; color: #7a9cc0; font-weight: 700; padding-bottom: 2px; border-bottom: 1px solid var(--star-dim); margin-bottom: 2px; }
+.plc-lesson-colhead .plr-score { flex-direction: row; align-items: center; color: #7a9cc0; font-weight: 700; }
+.plc-lesson-colhead .pd-info-btn { position: static; width: 13px; height: 13px; line-height: 13px; font-size: 0.48rem; margin-left: 2px; flex-shrink: 0; }
 
 .parent-tip {
   background: rgba(6,214,160,0.06);
@@ -1808,12 +1812,19 @@ html, body {
   display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
 }
 .pd-card {
-  border-radius: var(--radius-md); padding: 0.8rem 0.7rem;
+  position: relative; border-radius: var(--radius-md); padding: 0.8rem 0.7rem;
   border: 1.5px solid var(--star-dim); background: var(--navy2);
 }
 .pd-card-num { font-family: var(--ff-head); font-size: 1.5rem; line-height: 1; display: block; }
 .pd-card-label { font-size: 0.68rem; color: #7a9cc0; font-weight: 700; margin-top: 3px; display: block; }
 .pd-card-trend { font-size: 0.62rem; color: var(--teal); margin-top: 2px; display: block; }
+.pd-info-btn {
+  position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; border-radius: 50%;
+  border: none; background: rgba(255,255,255,0.08); color: #9ab3d1; font-size: 0.62rem;
+  font-weight: 700; line-height: 18px; text-align: center; padding: 0; cursor: pointer;
+}
+.pd-info-btn:hover, .pd-info-btn:active { background: rgba(255,255,255,0.18); color: var(--white); }
+.pd-section-title .pd-info-btn, .pd-game-h .pd-info-btn { position: static; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; margin-left: 4px; }
 .pd-card.words   { border-color: rgba(90,160,220,0.4); }
 .pd-card.streak  { border-color: rgba(255,150,80,0.4); }
 .pd-card.stars   { border-color: rgba(199,125,255,0.4); }
@@ -8376,7 +8387,7 @@ function renderNeedsPractice(host,p){
   var st=needsPracticeStats(p), flagged=st.filter(function(x){x.qpct=x.qT?Math.round(x.qW/x.qT*100):0;x.lowQ=x.qpct>=NP_LIMIT;return x.pct>=NP_LIMIT||x.lowQ}).sort(function(a,b){return Math.max(b.pct,b.qpct)-Math.max(a.pct,a.qpct)});
   var ok=st.length-flagged.length;
   var card=document.createElement('div');card.className='pd-section-card';
-  var h='<div class="pd-section-title">✅ Achievement by Lesson</div><div class="np-sub">For each lesson we show how many words (from Spell-a-thon and Planet Patrol) and quiz questions your child got right, out of everything they have tried. '+ACHIEVE_LIMIT+'% or higher is solid. Below '+ACHIEVE_LIMIT+'% is flagged as worth another round — including a quiz that is below '+ACHIEVE_LIMIT+'% on its own, even if the lesson overall looks fine.</div>';
+  var h='<div class="pd-section-title">✅ Achievement by Lesson<button class="pd-info-btn" type="button" aria-label="How scores work" onclick="showCardInfo(\'achievement\')">ⓘ</button></div><div class="np-sub">Combines Spell-a-thon, Planet Patrol and quiz results per lesson. '+ACHIEVE_LIMIT+'%+ is solid; below that is flagged for practice.</div>';
   if(!st.length){h+='<div class="pd-sr-sub">Not enough practice yet to show achievement. This appears once a lesson has at least '+NP_MIN_TRIED+' answers to look at (words tried or quiz questions).</div>';}
   else{
     flagged.forEach(function(x,i){
@@ -8384,7 +8395,7 @@ function renderNeedsPractice(host,p){
       var chips=x.weak.slice(0,5).map(function(w){return '<span class="np-chip">'+w+'</span>'}).join('');
       var more=x.weak.length>5?'<span class="np-more">+'+(x.weak.length-5)+' more</span>':'';
       var chipsBlock=x.weak.length?'<div class="np-chips-label">Worth another look:</div><div class="np-chips">'+chips+more+'</div>':'';
-      h+='<div class="np-row"><div class="np-top"><span class="np-ic">'+lessonThemeIcon(x.lesson)+'</span><div class="np-info"><div class="np-name">'+x.lesson.name+'</div><div class="np-fig">'+(x.tried?'Words: '+wordsRight+' of '+x.tried+' correct':'')+(x.tried&&x.qT?' · ':'')+(x.qT?'Quiz: '+(x.qT-x.qW)+' of '+x.qT+' correct ('+qAchPct+'%)':'')+'</div></div><div class="np-pct">'+achPct+'% achieved</div></div>'+(x.lowQ?'<div class="np-flag">⚠️ Quiz score below '+ACHIEVE_LIMIT+'%</div>':'')+chipsBlock+'<button class="pd-practice-btn np-btn" data-i="'+i+'">Practice this lesson</button></div>';
+      h+='<div class="np-row"><div class="np-top"><span class="np-ic">'+lessonThemeIcon(x.lesson)+'</span><div class="np-info"><div class="np-name">'+x.lesson.name+'</div><div class="np-fig">'+(x.tried?'Words: '+wordsRight+' of '+x.tried+' correct':'')+(x.tried&&x.qT?' · ':'')+(x.qT?'Quiz: '+(x.qT-x.qW)+' of '+x.qT+' correct ('+qAchPct+'%)':'')+'</div></div><div class="np-pct">'+achPct+'%<span class="np-pct-label">combined</span></div></div>'+(x.lowQ?'<div class="np-flag">⚠️ Quiz score below '+ACHIEVE_LIMIT+'%</div>':'')+chipsBlock+'<button class="pd-practice-btn np-btn" data-i="'+i+'">Practice this lesson</button></div>';
     });
     if(!flagged.length)h+='<div class="pd-sr-sub">Every lesson is at '+ACHIEVE_LIMIT+'% or higher. 🎉</div>';
     if(ok)h+='<div class="np-ok">✅ '+ok+' lesson'+(ok===1?'':'s')+' at '+ACHIEVE_LIMIT+'% or higher — nicely on track</div>';
@@ -8419,25 +8430,39 @@ function buildTimeline() {
   Object.keys(thisByLesson).forEach(id => {
     const lesson = lessonById(id);
     if (!lesson || !thisByLesson[id].total) return;
+    const level = LEVELS.find(lv => lv.lessons.some(l => l.id === id));
     const curAcc = Math.round((thisByLesson[id].correct / thisByLesson[id].total) * 100);
     if (lastByLesson[id] && lastByLesson[id].total) {
       const priorAcc = Math.round((lastByLesson[id].correct / lastByLesson[id].total) * 100);
       const delta = curAcc - priorAcc;
-      if (!mostImproved || delta > mostImproved.delta) mostImproved = { name: lesson.name, delta, curAcc };
+      if (delta > 0 && (!mostImproved || delta > mostImproved.delta)) mostImproved = { name: lesson.name, delta, curAcc };
     }
-    if (!needsAttention || curAcc < needsAttention.curAcc) needsAttention = { name: lesson.name, curAcc };
+    if (!needsAttention || curAcc < needsAttention.curAcc) needsAttention = { name: lesson.name, curAcc, level };
   });
 
   const card = document.createElement('div');
   card.className = 'pd-section-card';
   card.innerHTML = `
-    <div class="pd-section-title">📈 Compared With Last Week</div>
-    <div style="display:flex; flex-direction:column; gap:10px; font-size:0.82rem; color:var(--white);">
-      <div>📖 <strong>Words practised:</strong> ${wordsDelta===0 ? 'same as last week' : `<span style="color:${wordsDelta>0?'var(--teal)':'var(--coral)'}">${wordsDelta>0?wordsDelta+' more':(-wordsDelta)+' fewer'} than last week</span>`}</div>
-      <div>🎯 <strong>Accuracy:</strong> ${accDelta===null ? 'Not enough data yet' : accDelta===0 ? 'same as last week' : `<span style="color:${accDelta>0?'var(--teal)':'var(--coral)'}">${accDelta>0?'up':'down'} ${Math.abs(accDelta)}% from ${lastAcc}% last week</span>`}</div>
-      <div>🌱 <strong>Most improved skill:</strong> ${mostImproved ? `${mostImproved.name} (${mostImproved.delta>0?'+':''}${mostImproved.delta}%)` : 'Not enough data yet'}</div>
+    <div class="pd-section-title">📈 Compared With Last Week<button class="pd-info-btn" type="button" aria-label="How this comparison works" onclick="showCardInfo('compare')">ⓘ</button></div>
+    <div class="tl-period">Last 7 days vs. the 7 days before that</div>
+    <div class="tl-block">
+      <div class="tl-block-h">📖 Learning activity</div>
+      <div class="tl-line"><strong>${thisWeek.lessonsCompleted}</strong> lesson${thisWeek.lessonsCompleted===1?'':'s'} completed, <strong>${thisWeek.wordsPractised}</strong> word${thisWeek.wordsPractised===1?'':'s'} practised this week ${wordsDelta===0 ? '(same as last week)' : `<span style="color:${wordsDelta>0?'var(--teal)':'var(--coral)'}">(${wordsDelta>0?wordsDelta+' more':(-wordsDelta)+' fewer'} words than last week)</span>`}</div>
+    </div>
+    <div class="tl-block">
+      <div class="tl-block-h">🎯 Performance comparison</div>
+      <div class="tl-line">${accDelta===null ? 'Not enough data yet to compare accuracy.' : accDelta===0 ? `Accuracy held steady at ${thisAcc}% (same as last week).` : `Accuracy is <span style="color:${accDelta>0?'var(--teal)':'var(--coral)'}">${accDelta>0?'up':'down'} ${Math.abs(accDelta)} percentage point${Math.abs(accDelta)===1?'':'s'}</span> — ${thisAcc}% this week vs ${lastAcc}% last week.`}</div>
+      <div class="tl-line">🌱 <strong>Most improved:</strong> ${mostImproved ? `${mostImproved.name} (${mostImproved.delta>0?'+':''}${mostImproved.delta} points)` : 'Not enough data yet'}</div>
+    </div>
+    <div class="tl-block">
+      <div class="tl-block-h">➡️ Suggested next step</div>
+      <div class="tl-line">${needsAttention ? `Revisit <strong>${needsAttention.name}</strong> — currently at ${needsAttention.curAcc}% this week.` : 'Not enough data yet to suggest a lesson.'}</div>
+      ${needsAttention ? '<button class="pd-practice-btn" id="tl-next-step-btn">Practice this lesson</button>' : ''}
     </div>
   `;
+  if (needsAttention && needsAttention.level) {
+    card.querySelector('#tl-next-step-btn').addEventListener('click', () => { goHome(); openLevel(needsAttention.level.id); });
+  }
   body.appendChild(card);
   renderNeedsPractice(body, p);
 
@@ -8806,7 +8831,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 79;
+const APP_VERSION = 80;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -8847,6 +8872,16 @@ function uqStats(p){
   LEVELS.forEach(function(lv){var t=0,m=0,here={};chWordsFor(lv.id,null).forEach(function(w){var k=w.word.toLowerCase();if(seen[k]||here[k])return;here[k]=1;t++;if(best[k])m++;});
     Object.keys(here).forEach(function(k){seen[k]=1});out[lv.id]={t:t,m:m};tm+=m;tt+=t;});
   out.all={t:tt,m:tm};return out;}
+/* Mirrors uqStats, but for Planet Patrol: counts distinct words caught at
+   least once (p.ppTried), out of all words in the app — so the "Games" card
+   and the expanded Learning World card both read "X of Y" the same way
+   Spell-a-thon does, instead of Planet Patrol's old best-single-round/10. */
+function ppCaughtStats(p){
+  var tried=p.ppTried||{};
+  var seen={},out={},tc=0,tt=0;
+  LEVELS.forEach(function(lv){var t=0,c=0,here={};chWordsFor(lv.id,null).forEach(function(w){var k=w.word.toLowerCase();if(seen[k]||here[k])return;here[k]=1;t++;if(tried[k])c++;});
+    Object.keys(here).forEach(function(k){seen[k]=1});out[lv.id]={t:t,c:c};tc+=c;tt+=t;});
+  out.all={t:tt,c:tc};return out;}
 /* ── Level Check: periodically re-checks whether a child's assigned
    starting world still fits, based on real quiz performance in it (not
    just at first-run setup). Shown as a dismissible Parent Dashboard card,
@@ -8900,6 +8935,7 @@ function buildParentDashboard() {
   body.innerHTML = '';
   const p = getProgress();
   const uq = uqStats(p);
+  const ppq = ppCaughtStats(p);
 
   const filterEl  = document.getElementById('pd-date-filter');
   const filterVal = filterEl ? filterEl.value : '7';
@@ -8933,14 +8969,17 @@ function buildParentDashboard() {
   const bestStreak = (p.streak && p.streak.longest) || 0;
   const cardsGrid = document.createElement('div');
   cardsGrid.className = 'pd-cards-grid';
-  const tc = (icon, num, label, sub, cls) => `<div class="pd-card ${cls||''}"><span class="pd-card-num">${icon} ${num}</span><span class="pd-card-label">${label}</span><span class="pd-card-trend">${sub}</span></div>`;
+  // "Today: X" is redundant when the period filter is already "Today", so it's
+  // suppressed in that one case — every other filter shows it for context.
+  const showTodaySub = filterVal !== '1';
+  const tc = (icon, num, label, sub, cls, key) => `<div class="pd-card ${cls||''}"><button class="pd-info-btn" type="button" aria-label="What does ${label} mean?" onclick="showCardInfo('${key}')">ⓘ</button><span class="pd-card-num">${icon} ${num}</span><span class="pd-card-label">${label}</span><span class="pd-card-trend">${sub}</span></div>`;
   cardsGrid.innerHTML =
-    tc('🔥', streak, 'Day Streak', bestStreak > streak ? 'Best: ' + bestStreak : 'Keep it up!', 'streak') +
-    tc('🎯', accuracy===null?'—':accuracy+'%', 'Accuracy', 'Today: ' + (todayAcc===null?'—':todayAcc+'%'), accClass) +
-    tc('📚', rangeTotals.lessonsCompleted, 'Lessons', 'Today: ' + todayTotals.lessonsCompleted, 'lessons') +
-    tc('📖', rangeTotals.wordsPractised, 'Words Practised', 'Today: ' + todayTotals.wordsPractised, 'words') +
-    tc('✅', rangeTotals.quizCorrect, 'Quiz Correct', 'Today: ' + todayTotals.quizCorrect, 'stars') +
-    tc('✏️', rangeTotals.dictCorrect, 'Spelled Right', 'Today: ' + todayTotals.dictCorrect, 'spell');
+    tc('🔥', streak, 'Day Streak', bestStreak > streak ? 'Best: ' + bestStreak : 'Keep it up!', 'streak', 'streak') +
+    tc('🎯', accuracy===null?'—':accuracy+'%', 'Accuracy', showTodaySub ? 'Today: ' + (todayAcc===null?'—':todayAcc+'%') : '', accClass, 'accuracy') +
+    tc('📚', rangeTotals.lessonsCompleted, 'Lessons', showTodaySub ? 'Today: ' + todayTotals.lessonsCompleted : '', 'lessons', 'lessons') +
+    tc('📖', rangeTotals.wordsPractised, 'Words Practised', showTodaySub ? 'Today: ' + todayTotals.wordsPractised : '', 'words', 'words') +
+    tc('✅', rangeTotals.quizCorrect, 'Quiz Correct', showTodaySub ? 'Today: ' + todayTotals.quizCorrect : '', 'stars', 'quiz') +
+    tc('✏️', rangeTotals.dictCorrect, 'Spelled Right', showTodaySub ? 'Today: ' + todayTotals.dictCorrect : '', 'spell', 'spell');
   body.appendChild(cardsGrid);
 
   // ── Level Check (periodic re-check of starting-world fit) ──
@@ -8973,10 +9012,10 @@ function buildParentDashboard() {
   const gamesCard=document.createElement('div');gamesCard.className='pd-section-card';
   gamesCard.innerHTML=`<div class="pd-section-title">🎮 Games</div>
    <div class="pd-games">
-    <div class="pd-game"><div class="pd-game-h">🪐 Planet Patrol</div>
-      <div class="pd-game-n">${_pp.totalCaught||0}</div><div class="pd-game-l">words caught</div>
+    <div class="pd-game"><div class="pd-game-h">🪐 Planet Patrol <button class="pd-info-btn" type="button" aria-label="What does Planet Patrol count?" onclick="showCardInfo('pp')">ⓘ</button></div>
+      <div class="pd-game-n">${ppq.all.c}<span>/${ppq.all.t}</span></div><div class="pd-game-l">words caught</div>
       <div class="pd-game-s">${_pp.perfectRounds||0} perfect rounds</div></div>
-    <div class="pd-game"><div class="pd-game-h">🏆 Spell-a-thon</div>
+    <div class="pd-game"><div class="pd-game-h">🏆 Spell-a-thon <button class="pd-info-btn" type="button" aria-label="What does Spell-a-thon count?" onclick="showCardInfo('sw')">ⓘ</button></div>
       <div class="pd-game-n">${_swMast}<span>/${_swWords}</span></div><div class="pd-game-l">words mastered</div>
       <div class="pd-game-s">${_swPerfect} perfect rounds</div></div>
    </div>`;
@@ -9015,10 +9054,10 @@ function buildParentDashboard() {
       <div class="plc-bar-wrap"><div class="plc-bar" style="width:${pct}%;background:${colour};"></div></div>
       <div class="pd-lesson-detail-row" style="display:${isOpen?'grid':'none'}">
         <span class="pdl-name">${WORLD_EMOJI[level.id] || ''} ${level.name} Overview</span>
-        <span class="pdl-m"><b>${done}/${total}</b>Lessons</span>
-        <span class="pdl-m"><b>${level.lessons.reduce((a,l)=>a+(p[l.id]?.score||0),0)}/${level.lessons.reduce((a,l)=>a+l.quizzes.length,0)}</b>Quiz</span>
-        <span class="pdl-m"><b>${((p.planetPatrol||{}).bestByWorld||{})[level.id]||0}/10</b>Planet Patrol</span>
-        <span class="pdl-m"><b>${uq[level.id].m}/${uq[level.id].t}</b>Spell-a-thon</span>
+        <span class="pdl-m"><b>${done}/${total}</b>Lessons completed<button class="pd-info-btn" type="button" aria-label="What does Lessons count?" onclick="event.stopPropagation(); showCardInfo('worldLessons')">ⓘ</button></span>
+        <span class="pdl-m"><b>${level.lessons.reduce((a,l)=>a+(p[l.id]?.score||0),0)}/${level.lessons.reduce((a,l)=>a+l.quizzes.length,0)}</b>Quiz questions correct<button class="pd-info-btn" type="button" aria-label="What does Quiz count?" onclick="event.stopPropagation(); showCardInfo('worldQuiz')">ⓘ</button></span>
+        <span class="pdl-m"><b>${ppq[level.id].c}/${ppq[level.id].t}</b>Planet Patrol — words caught<button class="pd-info-btn" type="button" aria-label="What does Planet Patrol count?" onclick="event.stopPropagation(); showCardInfo('worldPP')">ⓘ</button></span>
+        <span class="pdl-m"><b>${uq[level.id].m}/${uq[level.id].t}</b>Spell-a-thon — words mastered<button class="pd-info-btn" type="button" aria-label="What does Spell-a-thon count?" onclick="event.stopPropagation(); showCardInfo('worldSW')">ⓘ</button></span>
       </div>
       <div class="plc-lessons" id="plc-${level.id}" style="display:${isOpen?'flex':'none'}; margin-top:0.5rem;"></div>
     `;
@@ -9030,6 +9069,16 @@ function buildParentDashboard() {
 
     if (isOpen) {
       const lessonsEl = card.querySelector('#plc-' + level.id);
+      const colHeader = document.createElement('div');
+      colHeader.className = 'plc-lesson-row plc-lesson-colhead';
+      colHeader.innerHTML = `
+        <span></span>
+        <span class="plr-name">Lesson</span>
+        <span class="plr-score">Quiz Score<button class="pd-info-btn" type="button" aria-label="What does Quiz Score mean?" onclick="event.stopPropagation(); showCardInfo('lessonScore')">ⓘ</button></span>
+        <span class="plr-st"></span>
+        <span class="plr-sw">Spell-a-thon</span>
+      `;
+      lessonsEl.appendChild(colHeader);
       level.lessons.forEach(lesson => {
         const isDone  = !!p[lesson.id];
         const score   = p[lesson.id]?.score || 0;
@@ -9041,12 +9090,13 @@ function buildParentDashboard() {
           return rec && rec.mastery >= 2;
         }).length;
 
+        const qPct = qTotal ? Math.round((score/qTotal)*100) : null;
         const row = document.createElement('div');
         row.className = 'plc-lesson-row';
         row.innerHTML = `
           <span class="plr-icon">${lessonThemeIcon(lesson)}</span>
           <span class="plr-name">${lesson.name}</span>
-          <span class="plr-score">${isDone ? score+'/'+qTotal : '–'}</span>
+          <span class="plr-score">${isDone && qPct!==null ? `${qPct}%<span class="plr-raw">${score}/${qTotal}</span>` : '–'}</span>
           <span class="plr-st">${isDone ? '✓' : '○'}</span>
           <span class="plr-sw">${lessonWords.length ? '🏆 '+lessonMastered+'/'+lessonWords.length : ''}</span>
         `;
@@ -9062,7 +9112,7 @@ function buildParentDashboard() {
     level.lessons.forEach(lesson => {
       const rec = p[lesson.id];
       if (rec && lesson.quizzes.length) {
-        lessonStats.push({ name: lesson.name, level, lesson, acc: Math.round((rec.score/lesson.quizzes.length)*100) });
+        lessonStats.push({ name: lesson.name, level, lesson, acc: Math.round((rec.score/lesson.quizzes.length)*100), score: rec.score, qTotal: lesson.quizzes.length });
       }
     });
   });
@@ -9075,7 +9125,7 @@ function buildParentDashboard() {
     strengths.forEach(s => {
       const row = document.createElement('div');
       row.className = 'pd-strength-row';
-      row.innerHTML = `<span class="pd-sr-icon">${lessonThemeIcon(s.lesson)}</span><div><div class="pd-sr-name">Great with ${s.name}!</div><div class="pd-sr-sub">Accuracy: ${s.acc}%</div></div>`;
+      row.innerHTML = `<span class="pd-sr-icon">${lessonThemeIcon(s.lesson)}</span><div><div class="pd-sr-name">Great with ${s.name}!</div><div class="pd-sr-sub">Quiz Score: ${s.acc}% — ${s.score} of ${s.qTotal} questions correct</div></div>`;
       strengthsCard.appendChild(row);
     });
   } else {
@@ -9094,7 +9144,7 @@ function buildParentDashboard() {
       row.innerHTML = `
         <div>
           <div class="pd-sr-name">${lessonThemeIcon(s.lesson)} ${s.name}</div>
-          <div class="pd-revisit-acc">Accuracy ${s.acc}%</div>
+          <div class="pd-revisit-acc">Quiz Score: ${s.acc}% — ${s.score} of ${s.qTotal} questions correct</div>
           <div class="pd-revisit-reason">Practice recommended to build confidence.</div>
         </div>
         <button class="pd-practice-btn">Practice</button>
@@ -10277,6 +10327,32 @@ window.addEventListener('appinstalled',function(){_installEvt=null;_setInstalled
 document.addEventListener('visibilitychange',function(){if(!document.hidden)_refreshInstallBtn();});
 function _showInstall(title,body){document.getElementById('install-title').textContent=title;document.getElementById('install-body').innerHTML=body;document.getElementById('install-modal').style.display='flex';}
 function closeInstall(){document.getElementById('install-modal').style.display='none';}
+
+/* Info-icon popovers for the Parent Hub — reuses the install bottom-sheet
+   instead of building a separate modal. PD_INFO holds a short title + plain-
+   language explanation for every stat shown on the dashboard. */
+const PD_INFO = {
+  streak:   { title: '🔥 Day Streak', text: 'The number of days in a row your child has practised at least once. Based on the Today / Last 7 Days / Last 30 Days / All Time filter at the top, this always shows the current streak as of today.' },
+  accuracy: { title: '🎯 Accuracy', text: 'The share of quiz questions, spelling attempts, and Planet Patrol catches your child got right, combined, during the selected period.' },
+  lessons:  { title: '📚 Lessons', text: 'The number of lessons your child finished during the selected period.' },
+  words:    { title: '📖 Words Practised', text: 'Every word or question your child worked through during the selected period — lesson quiz questions, Planet Patrol catches, and spelling attempts, all added together.' },
+  quiz:     { title: '✅ Quiz Correct', text: 'The number of lesson quiz questions your child answered correctly during the selected period.' },
+  spell:    { title: '✏️ Spelled Right', text: 'The number of spelling (dictation) attempts your child got right during the selected period.' },
+  pp:       { title: '🪐 Planet Patrol', text: 'A game where words are "caught" by hearing or reading them correctly. This counts every different word your child has caught at least once, out of all the words in the app, across every world.' },
+  sw:       { title: '🏆 Spell-a-thon', text: 'A game that tracks which words your child has truly mastered through repeated correct spelling. This counts every different word mastered, out of all the words in the app, across every world.' },
+  worldLessons: { title: '📚 Lessons', text: 'How many lessons in this world your child has completed, out of the total lessons in it.' },
+  worldQuiz:    { title: '✅ Quiz', text: 'How many quiz questions your child has answered correctly in this world, out of every quiz question across all its lessons.' },
+  worldPP:      { title: '🪐 Planet Patrol', text: 'How many different words from this world your child has caught at least once in Planet Patrol, out of all the words it contains.' },
+  worldSW:      { title: '🏆 Spell-a-thon', text: 'How many different words from this world your child has mastered in Spell-a-thon, out of all the words it contains.' },
+  lessonScore:  { title: '📝 Lesson Score', text: 'How your child did on this lesson’s quiz questions. 70% or higher means they have a solid grasp — below that, another round of practice is recommended (it isn’t a pass/fail grade).' },
+  achievement:  { title: '✅ Achievement by Lesson', text: 'For each lesson, this combines how many words (from Spell-a-thon and Planet Patrol) and quiz questions your child got right, out of everything they have tried. 70% or higher is solid. Below 70% is flagged as worth another round — including a quiz that is below 70% on its own, even if the lesson overall looks fine.' },
+  compare:      { title: '📈 How This Comparison Works', text: 'This compares the last 7 days to the 7 days before that. Accuracy is shown as a percentage-point change (for example, "up 5 points" means 80% → 85%, not 5% more quizzes answered correctly).' },
+};
+function showCardInfo(key){
+  const d = PD_INFO[key];
+  if (!d) return;
+  _showInstall(d.title, '<p style="line-height:1.5;">' + d.text + '</p>');
+}
 function installApp(){
   if(_installEvt){var e=_installEvt;_installEvt=null;e.prompt();if(e.userChoice)e.userChoice.then(function(c){if(c&&c.outcome==='accepted')_setInstalledFlag(true);_refreshInstallBtn();});return;}
   if(_isIOS()){
@@ -10495,8 +10571,9 @@ autoScrollToStart(1600);
 .pd-game-s{font-size:.68rem;color:var(--teal);margin-top:4px}
 .pd-lesson-detail-row{grid-template-columns:repeat(4,1fr)!important;gap:4px!important;padding:12px 0 8px!important}
 .pd-lesson-detail-row .pdl-name{margin-bottom:6px!important}
-.pdl-m{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.62rem;color:#7a9cc0;line-height:1.2}
+.pdl-m{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.62rem;color:#7a9cc0;line-height:1.2;text-align:center}
 .pdl-m b{font-family:var(--ff-head);font-size:1rem;color:#fff;font-weight:400}
+.pdl-m .pd-info-btn{position:static;width:14px;height:14px;line-height:14px;font-size:.5rem;margin-top:1px;flex-shrink:0}
 .plc-lesson-row{display:grid!important;grid-template-columns:1.6rem 1fr 3rem 1.4rem 4.2rem;align-items:center;gap:6px;padding:5px 0}
 .plc-lesson-row .plr-score{text-align:right}
 .plc-lesson-row .plr-st{text-align:center;color:var(--teal)}
@@ -10531,7 +10608,8 @@ window.__wordTotal=n;
 .np-info{flex:1;min-width:0}
 .np-name{font-family:var(--ff-head);font-size:.85rem;color:#fff}
 .np-fig{font-size:.7rem;color:#7a9cc0}
-.np-pct{font-family:var(--ff-head);font-size:1.25rem;color:var(--coral)}
+.np-pct{font-family:var(--ff-head);font-size:1.25rem;color:var(--coral);display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}
+.np-pct-label{font-family:var(--ff-body);font-size:.52rem;color:#7a9cc0;font-weight:700;text-transform:uppercase;letter-spacing:.02em}
 .np-chips-label{font-size:.7rem;color:#7a9cc0;margin-bottom:2px}
 .np-chips{display:flex;flex-wrap:wrap;gap:6px}
 .np-chip{font-size:.72rem;padding:3px 9px;border-radius:99px;background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.35);color:#ffb3b3}
@@ -10539,6 +10617,13 @@ window.__wordTotal=n;
 .np-btn{align-self:flex-start}
 .np-flag{font-size:.72rem;color:#ffd166;background:rgba(255,209,102,.12);border:1px solid rgba(255,209,102,.35);border-radius:99px;padding:3px 10px;align-self:flex-start}
 .np-ok{margin-top:6px;border-top:1px solid rgba(255,255,255,.07);padding-top:10px;font-size:.78rem;color:var(--teal)}
+.tl-period{font-size:.66rem;color:#7a9cc0;margin:-4px 0 10px;font-weight:600}
+.tl-block{margin-bottom:12px}
+.tl-block:last-child{margin-bottom:0}
+.tl-block-h{font-size:.74rem;font-weight:700;color:var(--white);margin-bottom:3px}
+.tl-line{font-size:.78rem;color:#c3d4ea;line-height:1.5;margin-bottom:3px}
+.tl-line:last-child{margin-bottom:0}
+.tl-block .pd-practice-btn{margin-top:6px}
 .ach-popup-reason{font-size:.85rem;color:#fff;opacity:.92;margin-top:4px;line-height:1.4;max-width:270px;padding:0 10px}
 .ach-popup-reward{font-size:.8rem;color:var(--gold);margin-top:6px;font-weight:700;max-width:270px;padding:0 10px}
 </style>
