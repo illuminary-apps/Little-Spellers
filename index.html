@@ -2708,22 +2708,6 @@ setTimeout(function () {
 </div>
 
 <!-- ══════════════════════════════════
-     LEARNING TIMELINE
-══════════════════════════════════ -->
-<div id="timeline-screen" class="screen">
-  <div class="lm-header">
-    <button class="back-btn" onclick="openParentHub()">←</button>
-    <div class="lm-title" style="flex:1; margin:0;">📈 Learning Timeline</div>
-    <div class="pd-learner-chip" id="tl-learner-chip" onclick="openProfileSwitcher('timeline')" role="button" aria-label="Switch which learner this shows">
-      <span class="plc-avatar" id="tl-learner-avatar">🦊</span>
-      <span class="plc-name" id="tl-learner-name">Explorer</span>
-      <span class="plc-caret">▾</span>
-    </div>
-  </div>
-  <div class="parent-body" id="timeline-body"></div>
-</div>
-
-<!-- ══════════════════════════════════
      SETTINGS
 ══════════════════════════════════ -->
 <div id="welcome-setup" class="screen">
@@ -3100,19 +3084,18 @@ function setParentPin(pin) {
 }
 
 /* Home-screen chip showing who's currently playing, plus the matching
-   chips on the Parent Dashboard and Learning Timeline (those two show
-   the active learner's name and double as a view-only switcher so a
-   parent can hop between kids' progress). All hidden until there's a
-   2nd learner — nothing to switch between otherwise. Call after load
-   and whenever the active profile (or its name/avatar) might change. */
+   chip on the Parent Dashboard (it shows the active learner's name and
+   doubles as a view-only switcher so a parent can hop between kids'
+   progress). All hidden until there's a 2nd learner — nothing to switch
+   between otherwise. Call after load and whenever the active profile
+   (or its name/avatar) might change. */
 function refreshProfileChip() {
   const profiles = listProfiles();
   const multi = profiles.length > 1;
   const prof = getActiveProfile();
   [
     ['profile-chip', 'profile-chip-avatar', 'profile-chip-name'],
-    ['pd-learner-chip', 'pd-learner-avatar', 'pd-learner-name'],
-    ['tl-learner-chip', 'tl-learner-avatar', 'tl-learner-name']
+    ['pd-learner-chip', 'pd-learner-avatar', 'pd-learner-name']
   ].forEach(([chipId, avatarId, nameId]) => {
     const chip = document.getElementById(chipId);
     if (!chip) return;
@@ -3175,7 +3158,7 @@ function maybeShowMigrationRename() {
 /* Lightweight "who's playing?" overlay — switching is not PIN-gated (it's
    just picking a save file, nothing sensitive), but adding/renaming/
    deleting learners lives in Settings behind the parent PIN.
-   `resumeTo` ('dashboard' | 'timeline') is set when this is opened from
+   `resumeTo` ('dashboard') is set when this is opened from
    one of those parent-only screens, so the reload it triggers lands
    straight back on that same screen (still showing the new learner's
    data) instead of dumping the parent back out to Home and making them
@@ -8185,7 +8168,7 @@ function positionAchRocket(idx) {
 /* ── Parent PIN gate ── */
 function requireParentPin(onSuccess) {
   const _act = document.querySelector('.screen.active');
-  if (_act && ['parent-hub-screen','parent','achievements-screen','spelling-secrets-screen','timeline-screen','settings-screen'].indexOf(_act.id) > -1) { onSuccess(); return; }
+  if (_act && ['parent-hub-screen','parent','achievements-screen','spelling-secrets-screen','settings-screen'].indexOf(_act.id) > -1) { onSuccess(); return; }
   const pin = getParentPin();
   if (!pin) { onSuccess(); return; }
 
@@ -8344,13 +8327,6 @@ function openSecretLesson(level, lesson) {
   body.appendChild(backBtn);
 }
 
-/* ════════════════════════════════════════════
-   LEARNING TIMELINE
-════════════════════════════════════════════ */
-function openTimeline() {
-  requireParentPin(() => { buildTimeline(); showScreen('timeline-screen'); });
-}
-
 function lessonById(id) {
   for (const level of LEVELS) {
     const lesson = level.lessons.find(l => l.id === id);
@@ -8404,75 +8380,6 @@ function renderNeedsPractice(host,p){
   card.querySelectorAll('.np-btn').forEach(function(b){b.addEventListener('click',function(){var x=flagged[+b.dataset.i];goHome();openLevel(x.level.id);});});
   host.appendChild(card);
 }
-function buildTimeline() {
-  refreshProfileChip();
-  const body = document.getElementById('timeline-body');
-  body.innerHTML = '';
-  const p = getProgress();
-
-  const thisWeek = sumDailyLog(getDailyLogRange(7));
-  const lastWeekEntries = Object.entries((p.dailyLog||{})).filter(([d]) => d >= daysAgoStr(13) && d < daysAgoStr(6)).map(([,v])=>v);
-  const lastWeek = sumDailyLog(lastWeekEntries);
-
-  const thisAccDen = thisWeek.quizTotal + thisWeek.dictTotal + (thisWeek.ppTotal||0);
-  const thisAcc = thisAccDen ? Math.round(((thisWeek.quizCorrect + thisWeek.dictCorrect + (thisWeek.ppCorrect||0))/thisAccDen)*100) : null;
-  const lastAccDen = lastWeek.quizTotal + lastWeek.dictTotal + (lastWeek.ppTotal||0);
-  const lastAcc = lastAccDen ? Math.round(((lastWeek.quizCorrect + lastWeek.dictCorrect + (lastWeek.ppCorrect||0))/lastAccDen)*100) : null;
-
-  const wordsDelta = thisWeek.wordsPractised - lastWeek.wordsPractised;
-  const accDelta = (thisAcc !== null && lastAcc !== null) ? thisAcc - lastAcc : null;
-  const longestStreak = (p.streak && p.streak.longest) || 0;
-
-  // most improved / needs attention, from per-lesson accuracy this week vs last week
-  const thisByLesson = sumByLessonRange(getDailyLogRange(7));
-  const lastByLesson = sumByLessonRange(lastWeekEntries);
-  let mostImproved = null, needsAttention = null;
-  Object.keys(thisByLesson).forEach(id => {
-    const lesson = lessonById(id);
-    if (!lesson || !thisByLesson[id].total) return;
-    const level = LEVELS.find(lv => lv.lessons.some(l => l.id === id));
-    const curAcc = Math.round((thisByLesson[id].correct / thisByLesson[id].total) * 100);
-    if (lastByLesson[id] && lastByLesson[id].total) {
-      const priorAcc = Math.round((lastByLesson[id].correct / lastByLesson[id].total) * 100);
-      const delta = curAcc - priorAcc;
-      if (delta > 0 && (!mostImproved || delta > mostImproved.delta)) mostImproved = { name: lesson.name, delta, curAcc };
-    }
-    if (!needsAttention || curAcc < needsAttention.curAcc) needsAttention = { name: lesson.name, curAcc, level };
-  });
-
-  const card = document.createElement('div');
-  card.className = 'pd-section-card';
-  card.innerHTML = `
-    <div class="pd-section-title">📈 Compared With Last Week<button class="pd-info-btn" type="button" aria-label="How this comparison works" onclick="showCardInfo('compare')">ⓘ</button></div>
-    <div class="tl-period">Last 7 days vs. the 7 days before that</div>
-    <div class="tl-block">
-      <div class="tl-block-h">📖 Learning activity</div>
-      <div class="tl-line"><strong>${thisWeek.lessonsCompleted}</strong> lesson${thisWeek.lessonsCompleted===1?'':'s'} completed, <strong>${thisWeek.wordsPractised}</strong> word${thisWeek.wordsPractised===1?'':'s'} practised this week ${wordsDelta===0 ? '(same as last week)' : `<span style="color:${wordsDelta>0?'var(--teal)':'var(--coral)'}">(${wordsDelta>0?wordsDelta+' more':(-wordsDelta)+' fewer'} words than last week)</span>`}</div>
-    </div>
-    <div class="tl-block">
-      <div class="tl-block-h">🎯 Performance comparison</div>
-      <div class="tl-line">${accDelta===null ? 'Not enough data yet to compare accuracy.' : accDelta===0 ? `Accuracy held steady at ${thisAcc}% (same as last week).` : `Accuracy is <span style="color:${accDelta>0?'var(--teal)':'var(--coral)'}">${accDelta>0?'up':'down'} ${Math.abs(accDelta)} percentage point${Math.abs(accDelta)===1?'':'s'}</span> — ${thisAcc}% this week vs ${lastAcc}% last week.`}</div>
-      <div class="tl-line">🌱 <strong>Most improved:</strong> ${mostImproved ? `${mostImproved.name} (${mostImproved.delta>0?'+':''}${mostImproved.delta} points)` : 'Not enough data yet'}</div>
-    </div>
-    <div class="tl-block">
-      <div class="tl-block-h">➡️ Suggested next step</div>
-      <div class="tl-line">${needsAttention ? `Revisit <strong>${needsAttention.name}</strong> — currently at ${needsAttention.curAcc}% this week.` : 'Not enough data yet to suggest a lesson.'}</div>
-      ${needsAttention ? '<button class="pd-practice-btn" id="tl-next-step-btn">Practice this lesson</button>' : ''}
-    </div>
-  `;
-  if (needsAttention && needsAttention.level) {
-    card.querySelector('#tl-next-step-btn').addEventListener('click', () => { goHome(); openLevel(needsAttention.level.id); });
-  }
-  body.appendChild(card);
-  renderNeedsPractice(body, p);
-
-  const note = document.createElement('div');
-  note.className = 'pd-sr-sub';
-  note.style.marginTop = '0.6rem';
-  note.textContent = 'This story updates automatically as your child practises — check back each week!';
-  body.appendChild(note);
-}
-
 /* ════════════════════════════════════════════
    MANAGE LEARNERS — add / rename / switch / delete child profiles
 ════════════════════════════════════════════ */
@@ -8720,7 +8627,7 @@ function buildSyncCard() {
    contacts access needed on our side at all. Falls back to copying the
    link (desktop browsers, or a mobile browser without the Web Share
    API) rather than failing silently. Lives as a Parent Hub ribbon (same
-   list as Dashboard/Timeline/Settings/Refresh) rather than inside
+   list as Dashboard/Spelling Secrets/Settings/Refresh) rather than inside
    Settings, so it's one tap away instead of buried a level deeper. ── */
 const LS_SHARE_URL = 'https://illuminary-apps.github.io/Little-Spellers/';
 const LS_SHARE_TEXT = "My child's been loving Little Spellers — a sweet little phonics app for learning to read. Thought you might like it too!";
@@ -8831,14 +8738,13 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 80;
+const APP_VERSION = 81;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
   _refreshInstallBtn();
   const sections = [
     { icon: '📊', name: 'Dashboard', sub: 'Progress, streaks & activity', fn: openParent },
-    { icon: '📈', name: 'Learning Timeline', sub: "This week's story", fn: openTimeline },
     { icon: '📚', name: 'Spelling Secrets', sub: 'Every rule, explained', fn: openSpellingSecrets },
     { icon: '⚙️', name: 'Settings', sub: 'Profile, PIN & sound', fn: openSettings },
     { icon: '💌', name: 'Share Little Spellers', sub: 'Tell another family about the app', fn: shareLittleSpellers },
@@ -8955,13 +8861,6 @@ function buildParentDashboard() {
   const accClass = accuracy === null ? '' : accuracy > 90 ? 'acc-green' : accuracy >= 75 ? 'acc-yellow' : 'acc-red';
   const streak = (p.streak && p.streak.current) || 0;
 
-  function trendLine(current, prior, suffix) {
-    if (prior === null || prior === undefined) return '';
-    const diff = current - prior;
-    if (diff === 0) return '';
-    return `<span class="pd-card-trend">${diff > 0 ? '↑' : '↓'}${Math.abs(diff)}${suffix} vs prior period</span>`;
-  }
-
   // ── Summary cards (period totals + today on each card) ──
   const todayTotals = sumDailyLog(getDailyLogRange(1));
   const todayAccNum = todayTotals.quizTotal + todayTotals.dictTotal + (todayTotals.ppTotal||0);
@@ -8981,6 +8880,66 @@ function buildParentDashboard() {
     tc('✅', rangeTotals.quizCorrect, 'Quiz Correct', showTodaySub ? 'Today: ' + todayTotals.quizCorrect : '', 'stars', 'quiz') +
     tc('✏️', rangeTotals.dictCorrect, 'Spelled Right', showTodaySub ? 'Today: ' + todayTotals.dictCorrect : '', 'spell', 'spell');
   body.appendChild(cardsGrid);
+
+  // ── Compared With [selected period] + Achievement by Lesson (formerly
+  // the separate Learning Timeline screen, folded into the Dashboard so the
+  // comparison follows the same Today/7/30/All Time filter as everything
+  // else here, instead of being hardcoded to "last week"). ──
+  const periodLabel = filterEl ? filterEl.options[filterEl.selectedIndex].textContent : periodLabelFallback(filterVal);
+  function periodLabelFallback(v){ return v==='1'?'Today':v==='30'?'Last 30 Days':v==='all'?'All Time':'Last 7 Days'; }
+  const hasPrior = days !== null;
+  const priorPeriodLabel = !hasPrior ? null : days === 1 ? 'yesterday' : `the ${days} days before that`;
+  const wordsDelta = priorTotals ? rangeTotals.wordsPractised - priorTotals.wordsPractised : null;
+  const accDelta = (accuracy !== null && priorAcc !== null) ? accuracy - priorAcc : null;
+
+  // Suggested next step only needs the current period's per-lesson accuracy,
+  // so it's computed any time there's lesson data — including All Time, which
+  // has no prior period to diff against for "Most improved".
+  let mostImproved = null, needsAttention = null;
+  {
+    const thisByLesson = sumByLessonRange(getDailyLogRange(days));
+    const lastByLesson = hasPrior ? sumByLessonRange(
+      Object.entries((p.dailyLog||{})).filter(([d]) => d >= daysAgoStr(days*2-1) && d < daysAgoStr(days-1)).map(([,v])=>v)
+    ) : {};
+    Object.keys(thisByLesson).forEach(id => {
+      const lesson = lessonById(id);
+      if (!lesson || !thisByLesson[id].total) return;
+      const level = LEVELS.find(lv => lv.lessons.some(l => l.id === id));
+      const curAcc = Math.round((thisByLesson[id].correct / thisByLesson[id].total) * 100);
+      if (lastByLesson[id] && lastByLesson[id].total) {
+        const priorLessonAcc = Math.round((lastByLesson[id].correct / lastByLesson[id].total) * 100);
+        const delta = curAcc - priorLessonAcc;
+        if (delta > 0 && (!mostImproved || delta > mostImproved.delta)) mostImproved = { name: lesson.name, delta };
+      }
+      if (!needsAttention || curAcc < needsAttention.curAcc) needsAttention = { name: lesson.name, curAcc, level };
+    });
+  }
+
+  const compareCard = document.createElement('div');
+  compareCard.className = 'pd-section-card';
+  compareCard.innerHTML = `
+    <div class="pd-section-title">📈 Progress Over Time<button class="pd-info-btn" type="button" aria-label="How this comparison works" onclick="showCardInfo('compare')">ⓘ</button></div>
+    <div class="tl-period">${hasPrior ? `${periodLabel} vs. ${priorPeriodLabel}` : `Showing ${periodLabel}`}</div>
+    <div class="tl-block">
+      <div class="tl-block-h">📖 Learning activity</div>
+      <div class="tl-line"><strong>${rangeTotals.lessonsCompleted}</strong> lesson${rangeTotals.lessonsCompleted===1?'':'s'} completed, <strong>${rangeTotals.wordsPractised}</strong> word${rangeTotals.wordsPractised===1?'':'s'} practised${wordsDelta===null ? '' : wordsDelta===0 ? ' (same as before)' : ` <span style="color:${wordsDelta>0?'var(--teal)':'var(--coral)'}">(${wordsDelta>0?wordsDelta+' more':(-wordsDelta)+' fewer'} words than before)</span>`}</div>
+    </div>
+    <div class="tl-block">
+      <div class="tl-block-h">🎯 Performance comparison</div>
+      <div class="tl-line">${!hasPrior ? (accuracy===null?'Not enough data yet.':`Accuracy so far: <strong>${accuracy}%</strong>.`) : accDelta===null ? 'Not enough data yet to compare accuracy.' : accDelta===0 ? `Accuracy held steady at ${accuracy}%.` : `Accuracy is <span style="color:${accDelta>0?'var(--teal)':'var(--coral)'}">${accDelta>0?'up':'down'} ${Math.abs(accDelta)} percentage point${Math.abs(accDelta)===1?'':'s'}</span> — ${accuracy}% now vs ${priorAcc}% before.`}</div>
+      ${hasPrior ? `<div class="tl-line">🌱 <strong>Most improved:</strong> ${mostImproved ? `${mostImproved.name} (+${mostImproved.delta} points)` : 'Not enough data yet'}</div>` : ''}
+    </div>
+    <div class="tl-block">
+      <div class="tl-block-h">➡️ Suggested next step</div>
+      <div class="tl-line">${needsAttention ? `Revisit <strong>${needsAttention.name}</strong> — currently at ${needsAttention.curAcc}%.` : 'Not enough data yet to suggest a lesson.'}</div>
+      ${needsAttention ? '<button class="pd-practice-btn" id="pd-next-step-btn">Practice this lesson</button>' : ''}
+    </div>
+  `;
+  if (needsAttention && needsAttention.level) {
+    compareCard.querySelector('#pd-next-step-btn').addEventListener('click', () => { goHome(); openLevel(needsAttention.level.id); });
+  }
+  body.appendChild(compareCard);
+  renderNeedsPractice(body, p);
 
   // ── Level Check (periodic re-check of starting-world fit) ──
   const levelCheck = levelCheckSuggestion();
@@ -9105,60 +9064,6 @@ function buildParentDashboard() {
     }
   });
   body.appendChild(worldsCard);
-
-  // ── Strengths & Worth Revisiting (computed from real per-lesson accuracy) ──
-  const lessonStats = [];
-  LEVELS.forEach(level => {
-    level.lessons.forEach(lesson => {
-      const rec = p[lesson.id];
-      if (rec && lesson.quizzes.length) {
-        lessonStats.push({ name: lesson.name, level, lesson, acc: Math.round((rec.score/lesson.quizzes.length)*100), score: rec.score, qTotal: lesson.quizzes.length });
-      }
-    });
-  });
-
-  const strengths = lessonStats.filter(s => s.acc >= 85).sort((a,b)=>b.acc-a.acc).slice(0,3);
-  const strengthsCard = document.createElement('div');
-  strengthsCard.className = 'pd-section-card';
-  strengthsCard.innerHTML = `<div class="pd-section-title">⭐ Strengths</div>`;
-  if (strengths.length) {
-    strengths.forEach(s => {
-      const row = document.createElement('div');
-      row.className = 'pd-strength-row';
-      row.innerHTML = `<span class="pd-sr-icon">${lessonThemeIcon(s.lesson)}</span><div><div class="pd-sr-name">Great with ${s.name}!</div><div class="pd-sr-sub">Quiz Score: ${s.acc}% — ${s.score} of ${s.qTotal} questions correct</div></div>`;
-      strengthsCard.appendChild(row);
-    });
-  } else {
-    strengthsCard.innerHTML += `<div class="pd-sr-sub">Complete a few more lessons to see strengths appear here!</div>`;
-  }
-  body.appendChild(strengthsCard);
-
-  const revisit = lessonStats.filter(s => s.acc < 75).sort((a,b)=>a.acc-b.acc).slice(0,3);
-  const revisitCard = document.createElement('div');
-  revisitCard.className = 'pd-section-card';
-  revisitCard.innerHTML = `<div class="pd-section-title">📌 Worth Revisiting</div><div style="font-size:0.68rem;color:#7a9cc0;margin-top:-6px;margin-bottom:6px;">These lessons need a little more practice.</div>`;
-  if (revisit.length) {
-    revisit.forEach(s => {
-      const row = document.createElement('div');
-      row.className = 'pd-revisit-row';
-      row.innerHTML = `
-        <div>
-          <div class="pd-sr-name">${lessonThemeIcon(s.lesson)} ${s.name}</div>
-          <div class="pd-revisit-acc">Quiz Score: ${s.acc}% — ${s.score} of ${s.qTotal} questions correct</div>
-          <div class="pd-revisit-reason">Practice recommended to build confidence.</div>
-        </div>
-        <button class="pd-practice-btn">Practice</button>
-      `;
-      row.querySelector('.pd-practice-btn').addEventListener('click', () => {
-        goHome();
-        openLevel(s.level.id);
-      });
-      revisitCard.appendChild(row);
-    });
-  } else {
-    revisitCard.innerHTML += `<div class="pd-sr-sub" style="color:#7a9cc0;">Nothing to flag right now — great work!</div>`;
-  }
-  body.appendChild(revisitCard);
 }
 
 /* ════════════════════════════════════════════
@@ -10229,17 +10134,15 @@ function proceedToApp() {
   runAchievementAudit();
   updateHomeProgress();
 
-  // A reload triggered by switching learners from inside the Dashboard or
-  // Timeline (openProfileSwitcher's resumeTo) lands straight back on that
-  // same screen for the new learner, instead of dumping the parent out to
+  // A reload triggered by switching learners from inside the Dashboard
+  // (openProfileSwitcher's resumeTo) lands straight back on that same
+  // screen for the new learner, instead of dumping the parent out to
   // Home and making them re-enter the PIN — this isn't a fresh app open,
   // it's a mid-session continuation they're already authenticated for.
   let _resumeScreen = null;
   try { _resumeScreen = sessionStorage.getItem('ls_resume_after_switch'); sessionStorage.removeItem('ls_resume_after_switch'); sessionStorage.removeItem('ls_skip_splash'); } catch (e) {}
   if (_resumeScreen === 'dashboard') {
     buildParentDashboard(); showScreen('parent');
-  } else if (_resumeScreen === 'timeline') {
-    buildTimeline(); showScreen('timeline-screen');
   } else {
     // Home used to just be the screen marked active by default in the raw
     // HTML, so nothing needed to say so explicitly. The sign-in gate took
@@ -10346,7 +10249,7 @@ const PD_INFO = {
   worldSW:      { title: '🏆 Spell-a-thon', text: 'How many different words from this world your child has mastered in Spell-a-thon, out of all the words it contains.' },
   lessonScore:  { title: '📝 Lesson Score', text: 'How your child did on this lesson’s quiz questions. 70% or higher means they have a solid grasp — below that, another round of practice is recommended (it isn’t a pass/fail grade).' },
   achievement:  { title: '✅ Achievement by Lesson', text: 'For each lesson, this combines how many words (from Spell-a-thon and Planet Patrol) and quiz questions your child got right, out of everything they have tried. 70% or higher is solid. Below 70% is flagged as worth another round — including a quiz that is below 70% on its own, even if the lesson overall looks fine.' },
-  compare:      { title: '📈 How This Comparison Works', text: 'This compares the last 7 days to the 7 days before that. Accuracy is shown as a percentage-point change (for example, "up 5 points" means 80% → 85%, not 5% more quizzes answered correctly).' },
+  compare:      { title: '📈 How This Comparison Works', text: 'This compares your selected period (the filter at the top of the Dashboard) to the equivalent period right before it — for example, Last 7 Days compares this week to the 7 days before that. Accuracy is shown as a percentage-point change (for example, "up 5 points" means 80% → 85%, not 5% more quizzes answered correctly). All Time has no earlier period to compare against, so it just shows totals so far.' },
 };
 function showCardInfo(key){
   const d = PD_INFO[key];
