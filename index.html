@@ -8709,24 +8709,18 @@ function buildSettings() {
   body.appendChild(soundCard);
 
   // Reset / Export / Import
+  // (The achievement/data-integrity audit itself — runAchievementAudit() —
+  // isn't a manual action a parent needs to trigger: it already runs
+  // automatically in the background on every app load, via proceedToApp().
+  // No "Check Achievements" button needed here for that.)
   const dataCard = document.createElement('div');
   dataCard.className = 'pd-section-card';
   dataCard.innerHTML = `
     <div class="pd-section-title">🗂️ Data</div>
-    <div class="set-row">
-      <button class="set-save-btn" id="set-audit-btn">🔍 Check Achievements</button>
-      <div class="set-future-note" id="set-audit-note"></div>
-    </div>
     <div class="set-row" style="margin-bottom:0;">
       <button class="set-danger-btn" id="set-reset-btn">🔄 Reset All Progress</button>
     </div>
   `;
-  dataCard.querySelector('#set-audit-btn').addEventListener('click', () => {
-    const fixedSomething = runAchievementAudit();
-    document.getElementById('set-audit-note').textContent = fixedSomething
-      ? '✓ Found and fixed some inconsistencies.'
-      : '✓ Everything checks out — no issues found.';
-  });
   dataCard.querySelector('#set-reset-btn').addEventListener('click', resetProgress);
   body.appendChild(dataCard);
 }
@@ -8738,7 +8732,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 82;
+const APP_VERSION = 83;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
