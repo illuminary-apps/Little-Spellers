@@ -8444,10 +8444,18 @@ function buildManageLearnersCard() {
       delBtn.textContent = '🗑️';
       delBtn.setAttribute('aria-label', 'Delete ' + prof.name);
       delBtn.addEventListener('click', () => {
-        if (!confirm(`Delete ${prof.name}'s profile? This erases all of their progress and cannot be undone.`)) return;
-        const wasActive = prof.id === activeId;
-        deleteProfile(prof.id);
-        if (wasActive) { location.reload(); } else { buildSettings(); }
+        showAppConfirm({
+          title: `Delete ${prof.name}'s profile?`,
+          message: 'This erases all of their progress and cannot be undone.',
+          confirmLabel: 'Delete Profile',
+          cancelLabel: 'Cancel',
+          danger: true,
+          onConfirm: () => {
+            const wasActive = prof.id === activeId;
+            deleteProfile(prof.id);
+            if (wasActive) { location.reload(); } else { buildSettings(); }
+          },
+        });
       });
       btnWrap.appendChild(delBtn);
     }
@@ -8732,7 +8740,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 83;
+const APP_VERSION = 84;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -9095,11 +9103,19 @@ function runAchievementAudit() {
 
 function resetProgress() {
   const name = getActiveProfile() ? getActiveProfile().name : 'this learner';
-  if (!confirm(`Reset all progress for ${name}? This cannot be undone. (Other learners on this device are not affected.)`)) return;
-  const id = getActiveProfileId();
-  try { localStorage.removeItem('ls_progress::' + id); } catch {}
-  updateHomeProgress();
-  goHome();
+  showAppConfirm({
+    title: `Reset all progress for ${name}?`,
+    message: 'This cannot be undone. Other learners on this device are not affected.',
+    confirmLabel: 'Reset Progress',
+    cancelLabel: 'Cancel',
+    danger: true,
+    onConfirm: () => {
+      const id = getActiveProfileId();
+      try { localStorage.removeItem('ls_progress::' + id); } catch {}
+      updateHomeProgress();
+      goHome();
+    },
+  });
 }
 
 /* ════════════════════════════════════════════
@@ -10177,6 +10193,21 @@ function checkForUpdates(){
       <button class="install-ok" onclick="closeInstall()">Got it</button>
     </div>
   </div>
+  <!-- App-styled Yes/No confirmation, used in place of the browser's native
+       confirm() for any destructive or important action (Reset All
+       Progress, deleting a profile, etc.) so it matches the app's look
+       instead of breaking out to a bare system dialog. Call showAppConfirm. -->
+  <div class="app-confirm-overlay" id="app-confirm-overlay" style="display:none" onclick="if(event.target===this)closeAppConfirm()">
+    <div class="app-confirm-box">
+      <div class="app-confirm-icon" id="app-confirm-icon">⚠️</div>
+      <div class="app-confirm-title" id="app-confirm-title"></div>
+      <div class="app-confirm-msg" id="app-confirm-msg"></div>
+      <div class="app-confirm-actions">
+        <button class="app-confirm-cancel-btn" id="app-confirm-cancel-btn">Cancel</button>
+        <button class="app-confirm-confirm-btn" id="app-confirm-confirm-btn">Confirm</button>
+      </div>
+    </div>
+  </div>
 <style>
 .install-slot{margin:18px 0 6px}
 .install-btn{border-color:rgba(255,209,102,.5)!important;animation:ibglow 3s ease-in-out infinite}
@@ -10191,6 +10222,16 @@ function checkForUpdates(){
 .install-card p{margin:0 0 12px;font-size:.95rem;line-height:1.5}
 .install-x{position:absolute;right:14px;top:12px;background:none;border:0;color:#fff;font-size:1.2rem;cursor:pointer}
 .install-ok{display:block;margin:6px auto 0;background:#ffd166;color:#2c2410;border:0;border-radius:999px;padding:10px 28px;font:700 1rem inherit;font-family:inherit;cursor:pointer}
+
+.app-confirm-overlay{position:fixed;inset:0;background:rgba(5,8,25,.78);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.app-confirm-box{width:100%;max-width:320px;background:var(--navy2);border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:22px 20px 18px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.app-confirm-icon{font-size:2rem;margin-bottom:6px}
+.app-confirm-title{font-family:var(--ff-head);font-size:1.02rem;color:#fff;margin-bottom:8px;line-height:1.3}
+.app-confirm-msg{font-size:.82rem;color:#9ab3d1;line-height:1.5;margin-bottom:18px}
+.app-confirm-actions{display:flex;gap:10px}
+.app-confirm-cancel-btn{flex:1;background:rgba(255,255,255,.06);color:#fff;border:1.5px solid rgba(255,255,255,.18);border-radius:99px;padding:10px 14px;font-family:var(--ff-head);font-size:.8rem;cursor:pointer}
+.app-confirm-confirm-btn{flex:1;background:var(--gold);color:var(--navy);border:none;border-radius:99px;padding:10px 14px;font-family:var(--ff-head);font-size:.8rem;cursor:pointer}
+.app-confirm-confirm-btn.danger{background:var(--coral);color:#2c0f0f}
 </style>
 <script>
 var _installEvt=null;
@@ -10213,6 +10254,34 @@ window.addEventListener('appinstalled',function(){_installEvt=null;_setInstalled
 document.addEventListener('visibilitychange',function(){if(!document.hidden)_refreshInstallBtn();});
 function _showInstall(title,body){document.getElementById('install-title').textContent=title;document.getElementById('install-body').innerHTML=body;document.getElementById('install-modal').style.display='flex';}
 function closeInstall(){document.getElementById('install-modal').style.display='none';}
+
+/* App-styled Yes/No confirm, replacing the browser's native confirm() for
+   destructive/important actions so the popup matches the rest of the app
+   instead of looking like a bare OS dialog. Usage:
+   showAppConfirm({ title, message, confirmLabel, cancelLabel, danger, onConfirm }) */
+let _appConfirmOnYes = null;
+function showAppConfirm(opts) {
+  opts = opts || {};
+  document.getElementById('app-confirm-icon').textContent = opts.icon || (opts.danger ? '⚠️' : '❓');
+  document.getElementById('app-confirm-title').textContent = opts.title || 'Are you sure?';
+  document.getElementById('app-confirm-msg').textContent = opts.message || '';
+  const confirmBtn = document.getElementById('app-confirm-confirm-btn');
+  confirmBtn.textContent = opts.confirmLabel || 'Confirm';
+  confirmBtn.classList.toggle('danger', !!opts.danger);
+  document.getElementById('app-confirm-cancel-btn').textContent = opts.cancelLabel || 'Cancel';
+  _appConfirmOnYes = typeof opts.onConfirm === 'function' ? opts.onConfirm : null;
+  document.getElementById('app-confirm-overlay').style.display = 'flex';
+}
+function closeAppConfirm() {
+  document.getElementById('app-confirm-overlay').style.display = 'none';
+  _appConfirmOnYes = null;
+}
+document.getElementById('app-confirm-cancel-btn').addEventListener('click', closeAppConfirm);
+document.getElementById('app-confirm-confirm-btn').addEventListener('click', () => {
+  const cb = _appConfirmOnYes;
+  closeAppConfirm();
+  if (cb) cb();
+});
 
 /* Info-icon popovers for the Parent Hub — reuses the install bottom-sheet
    instead of building a separate modal. PD_INFO holds a short title + plain-
