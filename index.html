@@ -8738,7 +8738,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 81;
+const APP_VERSION = 82;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -8881,66 +8881,6 @@ function buildParentDashboard() {
     tc('✏️', rangeTotals.dictCorrect, 'Spelled Right', showTodaySub ? 'Today: ' + todayTotals.dictCorrect : '', 'spell', 'spell');
   body.appendChild(cardsGrid);
 
-  // ── Compared With [selected period] + Achievement by Lesson (formerly
-  // the separate Learning Timeline screen, folded into the Dashboard so the
-  // comparison follows the same Today/7/30/All Time filter as everything
-  // else here, instead of being hardcoded to "last week"). ──
-  const periodLabel = filterEl ? filterEl.options[filterEl.selectedIndex].textContent : periodLabelFallback(filterVal);
-  function periodLabelFallback(v){ return v==='1'?'Today':v==='30'?'Last 30 Days':v==='all'?'All Time':'Last 7 Days'; }
-  const hasPrior = days !== null;
-  const priorPeriodLabel = !hasPrior ? null : days === 1 ? 'yesterday' : `the ${days} days before that`;
-  const wordsDelta = priorTotals ? rangeTotals.wordsPractised - priorTotals.wordsPractised : null;
-  const accDelta = (accuracy !== null && priorAcc !== null) ? accuracy - priorAcc : null;
-
-  // Suggested next step only needs the current period's per-lesson accuracy,
-  // so it's computed any time there's lesson data — including All Time, which
-  // has no prior period to diff against for "Most improved".
-  let mostImproved = null, needsAttention = null;
-  {
-    const thisByLesson = sumByLessonRange(getDailyLogRange(days));
-    const lastByLesson = hasPrior ? sumByLessonRange(
-      Object.entries((p.dailyLog||{})).filter(([d]) => d >= daysAgoStr(days*2-1) && d < daysAgoStr(days-1)).map(([,v])=>v)
-    ) : {};
-    Object.keys(thisByLesson).forEach(id => {
-      const lesson = lessonById(id);
-      if (!lesson || !thisByLesson[id].total) return;
-      const level = LEVELS.find(lv => lv.lessons.some(l => l.id === id));
-      const curAcc = Math.round((thisByLesson[id].correct / thisByLesson[id].total) * 100);
-      if (lastByLesson[id] && lastByLesson[id].total) {
-        const priorLessonAcc = Math.round((lastByLesson[id].correct / lastByLesson[id].total) * 100);
-        const delta = curAcc - priorLessonAcc;
-        if (delta > 0 && (!mostImproved || delta > mostImproved.delta)) mostImproved = { name: lesson.name, delta };
-      }
-      if (!needsAttention || curAcc < needsAttention.curAcc) needsAttention = { name: lesson.name, curAcc, level };
-    });
-  }
-
-  const compareCard = document.createElement('div');
-  compareCard.className = 'pd-section-card';
-  compareCard.innerHTML = `
-    <div class="pd-section-title">📈 Progress Over Time<button class="pd-info-btn" type="button" aria-label="How this comparison works" onclick="showCardInfo('compare')">ⓘ</button></div>
-    <div class="tl-period">${hasPrior ? `${periodLabel} vs. ${priorPeriodLabel}` : `Showing ${periodLabel}`}</div>
-    <div class="tl-block">
-      <div class="tl-block-h">📖 Learning activity</div>
-      <div class="tl-line"><strong>${rangeTotals.lessonsCompleted}</strong> lesson${rangeTotals.lessonsCompleted===1?'':'s'} completed, <strong>${rangeTotals.wordsPractised}</strong> word${rangeTotals.wordsPractised===1?'':'s'} practised${wordsDelta===null ? '' : wordsDelta===0 ? ' (same as before)' : ` <span style="color:${wordsDelta>0?'var(--teal)':'var(--coral)'}">(${wordsDelta>0?wordsDelta+' more':(-wordsDelta)+' fewer'} words than before)</span>`}</div>
-    </div>
-    <div class="tl-block">
-      <div class="tl-block-h">🎯 Performance comparison</div>
-      <div class="tl-line">${!hasPrior ? (accuracy===null?'Not enough data yet.':`Accuracy so far: <strong>${accuracy}%</strong>.`) : accDelta===null ? 'Not enough data yet to compare accuracy.' : accDelta===0 ? `Accuracy held steady at ${accuracy}%.` : `Accuracy is <span style="color:${accDelta>0?'var(--teal)':'var(--coral)'}">${accDelta>0?'up':'down'} ${Math.abs(accDelta)} percentage point${Math.abs(accDelta)===1?'':'s'}</span> — ${accuracy}% now vs ${priorAcc}% before.`}</div>
-      ${hasPrior ? `<div class="tl-line">🌱 <strong>Most improved:</strong> ${mostImproved ? `${mostImproved.name} (+${mostImproved.delta} points)` : 'Not enough data yet'}</div>` : ''}
-    </div>
-    <div class="tl-block">
-      <div class="tl-block-h">➡️ Suggested next step</div>
-      <div class="tl-line">${needsAttention ? `Revisit <strong>${needsAttention.name}</strong> — currently at ${needsAttention.curAcc}%.` : 'Not enough data yet to suggest a lesson.'}</div>
-      ${needsAttention ? '<button class="pd-practice-btn" id="pd-next-step-btn">Practice this lesson</button>' : ''}
-    </div>
-  `;
-  if (needsAttention && needsAttention.level) {
-    compareCard.querySelector('#pd-next-step-btn').addEventListener('click', () => { goHome(); openLevel(needsAttention.level.id); });
-  }
-  body.appendChild(compareCard);
-  renderNeedsPractice(body, p);
-
   // ── Level Check (periodic re-check of starting-world fit) ──
   const levelCheck = levelCheckSuggestion();
   if (levelCheck) {
@@ -9064,6 +9004,55 @@ function buildParentDashboard() {
     }
   });
   body.appendChild(worldsCard);
+
+  // ── Compared With [selected period] + Achievement by Lesson (formerly
+  // the separate Learning Timeline screen, folded into the Dashboard at the
+  // bottom, after the other sections, and following the same Today/7/30/
+  // All Time filter as everything else here instead of being hardcoded to
+  // "last week"). No "Suggested next step" line here — Achievement by
+  // Lesson right below already lists every lesson that needs practice with
+  // its own Practice button, so repeating just the single worst one here
+  // was redundant. ──
+  const periodLabel = filterEl ? filterEl.options[filterEl.selectedIndex].textContent : periodLabelFallback(filterVal);
+  function periodLabelFallback(v){ return v==='1'?'Today':v==='30'?'Last 30 Days':v==='all'?'All Time':'Last 7 Days'; }
+  const hasPrior = days !== null;
+  const priorPeriodLabel = !hasPrior ? null : days === 1 ? 'yesterday' : `the ${days} days before that`;
+  const wordsDelta = priorTotals ? rangeTotals.wordsPractised - priorTotals.wordsPractised : null;
+  const accDelta = (accuracy !== null && priorAcc !== null) ? accuracy - priorAcc : null;
+
+  let mostImproved = null;
+  if (hasPrior) {
+    const thisByLesson = sumByLessonRange(getDailyLogRange(days));
+    const lastByLesson = sumByLessonRange(
+      Object.entries((p.dailyLog||{})).filter(([d]) => d >= daysAgoStr(days*2-1) && d < daysAgoStr(days-1)).map(([,v])=>v)
+    );
+    Object.keys(thisByLesson).forEach(id => {
+      const lesson = lessonById(id);
+      if (!lesson || !thisByLesson[id].total || !lastByLesson[id] || !lastByLesson[id].total) return;
+      const curAcc = Math.round((thisByLesson[id].correct / thisByLesson[id].total) * 100);
+      const priorLessonAcc = Math.round((lastByLesson[id].correct / lastByLesson[id].total) * 100);
+      const delta = curAcc - priorLessonAcc;
+      if (delta > 0 && (!mostImproved || delta > mostImproved.delta)) mostImproved = { name: lesson.name, delta };
+    });
+  }
+
+  const compareCard = document.createElement('div');
+  compareCard.className = 'pd-section-card';
+  compareCard.innerHTML = `
+    <div class="pd-section-title">📈 Progress Over Time<button class="pd-info-btn" type="button" aria-label="How this comparison works" onclick="showCardInfo('compare')">ⓘ</button></div>
+    <div class="tl-period">${hasPrior ? `${periodLabel} vs. ${priorPeriodLabel}` : `Showing ${periodLabel}`}</div>
+    <div class="tl-block">
+      <div class="tl-block-h">📖 Learning activity</div>
+      <div class="tl-line"><strong>${rangeTotals.lessonsCompleted}</strong> lesson${rangeTotals.lessonsCompleted===1?'':'s'} completed, <strong>${rangeTotals.wordsPractised}</strong> word${rangeTotals.wordsPractised===1?'':'s'} practised${wordsDelta===null ? '' : wordsDelta===0 ? ' (same as before)' : ` <span style="color:${wordsDelta>0?'var(--teal)':'var(--coral)'}">(${wordsDelta>0?wordsDelta+' more':(-wordsDelta)+' fewer'} words than before)</span>`}</div>
+    </div>
+    <div class="tl-block">
+      <div class="tl-block-h">🎯 Performance comparison</div>
+      <div class="tl-line">${!hasPrior ? (accuracy===null?'Not enough data yet.':`Accuracy so far: <strong>${accuracy}%</strong>.`) : accDelta===null ? 'Not enough data yet to compare accuracy.' : accDelta===0 ? `Accuracy held steady at ${accuracy}%.` : `Accuracy is <span style="color:${accDelta>0?'var(--teal)':'var(--coral)'}">${accDelta>0?'up':'down'} ${Math.abs(accDelta)} percentage point${Math.abs(accDelta)===1?'':'s'}</span> — ${accuracy}% now vs ${priorAcc}% before.`}</div>
+      ${hasPrior ? `<div class="tl-line">🌱 <strong>Most improved:</strong> ${mostImproved ? `${mostImproved.name} (+${mostImproved.delta} points)` : 'Not enough data yet'}</div>` : ''}
+    </div>
+  `;
+  body.appendChild(compareCard);
+  renderNeedsPractice(body, p);
 }
 
 /* ════════════════════════════════════════════
@@ -10526,7 +10515,6 @@ window.__wordTotal=n;
 .tl-block-h{font-size:.74rem;font-weight:700;color:var(--white);margin-bottom:3px}
 .tl-line{font-size:.78rem;color:#c3d4ea;line-height:1.5;margin-bottom:3px}
 .tl-line:last-child{margin-bottom:0}
-.tl-block .pd-practice-btn{margin-top:6px}
 .ach-popup-reason{font-size:.85rem;color:#fff;opacity:.92;margin-top:4px;line-height:1.4;max-width:270px;padding:0 10px}
 .ach-popup-reward{font-size:.8rem;color:var(--gold);margin-top:6px;font-weight:700;max-width:270px;padding:0 10px}
 </style>
