@@ -2611,6 +2611,14 @@ setTimeout(function () {
 <!-- ══════════════════════════════════
      STAR CATCHER
 ══════════════════════════════════ -->
+<div id="wgame-screen" class="screen">
+  <div class="ch-header">
+    <button class="back-btn" onclick="wgExit()">←</button>
+    <div class="ch-title" id="wgame-title">Word Games</div>
+  </div>
+  <iframe id="wgame-frame" title="Word game" style="flex:1;width:100%;border:0;background:#0d1b2a" allow="autoplay"></iframe>
+</div>
+
 <div id="planetpatrol-screen" class="screen">
   <div class="ch-header">
     <button class="back-btn" onclick="ppExitGame()">←</button>
@@ -8740,7 +8748,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 86;
+const APP_VERSION = 87;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -9199,6 +9207,27 @@ function chRenderLevelList() {
     <span class="ch-level-arrow">›</span>`;
   satCard.addEventListener('click', chOpenSpellAThonLevels);
   body.appendChild(satCard);
+
+  [['🔗','Word Link','Link words into chains, trails and bridges','games/word_link.html'],
+   ['🌌','Word Galaxy','Six missions through the word galaxy','games/word_galaxy.html']].forEach(g => {
+    const c = document.createElement('div');
+    c.className = 'ch-level-card';
+    c.innerHTML = `<span class="ch-level-icon">${g[0]}</span><div class="ch-level-info"><div class="ch-level-name">${g[1]}</div><div class="ch-level-sub">${g[2]}</div></div><span class="ch-level-arrow">›</span>`;
+    c.addEventListener('click', () => wgOpen(g[3], g[0] + ' ' + g[1]));
+    body.appendChild(c);
+  });
+}
+
+function wgOpen(src, title) {
+  document.getElementById('wgame-title').textContent = title;
+  document.getElementById('wgame-frame').src = src + '?c=' + encodeURIComponent(getActiveProfileId());
+  showScreen('wgame-screen');
+}
+function wgExit() {
+  const f = document.getElementById('wgame-frame');
+  try { f.contentWindow.speechSynthesis.cancel(); } catch (e) {}
+  f.src = 'about:blank';
+  openChallenges();
 }
 
 function chOpenSpellAThonLevels() {
