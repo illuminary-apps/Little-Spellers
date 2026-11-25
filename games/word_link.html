@@ -768,6 +768,21 @@ function finish(all) {
 $('skinb').onclick = () => { skin = skin === 'solar' ? 'stars' : 'solar'; store.set('skin', skin); $('skinb').textContent = skin === 'solar' ? '⭐' : '🪐'; if (LV[lv].kind === 'tail' && !over) drawTether(); };
 $('skinb').textContent = skin === 'solar' ? '⭐' : '🪐';
 $('home').onclick = () => { if ($('cele').classList.contains('on')) return; showHub(); };
+/* ===== CBAR: completion bar ===== */
+function cbarInit(fn) {
+  const st = document.createElement('style');
+  st.textContent = '#cbar{position:fixed;left:0;right:0;top:0;height:7px;background:rgba(255,255,255,.12);z-index:55;pointer-events:none;display:none}#cbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7fffd4,#ffd166);border-radius:0 5px 5px 0;transition:width .5s}';
+  document.head.appendChild(st);
+  const el = document.createElement('div'); el.id = 'cbar'; el.innerHTML = '<i></i>'; document.body.appendChild(el);
+  setInterval(() => {
+    let f = null;
+    try { const h = document.getElementById('hub'); if (!(h && h.offsetParent !== null && getComputedStyle(h).display !== 'none')) f = fn(); } catch (e) { f = null; }
+    if (f == null || isNaN(f)) { el.style.display = 'none'; return; }
+    el.style.display = 'block'; el.firstChild.style.width = Math.round(Math.max(0, Math.min(1, f)) * 100) + '%';
+  }, 400);
+}
+/* ===== END CBAR ===== */
+cbarInit(() => (() => { const L = LV[lv]; let f = L.kind === 'route' ? (chain.length - 1) / Math.max(1, dTotal) : chain.length / NN(); f = Math.min(1, Math.max(0, f)); if (L.kind === 'tail' && L.rounds.length > 1) f = (rd + f) / L.rounds.length; return f; })());
 /* ===== COACH: shared practice walk-through helper (Lumi guide) =====
    API (all optional-safe):
    coach.on                 true while a guided/hinted practice level is running
