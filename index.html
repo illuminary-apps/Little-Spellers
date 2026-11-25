@@ -2611,6 +2611,15 @@ setTimeout(function () {
 <!-- ══════════════════════════════════
      STAR CATCHER
 ══════════════════════════════════ -->
+<div id="eval-screen" class="screen">
+  <div class="lesson-header">
+    <button class="back-btn" id="eval-back-btn" onclick="evalExit()">←</button>
+    <div class="lesson-progress-bar-wrap"><div class="lesson-progress-bar" id="eval-bar"></div></div>
+    <div class="lesson-step-label" id="eval-step">Check</div>
+  </div>
+  <div class="lesson-body" id="eval-body"></div>
+</div>
+
 <div id="wgame-screen" class="screen">
   <div class="ch-header">
     <button class="back-btn" onclick="wgExit()">←</button>
@@ -8844,7 +8853,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 97;
+const APP_VERSION = 98;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -9246,6 +9255,7 @@ const CH_ICONS = { foundation: '☁️', building: '🌙', expanding: '✨', mas
 const CH_FOOTPRINT_COUNT = 5;
 const CH_ROUND_SIZE = 5;
 
+let chSpellParent = 'games';
 let chCurrentLevel   = null;   // level object from LEVELS
 let chCurrentLesson  = null;   // lesson name string, or null for a Level Challenge
 let chPool           = [];     // all CHALLENGE_WORDS entries in scope
@@ -9272,6 +9282,7 @@ function saveChallengeWordProgress(wordId, updates) {
 
 /* ── entry point ── */
 function openChallenges() {
+  chSpellParent = 'games';
   chCurrentLevel = null;
   chCurrentLesson = null;
   showScreen('challenges');
@@ -9299,17 +9310,17 @@ function chRenderLevelList() {
   ppCard.addEventListener('click', openPlanetPatrolLevels);
   body.appendChild(ppCard);
 
-  const satCard = document.createElement('div');
-  satCard.className = 'ch-level-card';
-  satCard.innerHTML = `
-    <span class="ch-level-icon">🏆</span>
+  const evCard = document.createElement('div');
+  evCard.className = 'ch-level-card';
+  evCard.innerHTML = `
+    <span class="ch-level-icon">🎯</span>
     <div class="ch-level-info">
-      <div class="ch-level-name">Spell-a-thon</div>
-      <div class="ch-level-sub">Spell from memory, world by world</div>
+      <div class="ch-level-name">Evaluate</div>
+      <div class="ch-level-sub">Check what you learned, and Spell-a-thon</div>
     </div>
     <span class="ch-level-arrow">›</span>`;
-  satCard.addEventListener('click', chOpenSpellAThonLevels);
-  body.appendChild(satCard);
+  evCard.addEventListener('click', openEvaluate);
+  body.appendChild(evCard);
 
   [['🔗','Word Link','Link words into chains, trails and bridges','games/word_link.html'],
    ['🌌','Word Galaxy','Six missions through the word galaxy','games/word_galaxy.html']].forEach(g => {
@@ -9319,6 +9330,170 @@ function chRenderLevelList() {
     c.addEventListener('click', () => wgOpen(g[3], g[0] + ' ' + g[1]));
     body.appendChild(c);
   });
+}
+
+
+/* ════════════════════════════════════════
+   EVALUATE — screens
+════════════════════════════════════════ */
+let EV = null;
+const EV_STATUS_STARS = { new: 0, none: 0, emerging: 1, practice: 1, developing: 2, secure: 3 };
+function evStars(status) { const n = EV_STATUS_STARS[status] || 0; return '⭐'.repeat(n) + '☆'.repeat(3 - n); }
+
+function openEvaluate() {
+  chSpellParent = 'evaluate';
+  chCurrentLevel = null; chCurrentLesson = null;
+  showScreen('challenges');
+  evRenderHome();
+}
+function evRenderHome() {
+  const body = document.getElementById('ch-body');
+  body.classList.add('ch-grid'); body.innerHTML = '';
+  document.getElementById('ch-title').textContent = '🎯 Evaluate';
+  document.getElementById('ch-back-btn').onclick = goHome;
+  const p = getProgress();
+  const done = LEVELS.reduce((a, lv) => a + lv.lessons.filter(l => p[l.id]).length, 0);
+  EVAL_ORDER.forEach(k => {
+    const s = EVAL_SECS[k];
+    const attempted = LEVELS.reduce((a, lv) => a + lv.lessons.filter(l => evalAttempts(l.id, k).length).length, 0);
+    const card = document.createElement('div'); card.className = 'ch-level-card';
+    card.innerHTML = `<span class="ch-level-icon">${s.icon}</span><div class="ch-level-info"><div class="ch-level-name">${s.name}</div><div class="ch-level-sub">${s.desc}${attempted ? ' · ' + attempted + ' lesson' + (attempted === 1 ? '' : 's') + ' tried' : ''}</div></div><span class="ch-level-arrow">›</span>`;
+    card.addEventListener('click', () => evRenderLessons(k));
+    body.appendChild(card);
+  });
+  const sat = document.createElement('div'); sat.className = 'ch-level-card';
+  sat.innerHTML = `<span class="ch-level-icon">🏆</span><div class="ch-level-info"><div class="ch-level-name">Spell-a-thon</div><div class="ch-level-sub">Spell from memory, world by world</div></div><span class="ch-level-arrow">›</span>`;
+  sat.addEventListener('click', chOpenSpellAThonLevels);
+  body.appendChild(sat);
+  if (!done) { const n = document.createElement('div'); n.style.cssText = 'text-align:center;opacity:.7;font-size:.85rem;margin:14px 8px'; n.textContent = 'Finish a lesson first, then come back to check what you learned.'; body.appendChild(n); }
+}
+function evRenderLessons(sec) {
+  const s = EVAL_SECS[sec], p = getProgress();
+  const body = document.getElementById('ch-body'); body.classList.add('ch-grid'); body.innerHTML = '';
+  document.getElementById('ch-title').textContent = s.icon + ' ' + s.name;
+  document.getElementById('ch-back-btn').onclick = evRenderHome;
+  let any = false;
+  LEVELS.forEach(lv => {
+    const ls = lv.lessons.filter(l => p[l.id] && evalQs(l, sec).length);
+    if (!ls.length) return; any = true;
+    const h = document.createElement('div'); h.style.cssText = 'font-weight:800;opacity:.75;margin:12px 4px 2px;font-size:.85rem'; h.textContent = (CH_ICONS[lv.id] || '⭐') + ' ' + lv.name; body.appendChild(h);
+    ls.forEach(l => {
+      const m = evalMastery(l.id, sec), n = evalQs(l, sec).length;
+      const c = document.createElement('div'); c.className = 'ch-level-card';
+      c.innerHTML = `<span class="ch-level-icon">${lessonThemeIcon(l)}</span><div class="ch-level-info"><div class="ch-level-name">${l.name}</div><div class="ch-level-sub">${evStars(m.status)} · ${n} question${n === 1 ? '' : 's'}</div></div><span class="ch-level-arrow">›</span>`;
+      c.addEventListener('click', () => evalStart(l.id, sec));
+      body.appendChild(c);
+    });
+  });
+  if (!any) { const n = document.createElement('div'); n.style.cssText = 'text-align:center;opacity:.7;margin:24px 8px'; n.textContent = 'Finish a lesson to unlock its check here.'; body.appendChild(n); }
+}
+
+function evalStart(lessonId, sec) {
+  const les = findLessonById(lessonId);
+  EV = { les, sec, qs: evalQs(les, sec), idx: 0, first: {}, final: {}, phase: 'first', retryQs: [] };
+  document.getElementById('eval-back-btn').onclick = evalExit;
+  showScreen('eval-screen');
+  evalNext();
+}
+function evalExit() { try { if (synth) synth.cancel(); } catch (e) {} EV && evRenderLessons(EV.sec); showScreen('challenges'); }
+function evalList() { return EV.phase === 'first' ? EV.qs : EV.retryQs; }
+function evalNext() {
+  const list = evalList();
+  document.getElementById('eval-bar').style.width = Math.round(100 * EV.idx / Math.max(1, list.length)) + '%';
+  document.getElementById('eval-step').textContent = EVAL_SECS[EV.sec].icon + ' ' + (EV.phase === 'first' ? 'Check' : 'Try again');
+  if (EV.idx >= list.length) return evalPhaseDone();
+  evalRenderQ(list[EV.idx], EV.idx, list.length);
+}
+function evalAnswered(q, correct) {
+  if (EV.phase === 'first') EV.first[q.id] = correct;
+  EV.final[q.id] = correct;
+  EV.idx++; evalNext();
+}
+function evalPhaseDone() {
+  if (EV.phase === 'first') {
+    const missed = EV.qs.filter(q => !EV.first[q.id]);
+    if (missed.length) { EV.retryQs = missed; return evalRetryPrompt(missed.length); }
+  }
+  evalFinish();
+}
+function evalLumiSvg(cls) { const el = document.querySelector('.q-lumi-svg'); return el ? el.outerHTML.replace(/class="[^"]*"/, 'class="complete-lumi-svg ' + cls + '"') : ''; }
+function evalRetryPrompt(nMissed) {
+  const body = document.getElementById('eval-body'); body.innerHTML = '';
+  const n = EV.qs.length, c1 = n - nMissed;
+  const w = document.createElement('div'); w.className = 'complete-wrap';
+  w.innerHTML = `<div class="complete-title">${c1} of ${n} right first time!</div>
+    <div class="complete-subtitle">Want to try the ${nMissed} you missed again?</div>`;
+  const go = document.createElement('button'); go.className = 'complete-next-btn'; go.innerHTML = '<span class="cnb-label">Try again</span><span class="cnb-name">' + nMissed + ' question' + (nMissed === 1 ? '' : 's') + '</span>';
+  go.onclick = () => { EV.phase = 'retry'; EV.idx = 0; evalNext(); };
+  const skip = document.createElement('button'); skip.className = 'quiz-submit-btn'; skip.style.marginTop = '14px'; skip.textContent = 'Not now'; skip.onclick = evalFinish;
+  w.appendChild(go); w.appendChild(skip); body.appendChild(w);
+  try { speak('You got ' + c1 + ' of ' + n + ' right first time! Want to try the ones you missed again?'); } catch (e) {}
+}
+function evalFinish() {
+  const n = EV.qs.length, c1 = EV.qs.filter(q => EV.first[q.id]).length, cf = EV.qs.filter(q => EV.final[q.id]).length;
+  evalLogAttempt(EV.les.id, EV.sec, n, c1, cf, EV.qs.filter(q => !EV.first[q.id]).map(q => q.id));
+  document.getElementById('eval-bar').style.width = '100%';
+  const body = document.getElementById('eval-body'); body.innerHTML = '';
+  const stars = c1 === n ? 3 : c1 >= n * 0.6 ? 2 : 1;
+  const w = document.createElement('div'); w.className = 'complete-wrap';
+  const msg = c1 === n ? "Perfect! You're a star!" : c1 >= n * 0.6 ? 'Great work! Keep it up!' : 'Good try! Practice makes perfect!';
+  w.innerHTML = `<div class="complete-stars-row">${'⭐'.repeat(stars)}</div>
+    <div class="complete-title">${EVAL_SECS[EV.sec].name}</div>
+    <div class="complete-subtitle">${msg}</div>
+    <div class="score-row"><div class="score-chip"><span class="score-num">${c1}/${n}</span><span class="score-lbl">Right first time</span></div>${cf !== c1 ? `<div class="score-chip"><span class="score-num">${cf}/${n}</span><span class="score-lbl">After trying again</span></div>` : ''}</div>`;
+  const back = document.createElement('button'); back.className = 'complete-next-btn'; back.innerHTML = '<span class="cnb-label">Done</span><span class="cnb-name">Back to lessons</span>';
+  back.onclick = evalExit; w.appendChild(back); body.appendChild(w);
+  try { confetti(); speak(msg); } catch (e) {}
+}
+
+/* One question card. Same look and feedback as the old lesson quiz. */
+function evalRenderQ(q, idx, total) {
+  const body = document.getElementById('eval-body'); body.innerHTML = '';
+  const correctAnswers = q.answer.split(',').map(a => a.trim()).filter(Boolean), isMulti = correctAnswers.length > 1;
+  const wrap = document.createElement('div'); wrap.className = 'quiz-wrap';
+  const lab = document.createElement('div'); lab.className = 'quiz-q-label'; lab.textContent = (EV.phase === 'first' ? 'Question ' : 'Try again ') + (idx + 1) + ' of ' + total; wrap.appendChild(lab);
+  if (isMulti) { const b = document.createElement('div'); b.className = 'quiz-multi-badge'; b.textContent = '☑ Select ALL correct answers'; wrap.appendChild(b); }
+  const qt = document.createElement('div'); qt.className = 'quiz-question'; qt.textContent = q.q.replace(/\s*🔊\s*$/, ''); wrap.appendChild(qt);
+  const ab = document.createElement('button'); ab.className = 'quiz-audio-btn'; ab.innerHTML = '🔊 Hear the question';
+  ab.addEventListener('click', () => { ab.classList.add('playing'); speakQuizAudio(q.audio, () => ab.classList.remove('playing')); }); wrap.appendChild(ab);
+  const opts = document.createElement('div'); opts.className = 'quiz-options';
+  const fb = document.createElement('div'); fb.className = 'quiz-feedback';
+  const vis = q.options.filter(o => o !== '—'), letters = ['A', 'B', 'C', 'D']; let answered = false;
+  const next = ok => { evalAnswered(q, ok); };
+  const wrong = () => {
+    const utt = renderQuizFeedback(fb, false), go = () => setTimeout(() => next(false), 1000);
+    if (utt) { utt.onend = go; utt.onerror = go; } else setTimeout(() => next(false), 2200);
+  };
+  if (isMulti) {
+    const sel = new Set();
+    vis.forEach((opt, i) => {
+      const b = document.createElement('button'); b.className = 'quiz-opt multi'; b.innerHTML = `<span class="opt-letter">${letters[i]}</span>${opt}`;
+      b.addEventListener('click', () => { if (answered) return; if (sel.has(opt)) { sel.delete(opt); b.classList.remove('selected'); } else { sel.add(opt); b.classList.add('selected'); } });
+      opts.appendChild(b);
+    });
+    const sb = document.createElement('button'); sb.className = 'quiz-submit-btn'; sb.textContent = 'Check my answers ✓';
+    sb.addEventListener('click', e => {
+      if (answered) return; answered = true; sb.disabled = true;
+      const a = [...sel].sort(), c = correctAnswers.slice().sort(), ok = a.length === c.length && a.every(x => c.includes(x));
+      opts.querySelectorAll('.quiz-opt').forEach(b => { const t = b.textContent.replace(/^[A-D]/, '').trim(); b.classList.add('disabled'); if (correctAnswers.includes(t)) b.classList.add('correct'); else if (sel.has(t)) b.classList.add('wrong'); });
+      if (ok) { burstStar(e.clientX, e.clientY); renderQuizFeedback(fb, true); setTimeout(() => next(true), 1800); } else wrong();
+    });
+    wrap.appendChild(opts); wrap.appendChild(sb);
+  } else {
+    vis.forEach((opt, i) => {
+      const b = document.createElement('button'); b.className = 'quiz-opt'; b.innerHTML = `<span class="opt-letter">${letters[i]}</span>${opt}`;
+      b.addEventListener('click', e => {
+        if (answered) return; answered = true; opts.querySelectorAll('.quiz-opt').forEach(x => x.classList.add('disabled'));
+        const ok = opt === correctAnswers[0]; b.classList.add(ok ? 'correct' : 'wrong');
+        if (ok) { burstStar(e.clientX, e.clientY); renderQuizFeedback(fb, true); setTimeout(() => next(true), 1800); }
+        else { opts.querySelectorAll('.quiz-opt').forEach((x, j) => { if (vis[j] === correctAnswers[0]) x.classList.add('correct'); }); wrong(); }
+      });
+      opts.appendChild(b);
+    });
+    wrap.appendChild(opts);
+  }
+  wrap.appendChild(fb); body.appendChild(wrap);
+  setTimeout(() => { if (EV && evalList()[EV.idx] === q) { ab.classList.add('playing'); speakQuizAudio(q.audio, () => ab.classList.remove('playing')); } }, 500);
 }
 
 function wgOpen(src, title) {
@@ -9338,7 +9513,7 @@ function chOpenSpellAThonLevels() {
   body.classList.add('ch-grid');
   body.innerHTML = '';
   document.getElementById('ch-title').textContent = '🏆 Spell-a-thon';
-  document.getElementById('ch-back-btn').onclick = chRenderLevelList;
+  document.getElementById('ch-back-btn').onclick = chSpellParent === 'evaluate' ? evRenderHome : chRenderLevelList;
 
   LEVELS.forEach(level => {
     const card = document.createElement('div');
