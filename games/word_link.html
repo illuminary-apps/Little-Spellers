@@ -772,7 +772,7 @@ $('home').onclick = () => { if ($('cele').classList.contains('on')) return; show
    coach.start()            on=true
    Home button (#home) and nothing else is always allowed while blocking. */
 const coach = (function () {
-  let on = false, allow = [], allowKeys = '', soft = false, raf = 0, idleFn = null, idleMs = 6000, idleT = 0;
+  let on = false, allow = [], allowKeys = '', soft = false, raf = 0, idleFn = null, idleMs = 2500, idleT = 0, cur = 0, demoT = [];
   let ui, bub, bubTxt, rings = [], hand;
   function css() {
     if (document.getElementById('coachcss')) return;
@@ -802,28 +802,35 @@ const coach = (function () {
       const b = e.getBoundingClientRect(); if (!b.width) { r.style.display = 'none'; return; }
       r.style.display = 'block'; r.style.left = (b.left - 5) + 'px'; r.style.top = (b.top - 5) + 'px'; r.style.width = (b.width + 10) + 'px'; r.style.height = (b.height + 10) + 'px';
     });
-    if (els.length && els[0].getBoundingClientRect().width) {
-      const b = els[0].getBoundingClientRect(); hand.style.display = 'block';
+    const ce = els[Math.min(cur, els.length - 1)];
+    if (ce && ce.getBoundingClientRect().width) {
+      const b = ce.getBoundingClientRect(); hand.style.display = 'block';
       const below = b.bottom + 40 < innerHeight; hand.style.left = (b.left + b.width / 2 - 14) + 'px';
       hand.style.top = below ? (b.bottom + 4) + 'px' : (b.top - 40) + 'px'; hand.textContent = below ? '👆' : '👇';
-    } else hand.style.display = 'none';
+      let bt = below ? b.top - 54 : b.top - 92;
+      if (bt < 64) bt = below ? b.bottom + 50 : 64;
+      if (bt + 50 > innerHeight) bt = innerHeight - 56;
+      bub.style.top = bt + 'px';
+    } else { hand.style.display = 'none'; if (bub) bub.style.top = '104px'; }
     if (els.length) raf = requestAnimationFrame(layout);
   }
   function nudge() {
-    say('Tap the glowing one 👆');
+    say('Watch me!');
     rings.forEach(r => { r.classList.remove('coachshake'); void r.offsetWidth; r.classList.add('coachshake'); });
   }
   function guard(e) {
     if (!on || soft || !allow.length) return;
     const t = e.target; if (ui && ui.contains(t)) return;
     if (t.closest && t.closest('#home')) return;
-    if (allow.some(a => a && a.contains && a.contains(t))) return;
+    if (e.isTrusted === false && allow.some(a => a && a.contains && a.contains(t))) return;
+    if (soft || e.isTrusted !== false) { if (allow.some(a => a && a.contains && a.contains(t)) && soft) return; }
     e.stopPropagation(); e.preventDefault();
     if (e.type === 'pointerdown' || e.type === 'click') nudge();
   }
   ['pointerdown', 'pointerup', 'click', 'touchstart', 'mousedown'].forEach(ev => document.addEventListener(ev, guard, true));
   document.addEventListener('keydown', e => {
     if (!on || soft || !allow.length) return;
+    e.stopPropagation(); e.preventDefault(); return;
     if (e.key && e.key.length === 1 && allowKeys.indexOf(e.key.toLowerCase()) >= 0) return;
     if (e.key === 'Enter' && allow.some(a => a && ((a.id === 'ok') || (a.classList && a.classList.contains('ok'))))) return;
     if (e.key === 'Backspace' && allow.some(a => a && a.textContent === '⌫')) return;
@@ -831,21 +838,49 @@ const coach = (function () {
   }, true);
   function arm() { clearTimeout(idleT); if (on && idleFn) idleT = setTimeout(() => { if (on && idleFn) idleFn(); }, idleMs); }
   ['pointerdown', 'keydown'].forEach(ev => document.addEventListener(ev, () => { if (idleFn) { arm(); if (soft && allow.length) clear(); } }, true));
+  function shorten(t) {
+    t = String(t).replace(/[👆👇⭐]/g, '').trim();
+    if (/^Welcome/.test(t)) return 'Watch me!';
+    if (/^Now you try/.test(t)) return 'Your turn!';
+    if (/Well done|^Yes/.test(t)) return 'Well done!';
+    if (allow.length && !soft) return null;
+    if (t.split(/\s+/).length <= 2) return t;
+    return 'Try this!';
+  }
   function say(t, o) {
+    t = shorten(t); if (!t) return;
     build(); bubTxt.textContent = t; bub.style.display = 'flex';
-    if (!o || o.voice !== false) { try { if (typeof speak === 'function') speak(t.replace(/[👆👇⭐]/g, '')); } catch (e) { } }
+    if (!o || o.voice !== false) { try { if (typeof speak === 'function') speak(t); } catch (e) { } }
+  }
+  function tap(e) {
+    if (!e || !e.isConnected) return;
+    hand.style.transform = 'scale(.7)'; setTimeout(() => { if (hand) hand.style.transform = ''; }, 180);
+    const b = e.getBoundingClientRect(), o = { bubbles: true, cancelable: true, clientX: b.left + b.width / 2, clientY: b.top + b.height / 2, view: window, button: 0 };
+    ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'].forEach(n => {
+      try { e.dispatchEvent(n.startsWith('pointer') && window.PointerEvent ? new PointerEvent(n, Object.assign({ pointerId: 1, isPrimary: true, pointerType: 'touch' }, o)) : new MouseEvent(n, o)); } catch (x) { }
+    });
+  }
+  function demo(els) {
+    demoT.forEach(clearTimeout); demoT = []; cur = 0;
+    const run = () => {
+      els.forEach((e, i) => { demoT.push(setTimeout(() => { cur = i; }, 1300 * i + 900)); demoT.push(setTimeout(() => { tap(e); }, 1300 * i + 1500)); });
+      demoT.push(setTimeout(run, 1300 * els.length + 3200));
+    };
+    run();
   }
   function point(els, o) {
-    build(); allow = (Array.isArray(els) ? els : [els]).filter(Boolean); soft = !!(o && o.block === false);
+    build(); allow = (Array.isArray(els) ? els : [els]).filter(Boolean); soft = !!(o && o.block === false); cur = 0;
     cancelAnimationFrame(raf); raf = requestAnimationFrame(layout);
+    demoT.forEach(clearTimeout); demoT = [];
+    if (!soft && allow.length) demo(allow.slice());
   }
-  function clear() { allow = []; allowKeys = ''; soft = false; build(); cancelAnimationFrame(raf); rings.forEach(r => r.style.display = 'none'); hand.style.display = 'none'; }
+  function clear() { demoT.forEach(clearTimeout); demoT = []; cur = 0; allow = []; allowKeys = ''; soft = false; build(); cancelAnimationFrame(raf); rings.forEach(r => r.style.display = 'none'); hand.style.display = 'none'; }
   return {
     get on() { return on; },
     start() { on = true; build(); }, stop() { on = false; idleFn = null; clearTimeout(idleT); clear(); if (bub) bub.style.display = 'none'; },
     say, point, clear, keys(s) { allowKeys = (s || '').toLowerCase(); },
     hide() { build(); bub.style.display = 'none'; },
-    idle(fn, ms) { idleFn = fn; idleMs = ms || 6000; arm(); }, noIdle() { idleFn = null; clearTimeout(idleT); }
+    idle(fn, ms) { idleFn = fn; idleMs = Math.min(ms || 2500, 2500); arm(); }, noIdle() { idleFn = null; clearTimeout(idleT); }
   };
 })();
 /* ===== END COACH ===== */
