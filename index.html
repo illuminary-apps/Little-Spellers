@@ -8756,7 +8756,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 91;
+const APP_VERSION = 92;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -9129,8 +9129,14 @@ function resetProgress() {
       const id = getActiveProfileId();
       try { localStorage.removeItem('ls_progress::' + id); } catch {}
       clearGameProgress(id);
-      updateHomeProgress();
-      goHome();
+      // Behave like a brand-new profile: push the empty state to the cloud
+      // (so a sync doesn't bring the old progress back), then reload so
+      // nothing stays cached in memory.
+      const done = () => { try { sessionStorage.setItem('ls_skip_splash', '1'); } catch (e) {} location.reload(); };
+      try {
+        if (window.LSAfterReset) Promise.race([window.LSAfterReset(id), new Promise(r => setTimeout(r, 2500))]).then(done, done);
+        else done();
+      } catch (e) { done(); }
     },
   });
 }
@@ -10885,6 +10891,7 @@ window.deleteProfile = function(id) {
 };
 
 /* ── public surface used by the Settings "Account & Sync" card ── */
+window.LSAfterReset = async function(id) { bumpSyncTs(id); await pushChildToCloud(id); };
 window.LSSyncGetUser = function() { return _syncUser; };
 window.LSSyncSignIn = async function() {
   // Popup first, always. Every earlier failure (popup looking like it
