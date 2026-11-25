@@ -4526,6 +4526,94 @@ const LEVELS = [
   },
 ];
 
+/* ════════════════════════════════════════
+   EVALUATE — data layer
+   Every question gets an id and one of three sections:
+     L = Listen & Learn · P = Spot the Pattern · U = Use What You Know
+   History lives in progress.evalLog (additive; legacy scores untouched).
+════════════════════════════════════════ */
+const EVAL_SECS = {
+  L: { key: 'L', name: 'Listen & Learn', icon: '👂', desc: 'Hear a word and find it' },
+  P: { key: 'P', name: 'Spot the Pattern', icon: '🔍', desc: 'Rhymes, families and odd ones out' },
+  U: { key: 'U', name: 'Use What You Know', icon: '🧩', desc: 'Fill in, complete and apply' }
+};
+const EVAL_ORDER = ['L', 'P', 'U'];
+function evalClassify(q) {
+  const t = (q.q || '').toLowerCase();
+  if (t.indexOf('find the word you hear') === 0) return 'L';
+  if (t.indexOf('___') >= 0) return 'U';
+  if (/correctly spelled|correct spelling|spelled incorrectly|is a correct word/.test(t)) return 'U';
+  if (/^what does .* mean|what does the root|also means|tells us how|shows something already|^why does/.test(t)) return 'U';
+  if (/double its last letter|keeps its y|changes its y/.test(t)) return 'U';
+  if (/chunk/.test(t)) return 'P';
+  return 'P';
+}
+function evalHash(s) { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
+(function annotateQuestions() {
+  LEVELS.forEach(lv => lv.lessons.forEach(ls => {
+    ls.quizzes = ls.quizzes || [];
+    ls.quizzes.forEach(q => { q.sec = q.sec || evalClassify(q); q.id = q.id || (ls.id + ':' + evalHash((q.q || '') + '|' + (q.audio || '') + '|' + (q.answer || ''))); });
+  }));
+})();
+function evalQs(lesson, sec) { return (lesson.quizzes || []).filter(q => q.sec === sec); }
+function findLessonById(id) { let f = null; LEVELS.forEach(lv => lv.lessons.forEach(l => { if (l.id === id) f = l; })); return f; }
+
+/* one record per assessment attempt:
+   { t: ms, d: 'YYYY-MM-DD', l: lessonId, s: 'L'|'P'|'U', n: questions, c1: right first time,
+     cf: right after the retry round, m: [ids missed first time] } */
+function evalLogAttempt(lessonId, sec, n, c1, cf, missedIds) {
+  const p = getProgress();
+  p.evalLog = p.evalLog || [];
+  p.evalLog.push({ t: Date.now(), d: todayStr(), l: lessonId, s: sec, n, c1, cf, m: missedIds });
+  if (p.evalLog.length > 600) p.evalLog = p.evalLog.slice(-600);
+  saveProgress(p);
+  bumpDailyLog({ quizCorrect: c1, quizTotal: n, wordsPractised: n }, lessonId);
+  evalSyncLessonScore(lessonId);
+}
+function evalAttempts(lessonId, sec) {
+  const log = getProgress().evalLog || [];
+  return log.filter(a => a.l === lessonId && (!sec || a.s === sec));
+}
+/* lesson.score (used by stars, map and dashboard) = best first-attempt result per section, summed */
+function evalSyncLessonScore(lessonId) {
+  const les = findLessonById(lessonId); if (!les) return;
+  let total = 0;
+  EVAL_ORDER.forEach(s => {
+    const cap = evalQs(les, s).length;
+    const best = evalAttempts(lessonId, s).reduce((m, a) => Math.max(m, a.c1), 0);
+    total += Math.min(cap, best);
+  });
+  const p = getProgress();
+  if (!p[lessonId]) p[lessonId] = { complete: true, score: 0, ts: Date.now() };
+  if ((p[lessonId].score || 0) < total) { p[lessonId].score = total; saveProgress(p); }
+}
+/* Mastery for one section of one lesson. Never judged on a single attempt. */
+function evalMastery(lessonId, sec) {
+  const at = evalAttempts(lessonId, sec);
+  const tot = evalQs(findLessonById(lessonId) || {}, sec).length;
+  if (!at.length) return { sec, attempts: 0, pct: null, status: tot ? 'new' : 'none', trend: null, questions: tot };
+  const recent = at.slice(-3).reverse();            // newest first
+  const w = [0.5, 0.3, 0.2];
+  let num = 0, den = 0;
+  recent.forEach((a, i) => { num += w[i] * (a.n ? a.c1 / a.n : 0); den += w[i]; });
+  const pct = Math.round(100 * num / den);
+  const strongDays = new Set(recent.filter(a => a.n && a.c1 / a.n >= 0.8).map(a => a.d));
+  let status;
+  if (at.length < 2) status = 'emerging';
+  else if (strongDays.size >= 2) status = 'secure';
+  else if (pct >= 60) status = 'developing';
+  else status = 'practice';
+  let trend = null;
+  if (at.length >= 2) { const a = at[at.length - 1], b = at[at.length - 2]; trend = Math.round(100 * (a.c1 / a.n - b.c1 / b.n)); }
+  return { sec, attempts: at.length, pct, status, trend, questions: tot, lastFirst: Math.round(100 * at[at.length - 1].c1 / at[at.length - 1].n), lastFinal: Math.round(100 * at[at.length - 1].cf / at[at.length - 1].n) };
+}
+/* overall lesson result: pooled by question count so a short section cannot distort it */
+function evalOverall(lessonId) {
+  let num = 0, den = 0, any = false;
+  EVAL_ORDER.forEach(s => { const m = evalMastery(lessonId, s); if (m.pct !== null) { any = true; num += m.pct * m.questions; den += m.questions; } });
+  return any && den ? Math.round(num / den) : null;
+}
+
 /* ════════════════════════════════════════════
    NAVIGATION
 ════════════════════════════════════════════ */
