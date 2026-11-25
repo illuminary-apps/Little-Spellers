@@ -868,7 +868,7 @@ const coach = (function () {
     if (/^Welcome/.test(full)) { narrate(full); return; }
     t = shorten(t);
     if (!t) { if (demoOn) narrate(full); return; }
-    build(); bubTxt.textContent = t; bub.style.display = 'flex';
+    build(); /* no on-screen label: voice only */
     if (!o || o.voice !== false) { try { if (typeof speak === 'function') speak(t); } catch (e) { } }
   }
   function tap(e) {
