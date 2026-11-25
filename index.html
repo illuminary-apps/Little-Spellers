@@ -3071,6 +3071,13 @@ function updateProfile(id, updates) {
   if (typeof prof.name === 'string') prof.name = prof.name.trim().slice(0, 20) || 'Explorer';
   saveProfilesMeta(meta);
 }
+function clearGameProgress(id) {
+  try {
+    const p = 'c' + id + '::';
+    Object.keys(localStorage).filter(k => k.indexOf(p) === 0).forEach(k => localStorage.removeItem(k));
+  } catch {}
+}
+
 function deleteProfile(id) {
   const meta = getProfilesMeta();
   if (!meta || meta.profiles.length <= 1) return false;
@@ -3078,6 +3085,7 @@ function deleteProfile(id) {
   if (meta.activeId === id) meta.activeId = meta.profiles[0].id;
   saveProfilesMeta(meta);
   try { localStorage.removeItem('ls_progress::' + id); } catch {}
+  clearGameProgress(id);
   return true;
 }
 
@@ -8748,7 +8756,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 90;
+const APP_VERSION = 91;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -9120,6 +9128,7 @@ function resetProgress() {
     onConfirm: () => {
       const id = getActiveProfileId();
       try { localStorage.removeItem('ls_progress::' + id); } catch {}
+      clearGameProgress(id);
       updateHomeProgress();
       goHome();
     },
