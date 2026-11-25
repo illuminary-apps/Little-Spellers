@@ -458,8 +458,15 @@ const BK = {};
 function nbr1(w) { const L = w.length; if (!BK[L]) { BK[L] = {}; SW[L].forEach(x => { for (let i = 0; i < L; i++) { const p = x.slice(0, i) + '_' + x.slice(i + 1); (BK[L][p] = BK[L][p] || []).push(x); } }); } const out = new Set(); for (let i = 0; i < w.length; i++) (BK[L][w.slice(0, i) + '_' + w.slice(i + 1)] || []).forEach(x => { if (x !== w) out.add(x); }); return [...out]; }
 function bfsD(s) { const d = { [s]: 0 }, q = [s]; while (q.length) { const x = q.shift(); for (const n of nbr1(x)) if (!(n in d)) { d[n] = d[x] + 1; q.push(n); } } return d; }
 let pair = [], distT = {}, dTotal = 1, moves = 0, rNew = 0;
+const EASY = {"cat":0,"hat":0,"mat":0,"bat":0,"rat":0,"sat":0,"fat":0,"pat":0,"man":0,"pan":0,"van":0,"ran":0,"tan":0,"can":0,"ban":0,"fan":0,"tap":0,"map":0,"cap":0,"nap":0,"lap":0,"gap":0,"rap":0,"sap":0,"sad":0,"bad":0,"dad":0,"had":0,"mad":0,"lad":0,"pad":0,"glad":0,"ham":0,"jam":0,"ram":0,"yam":0,"dam":0,"clam":0,"tram":0,"slam":0,"bag":0,"rag":0,"tag":0,"wag":0,"nag":0,"flag":0,"drag":0,"brag":0,"the":1,"to":1,"i":1,"no":1,"go":1,"into":1,"he":1,"she":1,"we":1,"me":1,"be":1,"was":1,"my":1,"you":1,"they":1,"her":1,"all":1,"are":1,"said":1,"have":1,"like":1,"some":1,"come":1,"what":1,"where":1,"who":1,"which":1,"could":1,"would":1,"should":1,"because":1,"people":1,"water":1,"again":1,"friend":1,"school":1,"beautiful":1,"pretty":1,"sugar":1,"once":1,"door":1,"floor":1,"poor":1,"prove":1,"move":1,"whole":1,"hour":1,"eye":1,"busy":1,"every":1,"class":1,"grass":1,"pass":1,"mess":1,"press":1,"pull":1,"full":1,"bull":1,"roll":1,"ball":1,"complete":1,"different":1,"difficult":1,"famous":1,"important":1,"natural":1,"ordinary":1,"accident":1,"address":1,"history":1,"interest":1,"material":1,"answer":1,"forward":1,"heard":1,"notice":1,"perhaps":1,"appear":1,"arrive":1,"consider":1,"continue":1,"decide":1,"describe":1,"exercise":1,"actually":1,"certain":1,"extreme":1,"favourite":1,"occasionally":1,"opposite":1,"particular":1,"peculiar":1,"bicycle":1,"calendar":1,"centre":1,"experience":1,"february":1,"grammar":1,"height":1,"island":1,"knowledge":1,"library":1,"medicine":1,"minute":1,"believe":1,"caught":1,"disappear":1,"guard":1,"pet":1,"jet":1,"net":1,"set":1,"wet":1,"bet":1,"get":1,"let":1,"hen":1,"ten":1,"pen":1,"men":1,"den":1,"ben":1,"ken":1,"yen":1,"leg":1,"beg":1,"peg":1,"keg":1,"bed":1,"red":1,"fed":1,"led":1,"wed":1,"fled":1,"sped":1,"bell":1,"fell":1,"sell":1,"tell":1,"well":1,"yell":1,"shell":1,"spell":1,"sit":1,"hit":1,"bit":1,"fit":1,"kit":1,"pit":1,"wit":1,"spit":1,"pin":1,"win":1,"tin":1,"bin":1,"fin":1,"thin":1,"grin":1,"tip":1,"dip":1,"hip":1,"lip":1,"rip":1,"sip":1,"drip":1,"big":1,"dig":1,"fig":1,"pig":1,"wig":1,"jig":1,"twig":1,"sprig":1,"lid":1,"did":1,"hid":1,"rid":1,"bid":1,"grid":1,"skid":1,"slid":1,"hill":1,"fill":1,"bill":1,"mill":1,"pill":1,"will":1,"grill":1,"skill":1,"hot":1,"pot":1,"dot":1,"lot":1,"cot":1,"got":1,"rot":1,"trot":1,"top":1,"hop":1,"mop":1,"pop":1,"cop":1,"drop":1,"crop":1,"stop":1,"bob":1,"sob":1,"job":1,"blob":1,"knob":1,"dog":1,"fog":1,"hog":1,"log":1,"bog":1,"frog":1,"blog":1,"clog":1,"nod":1,"cod":1,"rod":1,"plod":1,"prod":1,"trod":1,"box":1,"fox":1,"ox":1,"cut":1,"but":1,"gut":1,"hut":1,"nut":1,"rut":1,"jut":1,"shut":1,"run":1,"sun":1,"fun":1,"bun":1,"spun":1,"stun":1,"cup":1,"pup":1,"sup":1,"rub":1,"hub":1,"tub":1,"club":1,"grub":1,"shrub":1,"stub":1,"bug":1,"dug":1,"hug":1,"jug":1,"mug":1,"rug":1,"plug":1,"slug":1,"gum":1,"hum":1,"sum":1,"drum":1,"plum":1};
+const er = w => EASY[w] === undefined ? 9 : EASY[w];
+const isTut = () => { const a = idxs(); return (lv === a[0] || lv === a[1]) && !doneSet.has(lv); };
+const ez = w => er(w) <= 1;
+function bfsE(s) { const d = { [s]: 0 }, q = [s]; while (q.length) { const x = q.shift(); for (const n of nbr1(x)) if (ez(n) && !(n in d)) { d[n] = d[x] + 1; q.push(n); } } return d; }
+function routeEasy(a, b) { const prev = { [a]: null }, q = [a]; while (q.length) { const x = q.shift(); if (x === b) break; for (const n of nbr1(x)) if (ez(n) && !(n in prev)) { prev[n] = x; q.push(n); } } if (!(b in prev)) return routeWords(a, b); const r = []; for (let x = b; x; x = prev[x]) r.unshift(x); return r; }
 function makePair(L) {
   const ws = SW[L.len];
+  if (isTut()) for (let r0 = 0; r0 <= 1; r0++) { const cs = ws.filter(w => er(w) <= r0); for (let k = 0; k < 300 && cs.length; k++) { const s = cs[Math.floor(Math.random() * cs.length)]; const dist = bfsE(s), c = ws.filter(w => dist[w] === Math.max(2, L.d) && ez(w)); if (c.length) return [s, c[Math.floor(Math.random() * c.length)]]; } }
   for (let t = 0; t < 600; t++) { const s = ws[Math.floor(Math.random() * ws.length)]; if (nbr1(s).length < 2) continue; const dist = bfsD(s), c = ws.filter(w => dist[w] === L.d); if (c.length) return [s, c[Math.floor(Math.random() * c.length)]]; }
   const s = ws[0], dist = bfsD(s), c = ws.filter(w => dist[w] >= 1).sort((a, b) => Math.abs(dist[a] - L.d) - Math.abs(dist[b] - L.d)); return [s, c[0]];
 }
@@ -638,12 +645,13 @@ function newRound() {
     $('sky').innerHTML = sceneSVG(L, pair); say('Change one letter at a time to fly to ' + L.bname + '.', '');
   } else if (L.kind === 'swap') {
     const ws = SW[L.len]; let w = ws[0], t = 0; do { w = ws[Math.floor(Math.random() * ws.length)]; t++; } while (nbs(w, L.k).length < 3 && t < 400);
+    if (isTut()) { const e0 = ws.filter(x => er(x) === 0 && nbs(x, L.k).filter(ez).length >= 2), e1 = ws.filter(x => ez(x) && nbs(x, L.k).filter(ez).length >= 2), e = e0.length ? e0 : e1; if (e.length) w = e[Math.floor(Math.random() * e.length)]; }
     chain = [w]; base = w; letters = w.split('');
     say((L.k === 1 ? 'Change one letter at a time' : 'Change up to ' + L.k + ' letters at a time') + ' to make ' + XL[L.xi].name + '.', '');
   } else {
     if (rdLv !== lv) { rd = 0; rdLv = lv; use = {}; } const R = L.rounds[rd]; { const xi = L.cons[rd % L.cons.length]; curCons = { name: XL[xi].name, p: XL[xi].P, xi }; }
     const okW = w => { const lens = R || [3, 4, 5, 6, 7, 8]; return (TB[w.slice(-1)] || []).some(x => x !== w && lens.includes(x.length)); };
-    let st = null; const lr = R || [3, 4, 5, 6, 7, 8], cands = STW.filter(w => lr.includes(w.length) && (use[w] || 0) < 2);
+    let st = null, cands; const lr = R || [3, 4, 5, 6, 7, 8]; cands = STW.filter(w => lr.includes(w.length) && (use[w] || 0) < 2); if (isTut()) { const e = cands.filter(ez); if (e.length) cands = e; }
     for (let t = 0; t < 300 && !st; t++) { const w = cands[Math.floor(Math.random() * cands.length)]; if (w && (TB[w.slice(-1)] || []).some(x => x !== w && lr.includes(x.length))) st = w; } if (!st) st = cands[0] || 'sun'; use[st] = (use[st] || 0) + 1;
     chain = [st]; req = st.slice(-1); typed = req; base = st; ghost = ''; setTurn();
     say('Your first word is ' + st + '. Now make a word that starts with ' + req + (want ? ' and has ' + want + ' letters' : '') + '.', '');
@@ -815,7 +823,6 @@ const coach = (function () {
     if (els.length) raf = requestAnimationFrame(layout);
   }
   function nudge() {
-    say('Watch me!', { voice: false });
     rings.forEach(r => { r.classList.remove('coachshake'); void r.offsetWidth; r.classList.add('coachshake'); });
   }
   function guard(e) {
@@ -840,7 +847,6 @@ const coach = (function () {
   ['pointerdown', 'keydown'].forEach(ev => document.addEventListener(ev, () => { if (idleFn) { arm(); if (soft && allow.length) clear(); } }, true));
   function shorten(t) {
     t = String(t).replace(/[👆👇⭐]/g, '').trim();
-    if (/^Welcome/.test(t)) return 'Watch me!';
     if (/^Now you try/.test(t)) return 'Your turn!';
     if (/Well done|^Yes/.test(t)) return 'Well done!';
     if (allow.length && !soft) return null;
@@ -859,10 +865,10 @@ const coach = (function () {
   function narrate(t) { if (!t) return; if (t === lastN && Date.now() - lastNT < 9000) return; lastN = t; lastNT = Date.now(); nq.push(t); pump(); }
   function say(t, o) {
     const full = String(t).replace(/[👆👇⭐]/g, '').trim(), demoOn = allow.length && !soft;
+    if (/^Welcome/.test(full)) { narrate(full); return; }
     t = shorten(t);
     if (!t) { if (demoOn) narrate(full); return; }
     build(); bubTxt.textContent = t; bub.style.display = 'flex';
-    if (/^Welcome/.test(full)) { narrate(full); return; }
     if (!o || o.voice !== false) { try { if (typeof speak === 'function') speak(t); } catch (e) { } }
   }
   function tap(e) {
@@ -909,7 +915,7 @@ function tutInit() {
   if (!tutMode) return; coach.start();
   const first = (lv === a[0] && !doneSet.has(lv)) && !(L.kind === 'tail' && rd >= 1);
   if (tutMode === 1) {
-    coach.say(rd === 0 || L.kind !== 'tail' ? ({ swap: 'Welcome to Word Chain! In this game you change one letter of a word to make a new word. Watch me.', tail: 'Welcome to Word Trail! Make a new word that starts with the last letter of the word before it. Watch me.', route: 'Welcome to Word Connect! Change one letter at a time to fly the rocket to the planet. Watch me.' })[L.kind] : 'Next one!');
+    coach.say(rd === 0 || L.kind !== 'tail' ? ({ swap: 'Welcome to Word Chain! In this game you change one letter of a word to make a new word. I will show you.', tail: 'Welcome to Word Trail! Make a new word that starts with the last letter of the word before it. I will show you.', route: 'Welcome to Word Connect! Change one letter at a time to fly the rocket to the planet. I will show you.' })[L.kind] : 'Next one!');
     tutTick = setInterval(tutStep, 250);
   } else {
     coach.say(lv === a[0] ? 'Now you try this one by yourself! I will help if you get stuck.' : "Now you try! I'll help if you get stuck.");
@@ -921,9 +927,9 @@ function tutStep() { if (over || busy || !tutMode) return; const t = tutTarget()
 const tutKey = c => document.querySelector('#kb .key[data-k="' + c + '"]');
 function tutPick() {
   const L = LV[lv];
-  if (L.kind === 'route') { const r = routeWords(base, pair[1]); return r[1] || ''; }
-  if (L.kind === 'swap') { const c = nbs(base, L.k).filter(x => SWS[L.len].has(x)); const good = c.filter(x => ham(x, base) === 1 && (chain.length + 1 >= NN() || nbs(x, L.k).length > 0)); return (good.length ? good : c)[0] || ''; }
-  const c = sugg().filter(x => TS.has(x) && (use[x] || 0) < 2); return c[0] || '';
+  if (L.kind === 'route') { const r = routeEasy(base, pair[1]); return r[1] || ''; }
+  if (L.kind === 'swap') { const c = nbs(base, L.k).filter(x => SWS[L.len].has(x)); const good = c.filter(x => ham(x, base) === 1 && (chain.length + 1 >= NN() || nbs(x, L.k).length > 0)); const gl = (good.length ? good : c).slice().sort((a, b) => er(a) - er(b)); return gl[0] || ''; }
+  const c = sugg().filter(x => TS.has(x) && (use[x] || 0) < 2).sort((a, b) => er(a) - er(b)); return c[0] || '';
 }
 function tutTarget() {
   const L = LV[lv]; if (over || busy) return null;
