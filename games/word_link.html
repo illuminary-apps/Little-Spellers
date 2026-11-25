@@ -772,7 +772,7 @@ $('home').onclick = () => { if ($('cele').classList.contains('on')) return; show
    coach.start()            on=true
    Home button (#home) and nothing else is always allowed while blocking. */
 const coach = (function () {
-  let on = false, allow = [], allowKeys = '', soft = false, raf = 0, idleFn = null, idleMs = 2500, idleT = 0, cur = 0, demoT = [];
+  let on = false, allow = [], allowKeys = '', soft = false, raf = 0, idleFn = null, idleMs = 2500, idleT = 0, cur = 0, demoT = [], narrUntil = 0, narrMax = 0;
   let ui, bub, bubTxt, rings = [], hand;
   function css() {
     if (document.getElementById('coachcss')) return;
@@ -815,7 +815,7 @@ const coach = (function () {
     if (els.length) raf = requestAnimationFrame(layout);
   }
   function nudge() {
-    say('Watch me!');
+    say('Watch me!', { voice: false });
     rings.forEach(r => { r.classList.remove('coachshake'); void r.offsetWidth; r.classList.add('coachshake'); });
   }
   function guard(e) {
@@ -847,9 +847,22 @@ const coach = (function () {
     if (t.split(/\s+/).length <= 2) return t;
     return 'Try this!';
   }
+  let nq = [], nT = 0;
+  function talking() { if (nq.length) return true; const n = Date.now(); if (n > narrMax) return false; return n < narrUntil || !!(window.speechSynthesis && speechSynthesis.speaking); }
+  function pump() {
+    clearTimeout(nT); if (!nq.length) return;
+    const n = Date.now(); if (n < narrUntil || (n < narrMax && window.speechSynthesis && speechSynthesis.speaking)) { nT = setTimeout(pump, 200); return; }
+    const t = nq.shift(); try { if (typeof speak === 'function') speak(t); } catch (e) { }
+    narrUntil = Date.now() + 400 + t.length * 45; narrMax = Date.now() + 25000; if (nq.length) nT = setTimeout(pump, 250);
+  }
+  let lastN = '', lastNT = 0;
+  function narrate(t) { if (!t) return; if (t === lastN && Date.now() - lastNT < 9000) return; lastN = t; lastNT = Date.now(); nq.push(t); pump(); }
   function say(t, o) {
-    t = shorten(t); if (!t) return;
+    const full = String(t).replace(/[👆👇⭐]/g, '').trim(), demoOn = allow.length && !soft;
+    t = shorten(t);
+    if (!t) { if (demoOn) narrate(full); return; }
     build(); bubTxt.textContent = t; bub.style.display = 'flex';
+    if (/^Welcome/.test(full)) { narrate(full); return; }
     if (!o || o.voice !== false) { try { if (typeof speak === 'function') speak(t); } catch (e) { } }
   }
   function tap(e) {
@@ -862,11 +875,13 @@ const coach = (function () {
   }
   function demo(els) {
     demoT.forEach(clearTimeout); demoT = []; cur = 0;
-    const run = () => {
-      els.forEach((e, i) => { demoT.push(setTimeout(() => { cur = i; }, 1300 * i + 900)); demoT.push(setTimeout(() => { tap(e); }, 1300 * i + 1500)); });
-      demoT.push(setTimeout(run, 1300 * els.length + 3200));
+    const at = (fn, ms) => demoT.push(setTimeout(fn, ms));
+    const step = i => {
+      if (i >= els.length) { at(() => step(0), 3200); return; }
+      const wait = () => { if (talking()) { at(wait, 250); return; } cur = i; at(() => { tap(els[i]); at(() => step(i + 1), 1100); }, 800); };
+      at(wait, 300);
     };
-    run();
+    step(0);
   }
   function point(els, o) {
     build(); allow = (Array.isArray(els) ? els : [els]).filter(Boolean); soft = !!(o && o.block === false); cur = 0;
@@ -877,8 +892,8 @@ const coach = (function () {
   function clear() { demoT.forEach(clearTimeout); demoT = []; cur = 0; allow = []; allowKeys = ''; soft = false; build(); cancelAnimationFrame(raf); rings.forEach(r => r.style.display = 'none'); hand.style.display = 'none'; }
   return {
     get on() { return on; },
-    start() { on = true; build(); }, stop() { on = false; idleFn = null; clearTimeout(idleT); clear(); if (bub) bub.style.display = 'none'; },
-    say, point, clear, keys(s) { allowKeys = (s || '').toLowerCase(); },
+    start() { on = true; build(); }, stop() { on = false; nq = []; clearTimeout(nT); idleFn = null; clearTimeout(idleT); clear(); if (bub) bub.style.display = 'none'; },
+    say, narrate, point, clear, keys(s) { allowKeys = (s || '').toLowerCase(); },
     hide() { build(); bub.style.display = 'none'; },
     idle(fn, ms) { idleFn = fn; idleMs = Math.min(ms || 2500, 2500); arm(); }, noIdle() { idleFn = null; clearTimeout(idleT); }
   };
@@ -894,7 +909,7 @@ function tutInit() {
   if (!tutMode) return; coach.start();
   const first = (lv === a[0] && !doneSet.has(lv)) && !(L.kind === 'tail' && rd >= 1);
   if (tutMode === 1) {
-    coach.say(rd === 0 || L.kind !== 'tail' ? ({ swap: 'Welcome to Word Chain! Change one letter to make a new word and light up a star. Tap the glowing things and I will show you how.', tail: 'Welcome to Word Trail! Every new word starts with the last letter of the word before it. Tap the glowing letters and I will show you how.', route: 'Welcome! Fly the rocket by changing one letter at a time to make new words until you reach the planet. Tap the glowing things and I will show you how.' })[L.kind] : 'Here comes a new constellation! Tap the glowing letters.');
+    coach.say(rd === 0 || L.kind !== 'tail' ? ({ swap: 'Welcome to Word Chain! In this game you change one letter of a word to make a new word. Watch me.', tail: 'Welcome to Word Trail! Make a new word that starts with the last letter of the word before it. Watch me.', route: 'Welcome to Word Connect! Change one letter at a time to fly the rocket to the planet. Watch me.' })[L.kind] : 'Next one!');
     tutTick = setInterval(tutStep, 250);
   } else {
     coach.say(lv === a[0] ? 'Now you try this one by yourself! I will help if you get stuck.' : "Now you try! I'll help if you get stuck.");
@@ -923,11 +938,14 @@ function tutTarget() {
   if (!w.startsWith(typed)) return tutKey('⌫'); return typed === w ? tutKey('✓') : tutKey(w[typed.length]);
 }
 function tutSay(t) {
-  if (t === $('undo')) return 'Let us start that word again. Tap the glowing button.';
-  if (t.classList && t.classList.contains('box')) { coach.keys(''); return 'Tap the glowing box. It is the letter we will change.'; }
+  const K = LV[lv].kind;
+  if (t === $('undo')) return 'Oops, let us start that word again.';
+  if (t.classList && t.classList.contains('box')) { coach.keys(''); return 'We are at ' + base + '. Let us change one letter to make ' + tutW + '.'; }
   const c = t.dataset && t.dataset.k; coach.keys(c && /^[a-z]$/.test(c) ? c : '');
-  if (c === '⌫') return 'Oops, tap the glowing arrow to rub out a letter.'; if (c === '✓') return 'Now tap the green tick to check your word!';
-  return LV[lv].kind === 'tail' ? 'Tap the glowing letter.' : 'Now tap the glowing letter to change it.';
+  if (c === '⌫') return 'Oops, rub it out.';
+  if (c === '✓') return 'Now check the new word.';
+  if (K === 'tail') { if (typed.length === 1 && typed === req) { const pv = chain[chain.length - 1]; return chain.length === 1 ? pv + ' ends in ' + req + '. So the new word starts with ' + req + '. Let us make ' + tutW + '.' : pv + ' ends in ' + req + '. So let us try ' + tutW + '.'; } return null; }
+  return 'Now pick the letter ' + c + '.';
 }
 const _tnr = newRound; newRound = function () { _tnr(); tutInit(); };
 const _tfn = finish; finish = function (a) { coach.stop(); clearInterval(tutTick); tutMode = 0; _tfn(a); };
