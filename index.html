@@ -242,6 +242,7 @@ html, body {
 }
 
 /* Constellation grid */
+.ev-pulse{animation:evpulse 1.4s ease-in-out infinite}@keyframes evpulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,209,102,.7)}50%{transform:scale(1.05);box-shadow:0 0 0 14px rgba(255,209,102,0)}}@media (prefers-reduced-motion:reduce){.ev-pulse{animation:none}}
 .home-tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:480px;margin-bottom:6px}
 .home-tile{border-radius:22px;padding:22px 10px 18px;text-align:center;cursor:pointer;border:2px solid rgba(255,255,255,.18);transition:transform .15s}
 .home-tile:active{transform:scale(.95)}
@@ -3323,6 +3324,7 @@ function sumByLessonRange(entries) {
 }
 
 function updateHomeProgress() {
+  try { const t = document.querySelector('.ht-eval'); if (t) t.classList.toggle('ev-pulse', evalAnyPending()); } catch (e) {}
   if (typeof applyStartGlow === 'function') applyStartGlow();
   LEVELS.forEach(level => {
     const total    = level.lessons.length;
@@ -4613,6 +4615,21 @@ function evalSyncLessonScore(lessonId) {
   if (!p[lessonId]) p[lessonId] = { complete: true, score: 0, ts: Date.now() };
   if ((p[lessonId].score || 0) < total) { p[lessonId].score = total; saveProgress(p); }
 }
+/* A section of a lesson is "cleared" for the child once one attempt was all right first time
+   (and covered every current question). Parent mastery is unaffected; this only hides it from the child's list. */
+function evalCleared(lessonId, sec) {
+  const les = findLessonById(lessonId); const n = les ? evalQs(les, sec).length : 0;
+  return n > 0 && evalAttempts(lessonId, sec).some(a => a.c1 === a.n && a.n >= n);
+}
+function evalPendingFor(lessonId) {
+  const les = findLessonById(lessonId), p = getProgress();
+  if (!les || !p[lessonId]) return [];
+  return EVAL_ORDER.filter(k => evalQs(les, k).length && !evalCleared(lessonId, k));
+}
+function evalPendingCount(sec) {
+  let c = 0; LEVELS.forEach(lv => lv.lessons.forEach(l => { if (evalPendingFor(l.id).includes(sec)) c++; })); return c;
+}
+function evalAnyPending() { return EVAL_ORDER.some(k => evalPendingCount(k) > 0); }
 /* Mastery for one section of one lesson. Never judged on a single attempt. */
 function evalMastery(lessonId, sec) {
   const at = evalAttempts(lessonId, sec);
@@ -4715,7 +4732,7 @@ function _navReloadClean() {
 function _navTrimHome() {
   if (_navDepth > 1) { const n = _navDepth - 1; _navDepth = 1; _navIgnore++; try { history.go(-n); } catch (e) { _navIgnore--; } }
 }
-function _navOnScreen(id) { _nl('show ' + id); _wakeSet(id !== 'home'); if (id === 'home') { _navTrimHome(); if (window.__pendingReload) { window.__pendingReload = false; setTimeout(() => _navReloadClean(), 50); } } }
+function _navOnScreen(id) { _nl('show ' + id); if (id === 'home') { setTimeout(() => { try { fitHome(); } catch (e) {} }, 60); } _wakeSet(id !== 'home'); if (id === 'home') { _navTrimHome(); if (window.__pendingReload) { window.__pendingReload = false; setTimeout(() => _navReloadClean(), 50); } } }
 /* One history entry per tap, added synchronously inside the tap itself so Chrome treats it as
    user-made (entries added any later are skipped by Back). */
 document.addEventListener('click', e => {
@@ -5003,6 +5020,20 @@ function applyStartGlow() {
   });
 }
 
+/* Keep the whole home screen on one page, even on short browser windows */
+function fitHome() {
+  const h = document.getElementById('home'); if (!h || !h.classList.contains('active')) return;
+  const parts = h.querySelectorAll('.home-header,.constellation-label,.home-tiles,.home-bottom-row');
+  parts.forEach(e => e.style.zoom = '');
+  h.style.paddingBottom = '';
+  const natural = h.scrollHeight, avail = h.clientHeight;
+  if (natural > avail + 1) {
+    const z = Math.max(0.5, (avail - 8) / natural);
+    parts.forEach(e => e.style.zoom = z.toFixed(3));
+    h.style.paddingBottom = '0.5rem';
+  }
+}
+window.addEventListener('resize', () => setTimeout(fitHome, 50));
 function openLearn() { showScreen('learn'); updateHomeProgress(); }
 function applySoon() {
   try { if (typeof speak === 'function') speak('Apply is coming soon!'); } catch (e) {}
@@ -5014,6 +5045,7 @@ function applySoon() {
 function goHome() {
   showScreen('home');
   updateHomeProgress();
+  setTimeout(fitHome, 30); setTimeout(fitHome, 400);
 }
 
 function cloneJourneyUFO() {
@@ -7166,12 +7198,14 @@ function renderComplete(body) {
   // arrow (top-left) already does exactly that, and a kid can gesture-back
   // too, so a second one just added clutter. Same reasoning removed the
   // "My Achievements" shortcut and the badge-earned callout box below.
-  const evBtn = document.createElement('button');
-  evBtn.className = 'quiz-submit-btn';
-  evBtn.style.marginBottom = '12px';
-  evBtn.textContent = '🎯 Check what I learned';
-  evBtn.addEventListener('click', openEvaluate);
-  wrap.appendChild(evBtn);
+  if (evalPendingFor(l.id).length) {
+    const evBtn = document.createElement('button');
+    evBtn.className = 'quiz-submit-btn ev-pulse';
+    evBtn.style.marginBottom = '12px';
+    evBtn.textContent = '🎯 Check what I learned';
+    evBtn.addEventListener('click', openEvaluate);
+    wrap.appendChild(evBtn);
+  }
   const nextLesson = findNextLesson();
   if (nextLesson) {
     // This button always lands on a lesson beyond the first in its world
@@ -8315,6 +8349,7 @@ function evalBarsHtml(lessonId){
     h+='<div class="sc-mini-row"><span class="sc-mini-n">'+EVAL_SECS[s].icon+' '+EVAL_SECS[s].name+'</span><span class="sc-bar"><i class="'+(m.pct===null?'':evalBandLabel(v)[1])+'" style="width:'+v+'%"></i></span><span class="sc-mini-p">'+(m.pct===null?'–':v+'%')+'</span></div>';});
   return any?h+'</div>':'';
 }
+function evWorldPct(level,sec){var n=0,d=0;level.lessons.forEach(function(l){var m=evalMastery(l.id,sec);if(m.pct!==null){n+=m.pct*m.questions;d+=m.questions;}});return d?Math.round(n/d):null;}
 function renderSkillsCheck(host,p){
   var log=p.evalLog||[],card=document.createElement('div');card.className='pd-section-card';
   var h='<div class="pd-section-title">🎯 Skills Check<button class="pd-info-btn" type="button" aria-label="How Skills Check works" onclick="showCardInfo(\'skills\')">ⓘ</button></div>';
@@ -8737,7 +8772,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 101;
+const APP_VERSION = 102;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -8902,22 +8937,6 @@ function buildParentDashboard() {
     body.appendChild(lcCard);
   }
 
-  // ── Games (overall scores) ──
-  const _pp=p.planetPatrol||{}, _sw=(p.spellathon&&p.spellathon.byWorld)||{};
-  let _swPerfect=0,_swBack=0,_swWords=0,_swMast=0;
-  Object.values(_sw).forEach(w=>{_swPerfect+=w.perfect||0;_swBack+=w.comeback||0;});_swWords=uq.all.t;_swMast=uq.all.m;
-  
-  const gamesCard=document.createElement('div');gamesCard.className='pd-section-card';
-  gamesCard.innerHTML=`<div class="pd-section-title">🎮 Games</div>
-   <div class="pd-games">
-    <div class="pd-game"><div class="pd-game-h">🪐 Planet Patrol <button class="pd-info-btn" type="button" aria-label="What does Planet Patrol count?" onclick="showCardInfo('pp')">ⓘ</button></div>
-      <div class="pd-game-n">${ppq.all.c}<span>/${ppq.all.t}</span></div><div class="pd-game-l">words caught</div>
-      <div class="pd-game-s">${_pp.perfectRounds||0} perfect rounds</div></div>
-    <div class="pd-game"><div class="pd-game-h">🏆 Spell-a-thon <button class="pd-info-btn" type="button" aria-label="What does Spell-a-thon count?" onclick="showCardInfo('sw')">ⓘ</button></div>
-      <div class="pd-game-n">${_swMast}<span>/${_swWords}</span></div><div class="pd-game-l">words mastered</div>
-      <div class="pd-game-s">${_swPerfect} perfect rounds</div></div>
-   </div>`;
-  body.appendChild(gamesCard);
 
   // ── Learning Worlds ──
   const worldsCard = document.createElement('div');
@@ -8953,9 +8972,7 @@ function buildParentDashboard() {
       <div class="pd-lesson-detail-row" style="display:${isOpen?'grid':'none'}">
         <span class="pdl-name">${WORLD_EMOJI[level.id] || ''} ${level.name} Overview</span>
         <span class="pdl-m"><b>${done}/${total}</b>Lessons completed<button class="pd-info-btn" type="button" aria-label="What does Lessons count?" onclick="event.stopPropagation(); showCardInfo('worldLessons')">ⓘ</button></span>
-        <span class="pdl-m"><b>${level.lessons.reduce((a,l)=>a+(p[l.id]?.score||0),0)}/${level.lessons.reduce((a,l)=>a+l.quizzes.length,0)}</b>Quiz questions correct<button class="pd-info-btn" type="button" aria-label="What does Quiz count?" onclick="event.stopPropagation(); showCardInfo('worldQuiz')">ⓘ</button></span>
-        <span class="pdl-m"><b>${ppq[level.id].c}/${ppq[level.id].t}</b>Planet Patrol — words caught<button class="pd-info-btn" type="button" aria-label="What does Planet Patrol count?" onclick="event.stopPropagation(); showCardInfo('worldPP')">ⓘ</button></span>
-        <span class="pdl-m"><b>${uq[level.id].m}/${uq[level.id].t}</b>Spell-a-thon — words mastered<button class="pd-info-btn" type="button" aria-label="What does Spell-a-thon count?" onclick="event.stopPropagation(); showCardInfo('worldSW')">ⓘ</button></span>
+        ${EVAL_ORDER.map(sk => { const w = evWorldPct(level, sk); return `<span class="pdl-m"><b class="${w===null?'':evalBandLabel(w)[1]}">${w===null?'–':w+'%'}</b>${EVAL_SECS[sk].icon} ${EVAL_SECS[sk].name}</span>`; }).join('')}
       </div>
       <div class="plc-lessons" id="plc-${level.id}" style="display:${isOpen?'flex':'none'}; margin-top:0.5rem;"></div>
     `;
@@ -8972,9 +8989,8 @@ function buildParentDashboard() {
       colHeader.innerHTML = `
         <span></span>
         <span class="plr-name">Lesson</span>
-        <span class="plr-score">Quiz Score<button class="pd-info-btn" type="button" aria-label="What does Quiz Score mean?" onclick="event.stopPropagation(); showCardInfo('lessonScore')">ⓘ</button></span>
+        ${EVAL_ORDER.map(sk => `<span class="plr-sc" title="${EVAL_SECS[sk].name}">${EVAL_SECS[sk].icon}</span>`).join('')}
         <span class="plr-st"></span>
-        <span class="plr-sw">Spell-a-thon</span>
       `;
       lessonsEl.appendChild(colHeader);
       level.lessons.forEach(lesson => {
@@ -8988,15 +9004,19 @@ function buildParentDashboard() {
           return rec && rec.mastery >= 2;
         }).length;
 
-        const qPct = qTotal ? Math.round((score/qTotal)*100) : null;
         const row = document.createElement('div');
         row.className = 'plc-lesson-row';
+        const cells = EVAL_ORDER.map(sk => {
+          const m = evalMastery(lesson.id, sk);
+          if (!m.questions) return '<span class="plr-sc plr-na">n/a</span>';
+          if (m.pct === null) return '<span class="plr-sc">–</span>';
+          return `<span class="plr-sc ${evalBandLabel(m.pct)[1]}">${m.pct}%</span>`;
+        }).join('');
         row.innerHTML = `
           <span class="plr-icon">${lessonThemeIcon(lesson)}</span>
           <span class="plr-name">${lesson.name}</span>
-          <span class="plr-score">${isDone && qPct!==null ? `${qPct}%<span class="plr-raw">${score}/${qTotal}</span>` : '–'}</span>
+          ${cells}
           <span class="plr-st">${isDone ? '✓' : '○'}</span>
-          <span class="plr-sw">${lessonWords.length ? '🏆 '+lessonMastered+'/'+lessonWords.length : ''}</span>
         `;
         lessonsEl.appendChild(row);
       });
@@ -9229,6 +9249,8 @@ function evRenderHome() {
   const done = LEVELS.reduce((a, lv) => a + lv.lessons.filter(l => p[l.id]).length, 0);
   EVAL_ORDER.forEach(k => {
     const s = EVAL_SECS[k];
+    const pend = evalPendingCount(k);
+    if (!pend) return;
     const attempted = LEVELS.reduce((a, lv) => a + lv.lessons.filter(l => evalAttempts(l.id, k).length).length, 0);
     const card = document.createElement('div'); card.className = 'ch-level-card';
     card.innerHTML = `<span class="ch-level-icon">${s.icon}</span><div class="ch-level-info"><div class="ch-level-name">${s.name}</div><div class="ch-level-sub">${s.desc}${attempted ? ' · ' + attempted + ' lesson' + (attempted === 1 ? '' : 's') + ' tried' : ''}</div></div><span class="ch-level-arrow">›</span>`;
@@ -9239,6 +9261,7 @@ function evRenderHome() {
   sat.innerHTML = `<span class="ch-level-icon">🏆</span><div class="ch-level-info"><div class="ch-level-name">Spell-a-thon</div><div class="ch-level-sub">Spell from memory, world by world</div></div><span class="ch-level-arrow">›</span>`;
   sat.addEventListener('click', chOpenSpellAThonLevels);
   body.appendChild(sat);
+  if (done && !evalAnyPending()) { const n = document.createElement('div'); n.style.cssText = 'text-align:center;font-size:.95rem;margin:14px 8px;font-weight:700'; n.textContent = '🎉 All checks done! Finish another lesson for new ones.'; body.appendChild(n); }
   if (!done) { const n = document.createElement('div'); n.style.cssText = 'text-align:center;opacity:.7;font-size:.85rem;margin:14px 8px'; n.textContent = 'Finish a lesson first, then come back to check what you learned.'; body.appendChild(n); }
 }
 function evRenderLessons(sec) {
@@ -9248,7 +9271,7 @@ function evRenderLessons(sec) {
   document.getElementById('ch-back-btn').onclick = evRenderHome;
   let any = false;
   LEVELS.forEach(lv => {
-    const ls = lv.lessons.filter(l => p[l.id] && evalQs(l, sec).length);
+    const ls = lv.lessons.filter(l => p[l.id] && evalQs(l, sec).length && !evalCleared(l.id, sec));
     if (!ls.length) return; any = true;
     const h = document.createElement('div'); h.style.cssText = 'font-weight:800;opacity:.75;margin:12px 4px 2px;font-size:.85rem'; h.textContent = (CH_ICONS[lv.id] || '⭐') + ' ' + lv.name; body.appendChild(h);
     ls.forEach(l => {
@@ -9269,7 +9292,7 @@ function evalStart(lessonId, sec) {
   showScreen('eval-screen');
   evalNext();
 }
-function evalExit() { try { if (synth) synth.cancel(); } catch (e) {} EV && evRenderLessons(EV.sec); showScreen('challenges'); }
+function evalExit() { try { if (synth) synth.cancel(); } catch (e) {} if (EV) { if (evalPendingCount(EV.sec)) evRenderLessons(EV.sec); else evRenderHome(); } showScreen('challenges'); }
 function evalList() { return EV.phase === 'first' ? EV.qs : EV.retryQs; }
 function evalNext() {
   const list = evalList();
@@ -10707,12 +10730,13 @@ autoScrollToStart(1600);
 .pd-lesson-detail-row{grid-template-columns:repeat(4,1fr)!important;gap:4px!important;padding:12px 0 8px!important}
 .pd-lesson-detail-row .pdl-name{margin-bottom:6px!important}
 .pdl-m{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.62rem;color:#7a9cc0;line-height:1.2;text-align:center}
+.plc-lesson-row .plr-sc.sc-good,.pdl-m b.sc-good{color:#6fe09a}.plc-lesson-row .plr-sc.sc-mid,.pdl-m b.sc-mid{color:#ffd166}.plc-lesson-row .plr-sc.sc-low,.pdl-m b.sc-low{color:#ff8a80}
 .pdl-m b{font-family:var(--ff-head);font-size:1rem;color:#fff;font-weight:400}
 .pdl-m .pd-info-btn{position:static;width:14px;height:14px;line-height:14px;font-size:.5rem;margin-top:1px;flex-shrink:0}
-.plc-lesson-row{display:grid!important;grid-template-columns:1.6rem 1fr 3rem 1.4rem 4.2rem;align-items:center;gap:6px;padding:5px 0}
+.plc-lesson-row{display:grid!important;grid-template-columns:1.6rem 1fr 2.6rem 2.6rem 2.6rem 1.2rem;align-items:center;gap:6px;padding:5px 0}
 .plc-lesson-row .plr-score{text-align:right}
 .plc-lesson-row .plr-st{text-align:center;color:var(--teal)}
-.plc-lesson-row .plr-sw{text-align:right;font-size:.66rem;color:#7a9cc0;white-space:nowrap}
+.plc-lesson-row .plr-sc{text-align:center;font-size:.72rem;font-weight:700;color:#7a9cc0}.plr-sc.plr-na{opacity:.4;font-weight:400;font-size:.6rem}
 .plc-lessons{margin-top:6px!important}
 .pd-world-card{margin:0 0 12px!important}
 .pd-world-card .plc-bar-wrap{margin-bottom:.4rem}
