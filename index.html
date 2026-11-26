@@ -8280,6 +8280,56 @@ function needsPracticeStats(p){
   });
   return out;
 }
+
+/* ── Parent Hub: Skills Check (Evaluate results) ── */
+function evalBandLabel(pct){return pct>=80?['Strong','sc-good']:pct>=60?['Getting there','sc-mid']:['Needs practice','sc-low'];}
+function evalBarsHtml(lessonId){
+  var any=false,h='<div class="sc-mini">';
+  EVAL_ORDER.forEach(function(s){var m=evalMastery(lessonId,s);if(!m.questions)return;
+    var v=m.pct===null?0:m.pct;if(m.pct!==null)any=true;
+    h+='<div class="sc-mini-row"><span class="sc-mini-n">'+EVAL_SECS[s].icon+' '+EVAL_SECS[s].name+'</span><span class="sc-bar"><i class="'+(m.pct===null?'':evalBandLabel(v)[1])+'" style="width:'+v+'%"></i></span><span class="sc-mini-p">'+(m.pct===null?'–':v+'%')+'</span></div>';});
+  return any?h+'</div>':'';
+}
+function renderSkillsCheck(host,p){
+  var log=p.evalLog||[],card=document.createElement('div');card.className='pd-section-card';
+  var h='<div class="pd-section-title">🎯 Skills Check<button class="pd-info-btn" type="button" aria-label="How Skills Check works" onclick="showCardInfo(\'skills\')">ⓘ</button></div>';
+  if(!log.length){
+    h+='<div class="pd-sr-sub">No Evaluate results yet. They appear here after your child tries Evaluate (Games tab → Evaluate). Earlier lesson quiz results are still counted in Achievement by Lesson below.</div>';
+    card.innerHTML=h;host.appendChild(card);return;
+  }
+  var since=new Date(log[0].t).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});
+  var lessons=[];LEVELS.forEach(function(lv){lv.lessons.forEach(function(l){lessons.push({lv:lv,l:l});});});
+  var per={},oN=0,oD=0;
+  EVAL_ORDER.forEach(function(s){per[s]={num:0,den:0,qs:0,lessons:0,tr:[]};});
+  var rows=[];
+  lessons.forEach(function(x){
+    var weak=[],tried=false;
+    EVAL_ORDER.forEach(function(s){var m=evalMastery(x.l.id,s);if(m.pct===null)return;tried=true;
+      var P=per[s];P.num+=m.pct*m.questions;P.den+=m.questions;P.lessons++;P.qs+=evalAttempts(x.l.id,s).reduce(function(a,b){return a+b.n;},0);
+      if(m.trend!==null)P.tr.push(m.trend);
+      if(m.status==='practice'||(m.status==='developing'&&m.pct<70))weak.push(EVAL_SECS[s].name);});
+    var ov=evalOverall(x.l.id);if(ov!==null){oN+=ov;oD++;}
+    if(weak.length)rows.push({x:x,weak:weak,ov:ov});
+  });
+  var overall=oD?Math.round(oN/oD):null;
+  if(overall!==null){var b=evalBandLabel(overall);h+='<div class="sc-overall"><div class="sc-big '+b[1]+'">'+overall+'%</div><div><div class="sc-ov-t">Overall · '+b[0]+'</div><div class="sc-ov-s">First-try accuracy across '+oD+' lesson'+(oD===1?'':'s')+' · tracking since '+since+'</div></div></div>';}
+  h+='<div class="sc-grid">';
+  EVAL_ORDER.forEach(function(s){var P=per[s],S=EVAL_SECS[s];
+    if(!P.den){h+='<div class="sc-tile"><div class="sc-ic">'+S.icon+'</div><div class="sc-nm">'+S.name+'</div><div class="sc-pc">–</div><div class="sc-lb">Not tried yet</div></div>';return;}
+    var pc=Math.round(P.num/P.den),b=evalBandLabel(pc),tr=P.tr.length?Math.round(P.tr.reduce(function(a,c){return a+c;},0)/P.tr.length):null;
+    h+='<div class="sc-tile"><div class="sc-ic">'+S.icon+'</div><div class="sc-nm">'+S.name+'</div><div class="sc-pc '+b[1]+'">'+pc+'%</div><div class="sc-lb">'+b[0]+(tr?(tr>0?' · ↑':' · ↓'):'')+'</div><div class="sc-ft">'+P.qs+' answers · '+P.lessons+' lesson'+(P.lessons===1?'':'s')+'</div></div>';});
+  h+='</div>';
+  h+='<div class="np-sub">Based on first-try answers (a retry never replaces them) and the last few attempts. One attempt is a snapshot, not a verdict.</div>';
+  if(rows.length){
+    h+='<div class="pd-section-title" style="font-size:14px;margin-top:10px">Worth revisiting</div>';
+    rows.slice(0,8).forEach(function(r,i){
+      h+='<div class="np-row"><div class="np-top"><span class="np-ic">'+lessonThemeIcon(r.x.l)+'</span><div class="np-info"><div class="np-name">'+r.x.l.name+'</div><div class="np-fig">Needs practice: '+r.weak.join(', ')+'</div></div></div>'+evalBarsHtml(r.x.l.id)+'<button class="pd-practice-btn sc-open" data-i="'+i+'">Open this lesson</button></div>';});
+    if(rows.length>8)h+='<div class="np-ok">+ '+(rows.length-8)+' more lessons to revisit</div>';
+  }else h+='<div class="np-ok">✅ Nothing flagged — no section needs a revisit right now</div>';
+  card.innerHTML=h;
+  card.querySelectorAll('.sc-open').forEach(function(bn){bn.addEventListener('click',function(){var r=rows[+bn.dataset.i];goHome();openLevel(r.x.lv.id);});});
+  host.appendChild(card);
+}
 function renderNeedsPractice(host,p){
   var ACHIEVE_LIMIT=100-NP_LIMIT; // 70% — below this, a lesson is flagged for more practice
   var st=needsPracticeStats(p), flagged=st.filter(function(x){x.qpct=x.qT?Math.round(x.qW/x.qT*100):0;x.lowQ=x.qpct>=NP_LIMIT;return x.pct>=NP_LIMIT||x.lowQ}).sort(function(a,b){return Math.max(b.pct,b.qpct)-Math.max(a.pct,a.qpct)});
@@ -8293,7 +8343,7 @@ function renderNeedsPractice(host,p){
       var chips=x.weak.slice(0,5).map(function(w){return '<span class="np-chip">'+w+'</span>'}).join('');
       var more=x.weak.length>5?'<span class="np-more">+'+(x.weak.length-5)+' more</span>':'';
       var chipsBlock=x.weak.length?'<div class="np-chips-label">Worth another look:</div><div class="np-chips">'+chips+more+'</div>':'';
-      h+='<div class="np-row"><div class="np-top"><span class="np-ic">'+lessonThemeIcon(x.lesson)+'</span><div class="np-info"><div class="np-name">'+x.lesson.name+'</div><div class="np-fig">'+(x.tried?'Words: '+wordsRight+' of '+x.tried+' correct':'')+(x.tried&&x.qT?' · ':'')+(x.qT?'Quiz: '+(x.qT-x.qW)+' of '+x.qT+' correct ('+qAchPct+'%)':'')+'</div></div><div class="np-pct">'+achPct+'%<span class="np-pct-label">combined</span></div></div>'+(x.lowQ?'<div class="np-flag">⚠️ Quiz score below '+ACHIEVE_LIMIT+'%</div>':'')+chipsBlock+'<button class="pd-practice-btn np-btn" data-i="'+i+'">Practice this lesson</button></div>';
+      h+='<div class="np-row"><div class="np-top"><span class="np-ic">'+lessonThemeIcon(x.lesson)+'</span><div class="np-info"><div class="np-name">'+x.lesson.name+'</div><div class="np-fig">'+(x.tried?'Words: '+wordsRight+' of '+x.tried+' correct':'')+(x.tried&&x.qT?' · ':'')+(x.qT?'Quiz: '+(x.qT-x.qW)+' of '+x.qT+' correct ('+qAchPct+'%)':'')+'</div></div><div class="np-pct">'+achPct+'%<span class="np-pct-label">combined</span></div></div>'+(x.lowQ?'<div class="np-flag">⚠️ Quiz score below '+ACHIEVE_LIMIT+'%</div>':'')+evalBarsHtml(x.lesson.id)+chipsBlock+'<button class="pd-practice-btn np-btn" data-i="'+i+'">Practice this lesson</button></div>';
     });
     if(!flagged.length)h+='<div class="pd-sr-sub">Every lesson is at '+ACHIEVE_LIMIT+'% or higher. 🎉</div>';
     if(ok)h+='<div class="np-ok">✅ '+ok+' lesson'+(ok===1?'':'s')+' at '+ACHIEVE_LIMIT+'% or higher — nicely on track</div>';
@@ -8662,7 +8712,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 99;
+const APP_VERSION = 100;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -8976,6 +9026,7 @@ function buildParentDashboard() {
     </div>
   `;
   body.appendChild(compareCard);
+  renderSkillsCheck(body, p);
   renderNeedsPractice(body, p);
 }
 
@@ -10414,6 +10465,7 @@ const PD_INFO = {
   worldPP:      { title: '🪐 Planet Patrol', text: 'How many different words from this world your child has caught at least once in Planet Patrol, out of all the words it contains.' },
   worldSW:      { title: '🏆 Spell-a-thon', text: 'How many different words from this world your child has mastered in Spell-a-thon, out of all the words it contains.' },
   lessonScore:  { title: '📝 Lesson Score', text: 'How your child did on this lesson’s quiz questions. 70% or higher means they have a solid grasp — below that, another round of practice is recommended (it isn’t a pass/fail grade).' },
+  skills:       { title: '🎯 Skills Check', text: 'Evaluate has three sections: Listen & Learn, Spot the Pattern and Use What You Know. Each lesson is tracked separately for each section, using the FIRST answer to every question (the end-of-section retry never replaces it). Results use the last three attempts, so one good or bad day does not decide anything. Strong is 80%+, Getting there 60–79%, Needs practice below 60%. This only suggests what to revisit — it never locks anything for your child.' },
   achievement:  { title: '✅ Achievement by Lesson', text: 'For each lesson, this combines how many words (from Spell-a-thon and Planet Patrol) and quiz questions your child got right, out of everything they have tried. 70% or higher is solid. Below 70% is flagged as worth another round — including a quiz that is below 70% on its own, even if the lesson overall looks fine.' },
   compare:      { title: '📈 How This Comparison Works', text: 'This compares your selected period (the filter at the top of the Dashboard) to the equivalent period right before it — for example, Last 7 Days compares this week to the 7 days before that. Accuracy is shown as a percentage-point change (for example, "up 5 points" means 80% → 85%, not 5% more quizzes answered correctly). All Time has no earlier period to compare against, so it just shows totals so far.' },
 };
@@ -10671,6 +10723,7 @@ window.__wordTotal=n;
 })();</script>
 <style>.pd-card.lessons{border-color:rgba(255,209,102,.4)}.pd-card.lessons .pd-card-num{color:var(--gold)}.pd-card.spell{border-color:rgba(6,214,160,.4)}.pd-card.spell .pd-card-num{color:var(--teal)}.pd-card .pd-card-trend{color:#7a9cc0}</style><style>
 .np-sub{font-size:.72rem;line-height:1.45;color:#9db4d6;margin:-4px 0 10px}
+.sc-overall{display:flex;gap:12px;align-items:center;margin:6px 0 10px}.sc-big{font-size:30px;font-weight:800}.sc-ov-t{font-weight:700}.sc-ov-s{font-size:12px;opacity:.7}.sc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}.sc-tile{background:rgba(255,255,255,.06);border-radius:12px;padding:8px 4px;text-align:center}.sc-ic{font-size:20px}.sc-nm{font-size:11px;font-weight:700;min-height:26px}.sc-pc{font-size:20px;font-weight:800}.sc-lb{font-size:11px;opacity:.85}.sc-ft{font-size:10px;opacity:.6;margin-top:2px}.sc-good{color:#6fe09a}.sc-mid{color:#ffd166}.sc-low{color:#ff8a80}.sc-mini{margin:6px 0}.sc-mini-row{display:flex;align-items:center;gap:6px;font-size:11px;margin:3px 0}.sc-mini-n{flex:0 0 118px}.sc-bar{flex:1;height:7px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden}.sc-bar i{display:block;height:100%;background:#8aa;border-radius:4px}.sc-bar i.sc-good{background:#6fe09a}.sc-bar i.sc-mid{background:#ffd166}.sc-bar i.sc-low{background:#ff8a80}.sc-mini-p{flex:0 0 32px;text-align:right}
 .np-row{border-top:1px solid rgba(255,255,255,.07);padding:10px 0;display:flex;flex-direction:column;gap:8px}
 .np-top{display:flex;align-items:center;gap:10px}
 .np-ic{font-size:1.2rem;width:1.6rem;text-align:center}
