@@ -4576,7 +4576,7 @@ function evalLogAttempt(lessonId, sec, n, c1, cf, missedIds) {
   p.evalLog.push({ t: Date.now(), d: todayStr(), l: lessonId, s: sec, n, c1, cf, m: missedIds });
   if (p.evalLog.length > 600) p.evalLog = p.evalLog.slice(-600);
   saveProgress(p);
-  bumpDailyLog({ quizCorrect: c1, quizTotal: n, wordsPractised: n }, lessonId);
+  bumpDailyLog({ quizCorrect: c1, quizTotal: n, starsEarned: c1, wordsPractised: n }, lessonId);
   evalSyncLessonScore(lessonId);
 }
 function evalAttempts(lessonId, sec) {
@@ -5208,11 +5208,13 @@ function setProgress(pct, label) {
 function renderPhase() {
   const body = document.getElementById('lesson-body');
   body.innerHTML = '';
+  // The quiz now lives in Evaluate — a lesson goes straight from its last
+  // learning step to the finish screen.
+  if (lessonPhase === 'quiz') lessonPhase = 'complete';
 
   if (lessonPhase === 'teach')       { renderTeach(body);       setProgress(15, 'Learn 📖'); }
   if (lessonPhase === 'practice')    { renderPractice(body);    setProgress(45, 'Practise 🎯'); }
   if (lessonPhase === 'wordblocks')  { renderWordBlocksLesson(body); setProgress(62, 'Word Blocks 🧩'); }
-  if (lessonPhase === 'quiz')        { renderQuiz(body);        setProgress(70 + quizIndex * 10, 'Quiz ⭐'); }
   if (lessonPhase === 'complete')    { renderComplete(body);    setProgress(100, 'Done! 🎉'); }
 
   // renderPhase() swaps content WITHOUT switching .screen (quiz question
@@ -7106,212 +7108,17 @@ function renderQuizFeedback(el, correct) {
   return utt;
 }
 
-function renderQuiz(body) {
-  const l = currentLesson;
-  const q = l.quizzes[quizIndex];
-  if (!q) { lessonPhase = 'complete'; renderPhase(); return; }
-
-  // Multi-select: answer contains comma → multiple correct answers
-  const correctAnswers = q.answer.split(',').map(a => a.trim()).filter(Boolean);
-  const isMulti = correctAnswers.length > 1;
-
-  const wrap = document.createElement('div');
-  wrap.className = 'quiz-wrap';
-
-  const qLabel = document.createElement('div');
-  qLabel.className = 'quiz-q-label';
-  qLabel.textContent = 'Question ' + (quizIndex + 1) + ' of ' + l.quizzes.length;
-  wrap.appendChild(qLabel);
-
-  // Multi-select badge
-  if (isMulti) {
-    const badge = document.createElement('div');
-    badge.className = 'quiz-multi-badge';
-    badge.textContent = '☑ Select ALL correct answers';
-    wrap.appendChild(badge);
-  }
-
-  const qText = document.createElement('div');
-  qText.className = 'quiz-question';
-  // Strip the 🔊 emoji from display text if present at end (it's just a visual cue)
-  qText.textContent = q.q.replace(/\s*🔊\s*$/, '');
-  wrap.appendChild(qText);
-
-  const audioBtn = document.createElement('button');
-  audioBtn.className = 'quiz-audio-btn';
-  audioBtn.innerHTML = '🔊 Hear the question';
-  audioBtn.addEventListener('click', () => {
-    audioBtn.classList.add('playing');
-    speakQuizAudio(q.audio, () => audioBtn.classList.remove('playing'));
-  });
-  wrap.appendChild(audioBtn);
-
-  const opts = document.createElement('div');
-  opts.className = 'quiz-options';
-
-  const feedback = document.createElement('div');
-  feedback.className = 'quiz-feedback';
-
-  // Filter out placeholder '—' options
-  const visibleOptions = q.options.filter(o => o !== '—');
-
-  const letters = ['A','B','C','D'];
-  let answered = false;
-
-  if (isMulti) {
-    /* ── MULTI-SELECT MODE ── */
-    const selectedSet = new Set();
-
-    visibleOptions.forEach((opt, i) => {
-      const btn = document.createElement('button');
-      btn.className = 'quiz-opt multi';
-      btn.innerHTML = `<span class="opt-letter">${letters[i]}</span>${opt}`;
-
-      btn.addEventListener('click', () => {
-        if (answered) return;
-        if (selectedSet.has(opt)) {
-          selectedSet.delete(opt);
-          btn.classList.remove('selected');
-        } else {
-          selectedSet.add(opt);
-          btn.classList.add('selected');
-        }
-      });
-      opts.appendChild(btn);
-    });
-
-    // Submit button for multi-select
-    const submitBtn = document.createElement('button');
-    submitBtn.className = 'quiz-submit-btn';
-    submitBtn.textContent = 'Check my answers ✓';
-    submitBtn.addEventListener('click', e => {
-      if (answered) return;
-      answered = true;
-      submitBtn.disabled = true;
-
-      const selectedArr = Array.from(selectedSet).sort();
-      const correctArr  = correctAnswers.slice().sort();
-      const allCorrect  = selectedArr.length === correctArr.length &&
-                          selectedArr.every(a => correctArr.includes(a));
-
-      // Colour each button
-      opts.querySelectorAll('.quiz-opt').forEach(btn => {
-        const optText = btn.textContent.replace(/^[A-D]/, '').trim();
-        const isCorrectOpt = correctAnswers.includes(optText);
-        const wasSelected  = selectedSet.has(optText);
-        btn.classList.add('disabled');
-        if (isCorrectOpt) btn.classList.add('correct');
-        else if (wasSelected) btn.classList.add('wrong');
-      });
-
-      if (allCorrect) {
-        quizScore++;
-        burstStar(e.clientX, e.clientY);
-        renderQuizFeedback(feedback, true);
-        setTimeout(() => {
-          quizIndex++;
-          lessonPhase = quizIndex < l.quizzes.length ? 'quiz' : 'complete';
-          renderPhase();
-        }, 1800);
-      } else {
-        // Auto-advances now instead of waiting for a tapped "Next
-        // question" button — same pattern as the correct-answer path,
-        // just with a longer pause so there's time to actually see
-        // Lumi's reaction and the highlighted correct answer(s).
-        const advance = () => {
-          quizIndex++;
-          lessonPhase = quizIndex < l.quizzes.length ? 'quiz' : 'complete';
-          renderPhase();
-        };
-        const utt = renderQuizFeedback(feedback, false);
-        const goNext = () => setTimeout(advance, 1000);
-        if (utt) { utt.onend = goNext; utt.onerror = goNext; }
-        else { setTimeout(advance, 2200); }
-      }
-    });
-
-    wrap.appendChild(opts);
-    wrap.appendChild(submitBtn);
-
-  } else {
-    /* ── SINGLE-SELECT MODE ── */
-    visibleOptions.forEach((opt, i) => {
-      const btn = document.createElement('button');
-      btn.className = 'quiz-opt';
-      btn.innerHTML = `<span class="opt-letter">${letters[i]}</span>${opt}`;
-
-      btn.addEventListener('click', e => {
-        if (answered) return;
-        answered = true;
-        opts.querySelectorAll('.quiz-opt').forEach(b => b.classList.add('disabled'));
-        const correct = opt === correctAnswers[0];
-        btn.classList.add(correct ? 'correct' : 'wrong');
-        if (correct) {
-          quizScore++;
-          burstStar(e.clientX, e.clientY);
-          renderQuizFeedback(feedback, true);
-          setTimeout(() => {
-            quizIndex++;
-            lessonPhase = quizIndex < l.quizzes.length ? 'quiz' : 'complete';
-            renderPhase();
-          }, 1800);
-        } else {
-          opts.querySelectorAll('.quiz-opt').forEach((b, idx) => {
-            if (visibleOptions[idx] === correctAnswers[0]) b.classList.add('correct');
-          });
-          // Auto-advances now instead of waiting for a tapped "Next
-          // question" button — same pattern as the correct-answer path,
-          // just with a longer pause so there's time to actually see
-          // Lumi's reaction and the highlighted correct answer.
-          const advance = () => {
-            quizIndex++;
-            lessonPhase = quizIndex < l.quizzes.length ? 'quiz' : 'complete';
-            renderPhase();
-          };
-          const utt = renderQuizFeedback(feedback, false);
-          const goNext = () => setTimeout(advance, 1000);
-          if (utt) { utt.onend = goNext; utt.onerror = goNext; }
-          else { setTimeout(advance, 2200); }
-        }
-      });
-
-      opts.appendChild(btn);
-    });
-
-    wrap.appendChild(opts);
-  }
-
-  wrap.appendChild(feedback);
-  body.appendChild(wrap);
-
-  // Auto-read question on load
-  setTimeout(() => {
-    audioBtn.classList.add('playing');
-    speakQuizAudio(q.audio, () => audioBtn.classList.remove('playing'));
-  }, 500);
-}
-
 /* ── COMPLETE ── */
 function renderComplete(body) {
   const l = currentLesson;
-  const total = l.quizzes.length;
-  markLessonComplete(l.id, quizScore);
-  bumpDailyLog({ lessonsCompleted: 1, wordsPractised: total, starsEarned: quizScore, quizCorrect: quizScore, quizTotal: total }, l.id);
+  const wordsN = l.families ? l.families.reduce((a,f)=>a+f.words.length,0) : (l.words||[]).length;
+  markLessonComplete(l.id, 0);   // completion never depends on a score; Evaluate raises the score later
+  bumpDailyLog({ lessonsCompleted: 1, wordsPractised: wordsN }, l.id);
   confetti();
 
-  const pctScore = Math.round((quizScore / total) * 100);
-  const starRating = quizScore === total ? 3 : quizScore >= total * 0.6 ? 2 : 1;
-  const starsHtml = '⭐'.repeat(starRating);
-  // Lumi's reaction mood — tumble (spin) for a perfect score, a happy
-  // bounce for a good one, a gentle wiggle otherwise. Never the "wrong
-  // answer" shake/rocking — finishing a lesson is worth celebrating
-  // regardless of score.
-  const lumiMood = quizScore === total ? 'st-t2' : quizScore >= total * 0.6 ? 'st-t3' : 'st-t1';
-  const msg  = quizScore === total
-    ? 'Perfect score! You\'re a star!'
-    : quizScore >= total * 0.6
-    ? 'Great work! Keep it up!'
-    : 'Good try! Practice makes perfect!';
+  const starsHtml = '⭐⭐⭐';
+  const lumiMood = 'st-t2';
+  const msg = 'Lesson complete! Well done!';
 
   const wrap = document.createElement('div');
   wrap.className = 'complete-wrap';
@@ -7323,11 +7130,7 @@ function renderComplete(body) {
 
     <div class="score-row">
       <div class="score-chip">
-        <span class="score-num">${quizScore}/${total}</span>
-        <span class="score-lbl">Quiz Score</span>
-      </div>
-      <div class="score-chip">
-        <span class="score-num">${l.families ? l.families.reduce((a,f)=>a+f.words.length,0) : (l.words||[]).length}</span>
+        <span class="score-num">${wordsN}</span>
         <span class="score-lbl">Words Heard</span>
       </div>
     </div>
@@ -7338,6 +7141,12 @@ function renderComplete(body) {
   // arrow (top-left) already does exactly that, and a kid can gesture-back
   // too, so a second one just added clutter. Same reasoning removed the
   // "My Achievements" shortcut and the badge-earned callout box below.
+  const evBtn = document.createElement('button');
+  evBtn.className = 'quiz-submit-btn';
+  evBtn.style.marginBottom = '12px';
+  evBtn.textContent = '🎯 Check what I learned';
+  evBtn.addEventListener('click', openEvaluate);
+  wrap.appendChild(evBtn);
   const nextLesson = findNextLesson();
   if (nextLesson) {
     // This button always lands on a lesson beyond the first in its world
@@ -8853,7 +8662,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 98;
+const APP_VERSION = 99;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
