@@ -242,6 +242,12 @@ html, body {
 }
 
 /* Constellation grid */
+.home-tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:480px;margin-bottom:6px}
+.home-tile{border-radius:22px;padding:22px 10px 18px;text-align:center;cursor:pointer;border:2px solid rgba(255,255,255,.18);transition:transform .15s}
+.home-tile:active{transform:scale(.95)}
+.ht-ic{font-size:46px;display:block;margin-bottom:6px}.ht-nm{font-family:var(--ff-head);font-size:1.25rem;font-weight:800;color:#fff}.ht-ds{font-size:.78rem;opacity:.8;color:#fff;margin-top:2px}
+.ht-learn{background:linear-gradient(145deg,#2d6cdf,#1b3f8f)}.ht-play{background:linear-gradient(145deg,#e0559b,#8f2a63)}.ht-eval{background:linear-gradient(145deg,#f0a500,#a86a00)}.ht-apply{background:linear-gradient(145deg,#1fb58a,#0f6b52)}.ht-soon{opacity:.6}
+#learn{align-items:center;overflow-y:auto}#learn .constellation-grid{padding:0 16px;box-sizing:border-box}#learn .constellation-label{padding:0 16px}#learn .constellation-label{margin-top:1rem}
 .constellation-label {
   font-family: var(--ff-head);
   font-size: 0.75rem;
@@ -2482,6 +2488,35 @@ setTimeout(function () {
 
   </div>
 
+  <p class="constellation-label">What shall we do today?</p>
+  <div class="home-tiles">
+    <div class="home-tile ht-learn" onclick="openLearn()" role="button"><span class="ht-ic">📚</span><div class="ht-nm">Learn</div><div class="ht-ds">Lessons &amp; worlds</div></div>
+    <div class="home-tile ht-play" onclick="openChallenges()" role="button"><span class="ht-ic">🎮</span><div class="ht-nm">Play</div><div class="ht-ds">Word games</div></div>
+    <div class="home-tile ht-eval" onclick="openEvaluate()" role="button"><span class="ht-ic">🎯</span><div class="ht-nm">Evaluate</div><div class="ht-ds">Show what you know</div></div>
+    <div class="home-tile ht-apply ht-soon" onclick="applySoon()" role="button"><span class="ht-ic">🌟</span><div class="ht-nm">Apply</div><div class="ht-ds">Coming soon</div></div>
+  </div>
+
+  <!-- Bottom action row -->
+  <div class="home-bottom-row">
+    <button class="home-action-btn" onclick="openBadges()">
+      <span class="hab-icon">🏅</span>
+      <span class="hab-label">My Badges</span>
+    </button>
+    <button class="home-action-btn" onclick="openParentHub()">
+      <span class="hab-icon">🧑‍🤝‍🧑</span>
+      <span class="hab-label">Parent Hub</span>
+    </button>
+  </div>
+
+
+</div><!-- /home -->
+
+<div id="learn" class="screen">
+  <div class="lm-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="lm-title">📚 Learn</div>
+    <span class="lm-badge"></span>
+  </div>
   <p class="constellation-label">Choose your World</p>
 
   <div class="constellation-grid">
@@ -2523,32 +2558,14 @@ setTimeout(function () {
     </div>
 
   </div><!-- /constellation-grid -->
-
-  <!-- Bottom action row -->
-  <div class="home-bottom-row">
-    <button class="home-action-btn" onclick="openChallenges()">
-      <span class="hab-icon">🎮</span>
-      <span class="hab-label">Games</span>
-    </button>
-    <button class="home-action-btn" onclick="openBadges()">
-      <span class="hab-icon">🏅</span>
-      <span class="hab-label">My Badges</span>
-    </button>
-    <button class="home-action-btn" onclick="openParentHub()">
-      <span class="hab-icon">🧑‍🤝‍🧑</span>
-      <span class="hab-label">Parent Hub</span>
-    </button>
-  </div>
-
-
-</div><!-- /home -->
+</div><!-- /learn -->
 
 <!-- ══════════════════════════════════
      LEVEL MAP SCREEN
 ══════════════════════════════════ -->
 <div id="levelmap" class="screen">
   <div class="lm-header">
-    <button class="back-btn" onclick="goHome()">←</button>
+    <button class="back-btn" onclick="openLearn()">←</button>
     <div class="lm-title" id="lm-title">Foundation</div>
     <span class="lm-badge" id="lm-badge">Level 1</span>
   </div>
@@ -4986,6 +5003,14 @@ function applyStartGlow() {
   });
 }
 
+function openLearn() { showScreen('learn'); updateHomeProgress(); }
+function applySoon() {
+  try { if (typeof speak === 'function') speak('Apply is coming soon!'); } catch (e) {}
+  const t = document.createElement('div');
+  t.textContent = '🌟 Apply is coming soon!';
+  t.style.cssText = 'position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#16304f;color:#fff;padding:10px 18px;border-radius:20px;z-index:9999;font-weight:700;border:1.5px solid #ffd166';
+  document.body.appendChild(t); setTimeout(() => t.remove(), 1800);
+}
 function goHome() {
   showScreen('home');
   updateHomeProgress();
@@ -8712,7 +8737,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 100;
+const APP_VERSION = 101;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -9147,7 +9172,7 @@ function openChallenges() {
   chCurrentLesson = null;
   showScreen('challenges');
   document.getElementById('ch-back-btn').onclick = goHome;
-  document.getElementById('ch-title').textContent = '🎮 Games';
+  document.getElementById('ch-title').textContent = '🎮 Play';
   chRenderLevelList();
 }
 
@@ -9155,7 +9180,7 @@ function chRenderLevelList() {
   const body = document.getElementById('ch-body');
   body.classList.add('ch-grid');
   body.innerHTML = '';
-  document.getElementById('ch-title').textContent = '🎮 Games';
+  document.getElementById('ch-title').textContent = '🎮 Play';
   document.getElementById('ch-back-btn').onclick = goHome;
 
   const ppCard = document.createElement('div');
@@ -9170,17 +9195,6 @@ function chRenderLevelList() {
   ppCard.addEventListener('click', openPlanetPatrolLevels);
   body.appendChild(ppCard);
 
-  const evCard = document.createElement('div');
-  evCard.className = 'ch-level-card';
-  evCard.innerHTML = `
-    <span class="ch-level-icon">🎯</span>
-    <div class="ch-level-info">
-      <div class="ch-level-name">Evaluate</div>
-      <div class="ch-level-sub">Check what you learned, and Spell-a-thon</div>
-    </div>
-    <span class="ch-level-arrow">›</span>`;
-  evCard.addEventListener('click', openEvaluate);
-  body.appendChild(evCard);
 
   [['🔗','Word Link','Link words into chains, trails and bridges','games/word_link.html'],
    ['🌌','Word Galaxy','Six missions through the word galaxy','games/word_galaxy.html']].forEach(g => {
