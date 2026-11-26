@@ -8779,7 +8779,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 103;
+const APP_VERSION = 104;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -9155,7 +9155,7 @@ function buildParentDashboard() {
       }).join('');
       card.insertAdjacentHTML('beforeend', pdCollapsible('learn_' + level.id, CH_ICONS[level.id] || '⭐', level.name, LEVEL_SUBTITLES[level.id] || '', done + '/' + level.lessons.length, pdBar(Math.round(done * 100 / level.lessons.length), COL[level.id]) + rows));
     });
-    secLearn.appendChild(card);
+    pdWireCollapsibles(card); secLearn.appendChild(card);
   })();
 
   // ── Play: each game, expandable ──
@@ -9200,7 +9200,7 @@ function buildParentDashboard() {
   const V = window.pdView;
   if (V === 'learn') { pageBody.appendChild(pdBackBar('📚 Learn')); pageBody.appendChild(secLearn); }
   else if (V === 'play') { pageBody.appendChild(pdBackBar('🎮 Play')); pageBody.appendChild(secPlay); }
-  else if (V === 'evaluate') { pageBody.appendChild(pdBackBar('🎯 Evaluate')); pageBody.appendChild(secEval); pdWireCollapsibles(secEval); }
+  else if (V === 'evaluate') { pageBody.appendChild(pdBackBar('🎯 Evaluate')); pageBody.appendChild(secEval); }
   else { pageBody.appendChild(secHome); }
 }
 
