@@ -243,6 +243,9 @@ html, body {
 
 /* Constellation grid */
 .ev-pulse{animation:evpulse 1.4s ease-in-out infinite}@keyframes evpulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,209,102,.7)}50%{transform:scale(1.05);box-shadow:0 0 0 14px rgba(255,209,102,0)}}@media (prefers-reduced-motion:reduce){.ev-pulse{animation:none}}
+.pd-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}.pd-tile{background:var(--card,#16273f);border:1px solid #243a5c;border-top:4px solid #7aa2ff;border-radius:18px;padding:12px;cursor:pointer;display:flex;flex-direction:column;gap:2px}.pd-tile:active{transform:scale(.97)}.pd-tile-n{font-weight:800;font-size:.8rem;color:#9db3cf}.pd-tile-b{font-family:var(--ff-head);font-size:1.7rem;color:#fff}.pd-tile-s{font-size:.72rem;color:#9db3cf}.pd-tile-soon{opacity:.55;cursor:default}
+.pd-viewbar{display:flex;align-items:center;gap:10px;margin:0 0 12px}.pd-viewback{background:#243a5c;color:#fff;border:0;border-radius:14px;padding:8px 12px;font-weight:800;cursor:pointer}.pd-viewtitle{font-family:var(--ff-head);font-size:1.2rem;color:#ffd166}
+.pd-sub-row{margin:8px 0}.pd-sub-top{display:flex;justify-content:space-between;font-size:.8rem;font-weight:700;margin-bottom:3px}.pd-sub-v{color:#9db3cf}.plr-when{font-size:.7rem;color:#7a9cc0}.pd-learn-row{grid-template-columns:1.6rem 1fr auto 1.2rem!important}
 .home-tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:480px;margin-bottom:6px}
 .home-tile{border-radius:22px;padding:22px 10px 18px;text-align:center;cursor:pointer;border:2px solid rgba(255,255,255,.18);transition:transform .15s}
 .home-tile:active{transform:scale(.95)}
@@ -8350,11 +8353,12 @@ function evalBarsHtml(lessonId){
   return any?h+'</div>':'';
 }
 function evWorldPct(level,sec){var n=0,d=0;level.lessons.forEach(function(l){var m=evalMastery(l.id,sec);if(m.pct!==null){n+=m.pct*m.questions;d+=m.questions;}});return d?Math.round(n/d):null;}
-function renderSkillsCheck(host,p){
+function renderSkillsCheck(host,p,mode){mode=mode||'all';
   var log=p.evalLog||[],card=document.createElement('div');card.className='pd-section-card';
-  var h='<div class="pd-section-title">🎯 Skills Check<button class="pd-info-btn" type="button" aria-label="How Skills Check works" onclick="showCardInfo(\'skills\')">ⓘ</button></div>';
+  var h=mode==='attention'?'':'<div class="pd-section-title">🎯 Skills Check<button class="pd-info-btn" type="button" aria-label="How Skills Check works" onclick="showCardInfo(\'skills\')">ⓘ</button></div>';
   if(!log.length){
-    h+='<div class="pd-sr-sub">No Evaluate results yet. They appear here after your child tries Evaluate (Games tab → Evaluate). Earlier lesson quiz results are still counted in Achievement by Lesson below.</div>';
+    if(mode==='attention'){return;}
+    h+='<div class="pd-sr-sub">No Evaluate results yet. They appear here after your child tries Evaluate (Evaluate on the home screen).</div>';
     card.innerHTML=h;host.appendChild(card);return;
   }
   var since=new Date(log[0].t).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});
@@ -8372,22 +8376,25 @@ function renderSkillsCheck(host,p){
     if(weak.length)rows.push({x:x,weak:weak,ov:ov});
   });
   var overall=oD?Math.round(oN/oD):null;
-  if(overall!==null){var b=evalBandLabel(overall);h+='<div class="sc-overall"><div class="sc-big '+b[1]+'">'+overall+'%</div><div><div class="sc-ov-t">Overall · '+b[0]+'</div><div class="sc-ov-s">First-try accuracy across '+oD+' lesson'+(oD===1?'':'s')+' · tracking since '+since+'</div></div></div>';}
-  h+='<div class="sc-grid">';
-  EVAL_ORDER.forEach(function(s){var P=per[s],S=EVAL_SECS[s];
+  var showSum=mode!=='attention',showRev=mode!=='summary';
+  if(showSum&&overall!==null){var b=evalBandLabel(overall);h+='<div class="sc-overall"><div class="sc-big '+b[1]+'">'+overall+'%</div><div><div class="sc-ov-t">Overall · '+b[0]+'</div><div class="sc-ov-s">First-try accuracy across '+oD+' lesson'+(oD===1?'':'s')+' · tracking since '+since+'</div></div></div>';}
+  if(showSum)h+='<div class="sc-grid">';
+  if(showSum)EVAL_ORDER.forEach(function(s){var P=per[s],S=EVAL_SECS[s];
     if(!P.den){h+='<div class="sc-tile"><div class="sc-ic">'+S.icon+'</div><div class="sc-nm">'+S.name+'</div><div class="sc-pc">–</div><div class="sc-lb">Not tried yet</div></div>';return;}
     var pc=Math.round(P.num/P.den),b=evalBandLabel(pc),tr=P.tr.length?Math.round(P.tr.reduce(function(a,c){return a+c;},0)/P.tr.length):null;
     h+='<div class="sc-tile"><div class="sc-ic">'+S.icon+'</div><div class="sc-nm">'+S.name+'</div><div class="sc-pc '+b[1]+'">'+pc+'%</div><div class="sc-lb">'+b[0]+(tr?(tr>0?' · ↑':' · ↓'):'')+'</div><div class="sc-ft">'+P.qs+' answers · '+P.lessons+' lesson'+(P.lessons===1?'':'s')+'</div></div>';});
-  h+='</div>';
-  h+='<div class="np-sub">Based on first-try answers (a retry never replaces them) and the last few attempts. One attempt is a snapshot, not a verdict.</div>';
+  if(showSum)h+='</div>';
+  if(showSum)h+='<div class="np-sub">Based on first-try answers (a retry never replaces them) and the last few attempts. One attempt is a snapshot, not a verdict.</div>';
+  if(!showRev){card.innerHTML=h;host.appendChild(card);return;}
+  if(mode==='attention')h+='<div class="pd-section-title">👀 Worth your attention</div><div class="pd-sr-sub" style="margin-bottom:6px">Suggestions only. Nothing is ever locked for your child.</div>';
   if(rows.length){
-    h+='<div class="pd-section-title" style="font-size:14px;margin-top:10px">Worth revisiting</div>';
+    if(mode!=='attention')h+='<div class="pd-section-title" style="font-size:14px;margin-top:10px">Worth revisiting</div>';
     rows.slice(0,8).forEach(function(r,i){
       h+='<div class="np-row"><div class="np-top"><span class="np-ic">'+lessonThemeIcon(r.x.l)+'</span><div class="np-info"><div class="np-name">'+r.x.l.name+'</div><div class="np-fig">Needs practice: '+r.weak.join(', ')+'</div></div></div>'+evalBarsHtml(r.x.l.id)+'<button class="pd-practice-btn sc-open" data-i="'+i+'">Open this lesson</button></div>';});
     if(rows.length>8)h+='<div class="np-ok">+ '+(rows.length-8)+' more lessons to revisit</div>';
   }else h+='<div class="np-ok">✅ Nothing flagged — no section needs a revisit right now</div>';
   card.innerHTML=h;
-  card.querySelectorAll('.sc-open').forEach(function(bn){bn.addEventListener('click',function(){var r=rows[+bn.dataset.i];goHome();openLevel(r.x.lv.id);});});
+  card.querySelectorAll('.sc-open').forEach(function(bn){bn.addEventListener('click',function(){var r=rows[+bn.dataset.i];goHome();openLearn();openLevel(r.x.lv.id);});});
   host.appendChild(card);
 }
 function renderNeedsPractice(host,p){
@@ -8772,7 +8779,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 102;
+const APP_VERSION = 103;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -8869,10 +8876,75 @@ function applyLevelCheckMove(toId) {
   buildParentDashboard();
 }
 
+
+/* ── Dashboard: four blocks (Learn / Play / Evaluate / Apply) ── */
+window.pdView = window.pdView || 'home';
+window.pdOpen = window.pdOpen || {};
+function pdGo(v) { window.pdView = v; buildParentDashboard(); try { document.getElementById('parent-body').scrollTop = 0; window.scrollTo(0, 0); } catch (e) {} }
+function pdGameStore(key) {
+  try { const id = (getProfilesMeta() || {}).activeId; const v = localStorage.getItem('c' + id + '::' + key.replace(/^/, '')); return v ? JSON.parse(v) : null; } catch (e) { return null; }
+}
+function pdGameStats() {
+  // Word Link level indexes: 0-28 Connect, 29-67 Chain, 68-77 Trail. Galaxy keeps one list per mission.
+  const full = pdGameStore('wce_full'); const arr = Array.isArray(full) ? full : [];
+  const wl = { connect: 0, chain: 0, trail: 0 };
+  arr.forEach(i => { if (i < 29) wl.connect++; else if (i < 68) wl.chain++; else if (i < 78) wl.trail++; });
+  const gm = [['sound', 'Sound Launch', 8], ['rootobs', 'Root Observatory', 6], ['rootstn', 'Root Station', 4], ['solar', 'Word Solar System', 8], ['dock', 'Compound Docking', 7], ['lineup', 'Cosmic Lineup', 4]]
+    .map(m => { const a = pdGameStore('wce_' + m[0] + '_full'); return { name: m[1], done: Array.isArray(a) ? a.length : 0, total: m[2] }; });
+  const pts = pdGameStore('wg_pts');
+  return { wl, wlDone: wl.connect + wl.chain + wl.trail, wlTotal: 78, gm, gmDone: gm.reduce((a, g) => a + g.done, 0), gmTotal: gm.reduce((a, g) => a + g.total, 0), pts: +pts || 0 };
+}
+function pdBar(pct, col) { return '<div class="plc-bar-wrap"><div class="plc-bar" style="width:' + pct + '%;background:' + col + ';"></div></div>'; }
+function pdCollapsible(key, icon, name, sub, headline, bodyHtml) {
+  const open = !!window.pdOpen[key];
+  return '<div class="parent-level-card pd-world-card" data-pdk="' + key + '"><div class="plc-header"><span class="plc-icon">' + icon + '</span><span class="plc-name">' + name + '<br><span style="font-size:0.65rem;color:#7a9cc0;font-family:var(--ff-body);">' + sub + '</span></span><span class="plc-pct">' + headline + '</span><span class="pd-world-chevron' + (open ? ' open' : '') + '">›</span></div>' + (open ? '<div style="margin-top:.5rem">' + bodyHtml + '</div>' : '') + '</div>';
+}
+function pdRowsHtml(rows) {
+  return rows.map(r => '<div class="pd-sub-row"><div class="pd-sub-top"><span>' + r.name + '</span><span class="pd-sub-v">' + r.v + '</span></div>' + pdBar(r.pct, r.col) + '</div>').join('');
+}
+function pdWorldRows(p, kind) {
+  const COL = { foundation: 'var(--coral)', building: 'var(--gold)', expanding: 'var(--teal)', mastery: 'var(--lavender)' };
+  const pps = kind === 'pp' ? ppCaughtStats(p) : null;
+  return LEVELS.map(level => {
+    if (pps) { const o = pps[level.id] || { c: 0, t: 0 }; return { name: level.name, v: o.c + ' / ' + o.t, pct: o.t ? Math.round(o.c * 100 / o.t) : 0, col: COL[level.id] || 'var(--gold)', n: o.c, t: o.t }; }
+    const ws = chWordsFor(level.id, null); let n = 0;
+    ws.forEach(w => {
+      if (kind === 'pp') { if ((p.ppTried || {})[w.word.toLowerCase()]) n++; }
+      else { const rec = (p.challengeMastery || {})[chWordId(w.level, w.lesson, w.word)]; if (rec && rec.mastery >= 2) n++; }
+    });
+    return { name: level.name, v: n + ' / ' + ws.length, pct: ws.length ? Math.round(n * 100 / ws.length) : 0, col: COL[level.id] || 'var(--gold)', n, t: ws.length };
+  });
+}
+function pdBackBar(title) {
+  const d = document.createElement('div'); d.className = 'pd-viewbar';
+  d.innerHTML = '<button type="button" class="pd-viewback">← Overview</button><div class="pd-viewtitle">' + title + '</div>';
+  d.querySelector('button').addEventListener('click', () => pdGo('home'));
+  return d;
+}
+function pdWireCollapsibles(host) {
+  host.querySelectorAll('.pd-world-card[data-pdk] .plc-header').forEach(h => h.addEventListener('click', () => {
+    const k = h.parentElement.dataset.pdk; window.pdOpen[k] = !window.pdOpen[k]; buildParentDashboard();
+  }));
+}
+function pdEvalTotals() {
+  let n = 0, d = 0, cleared = 0, total = 0;
+  LEVELS.forEach(lv => lv.lessons.forEach(l => {
+    const ov = evalOverall(l.id); if (ov !== null) { n += ov; d++; }
+    EVAL_ORDER.forEach(k => { if (evalQs(l, k).length && getProgress()[l.id]) { total++; if (evalCleared(l.id, k)) cleared++; } });
+  }));
+  return { pct: d ? Math.round(n / d) : null, cleared, total };
+}
+function pdTile(col, name, big, sub, view) {
+  return '<div class="pd-tile' + (view ? '' : ' pd-tile-soon') + '" style="border-top-color:' + col + '"' + (view ? ' data-view="' + view + '"' : '') + '><div class="pd-tile-n">' + name + '</div><div class="pd-tile-b">' + big + '</div><div class="pd-tile-s">' + sub + '</div></div>';
+}
+
 function buildParentDashboard() {
   refreshProfileChip();
-  const body = document.getElementById('parent-body');
-  body.innerHTML = '';
+  const pageBody = document.getElementById('parent-body');
+  pageBody.innerHTML = '';
+  let body = pageBody;
+  const secHome = document.createElement('div'), secLearn = document.createElement('div'), secPlay = document.createElement('div'), secEval = document.createElement('div');
+  [secHome, secLearn, secPlay, secEval].forEach(e => { e.className = 'pd-view'; });
   const p = getProgress();
   const uq = uqStats(p);
   const ppq = ppCaughtStats(p);
@@ -8908,12 +8980,9 @@ function buildParentDashboard() {
   const tc = (icon, num, label, sub, cls, key) => `<div class="pd-card ${cls||''}"><button class="pd-info-btn" type="button" aria-label="What does ${label} mean?" onclick="showCardInfo('${key}')">ⓘ</button><span class="pd-card-num">${icon} ${num}</span><span class="pd-card-label">${label}</span><span class="pd-card-trend">${sub}</span></div>`;
   cardsGrid.innerHTML =
     tc('🔥', streak, 'Day Streak', bestStreak > streak ? 'Best: ' + bestStreak : 'Keep it up!', 'streak', 'streak') +
-    tc('🎯', accuracy===null?'—':accuracy+'%', 'Accuracy', showTodaySub ? 'Today: ' + (todayAcc===null?'—':todayAcc+'%') : '', accClass, 'accuracy') +
     tc('📚', rangeTotals.lessonsCompleted, 'Lessons', showTodaySub ? 'Today: ' + todayTotals.lessonsCompleted : '', 'lessons', 'lessons') +
-    tc('📖', rangeTotals.wordsPractised, 'Words Practised', showTodaySub ? 'Today: ' + todayTotals.wordsPractised : '', 'words', 'words') +
-    tc('✅', rangeTotals.quizCorrect, 'Quiz Correct', showTodaySub ? 'Today: ' + todayTotals.quizCorrect : '', 'stars', 'quiz') +
-    tc('✏️', rangeTotals.dictCorrect, 'Spelled Right', showTodaySub ? 'Today: ' + todayTotals.dictCorrect : '', 'spell', 'spell');
-  body.appendChild(cardsGrid);
+    tc('📖', rangeTotals.wordsPractised, 'Words Practised', showTodaySub ? 'Today: ' + todayTotals.wordsPractised : '', 'words', 'words') ;
+  secLearn.appendChild(cardsGrid);
 
   // ── Level Check (periodic re-check of starting-world fit) ──
   const levelCheck = levelCheckSuggestion();
@@ -8934,7 +9003,7 @@ function buildParentDashboard() {
     `;
     lcCard.querySelector('#lc-move-btn').addEventListener('click', () => applyLevelCheckMove(levelCheck.toId));
     lcCard.querySelector('#lc-dismiss-btn').addEventListener('click', () => { dismissLevelCheck(levelCheck.toId); buildParentDashboard(); });
-    body.appendChild(lcCard);
+    secHome.appendChild(lcCard);
   }
 
 
@@ -9022,7 +9091,8 @@ function buildParentDashboard() {
       });
     }
   });
-  body.appendChild(worldsCard);
+  worldsCard.querySelector('.pd-section-title').innerHTML = '🎯 Results by World';
+  secEval.appendChild(worldsCard);
 
   // ── Compared With [selected period] + Achievement by Lesson (formerly
   // the separate Learning Timeline screen, folded into the Dashboard at the
@@ -9070,9 +9140,68 @@ function buildParentDashboard() {
       ${hasPrior ? `<div class="tl-line">🌱 <strong>Most improved:</strong> ${mostImproved ? `${mostImproved.name} (+${mostImproved.delta} points)` : 'Not enough data yet'}</div>` : ''}
     </div>
   `;
-  body.appendChild(compareCard);
-  renderSkillsCheck(body, p);
-  renderNeedsPractice(body, p);
+  secHome.appendChild(compareCard);
+
+  // ── Learn: lessons by world ──
+  (function () {
+    const card = document.createElement('div'); card.className = 'pd-section-card';
+    card.innerHTML = '<div class="pd-section-title">📚 Lessons by World</div>';
+    const COL = { foundation: 'var(--coral)', building: 'var(--gold)', expanding: 'var(--teal)', mastery: 'var(--lavender)' };
+    LEVELS.forEach(level => {
+      const done = level.lessons.filter(l => !!p[l.id]).length;
+      const rows = level.lessons.map(l => {
+        const rec = p[l.id]; const when = rec && rec.ts ? new Date(rec.ts).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : '';
+        return '<div class="plc-lesson-row pd-learn-row"><span class="plr-icon">' + lessonThemeIcon(l) + '</span><span class="plr-name">' + l.name + '</span><span class="plr-when">' + when + '</span><span class="plr-st">' + (rec ? '✓' : '○') + '</span></div>';
+      }).join('');
+      card.insertAdjacentHTML('beforeend', pdCollapsible('learn_' + level.id, CH_ICONS[level.id] || '⭐', level.name, LEVEL_SUBTITLES[level.id] || '', done + '/' + level.lessons.length, pdBar(Math.round(done * 100 / level.lessons.length), COL[level.id]) + rows));
+    });
+    secLearn.appendChild(card);
+  })();
+
+  // ── Play: each game, expandable ──
+  (function () {
+    const g = pdGameStats(); const card = document.createElement('div'); card.className = 'pd-section-card';
+    card.innerHTML = '<div class="pd-section-title">🎮 Games</div><div class="pd-sr-sub" style="margin-bottom:8px">How much your child plays. Tap a game to open it.</div>';
+    const pp = pdWorldRows(p, 'pp'), ppN = pp.reduce((a, r) => a + r.n, 0), ppT = pp.reduce((a, r) => a + r.t, 0);
+    card.insertAdjacentHTML('beforeend', pdCollapsible('play_pp', '🪐', 'Planet Patrol', 'Words caught, by world', ppN + '/' + ppT, pdRowsHtml(pp)));
+    card.insertAdjacentHTML('beforeend', pdCollapsible('play_wl', '🔗', 'Word Link', 'Levels cleared, by game', g.wlDone + '/' + g.wlTotal, pdRowsHtml([
+      { name: 'Word Chain', v: g.wl.chain + ' / 39', pct: Math.round(g.wl.chain * 100 / 39), col: 'var(--gold)' },
+      { name: 'Word Trail', v: g.wl.trail + ' / 10', pct: Math.round(g.wl.trail * 100 / 10), col: 'var(--teal)' },
+      { name: 'Word Connect', v: g.wl.connect + ' / 29', pct: Math.round(g.wl.connect * 100 / 29), col: 'var(--coral)' }])));
+    card.insertAdjacentHTML('beforeend', pdCollapsible('play_wg', '🌌', 'Word Galaxy', 'Missions, with levels cleared' + (g.pts ? ' · ' + g.pts + ' points' : ''), g.gmDone + '/' + g.gmTotal, pdRowsHtml(g.gm.map(m => ({ name: m.name, v: m.done + ' / ' + m.total, pct: Math.round(m.done * 100 / m.total), col: 'var(--lavender)' })))));
+    pdWireCollapsibles(card); secPlay.appendChild(card);
+  })();
+
+  // ── Evaluate: summary on top, then by world, then Spell-a-thon ──
+  const evTop = document.createElement('div'); renderSkillsCheck(evTop, p, 'summary'); secEval.insertBefore(evTop, secEval.firstChild);
+  (function () {
+    const card = document.createElement('div'); card.className = 'pd-section-card';
+    card.innerHTML = '<div class="pd-section-title">🏆 Spell-a-thon</div><div class="pd-sr-sub" style="margin-bottom:8px">Words spelled from memory, mastered.</div>';
+    const sp = pdWorldRows(p, 'sp'), n = sp.reduce((a, r) => a + r.n, 0), t = sp.reduce((a, r) => a + r.t, 0);
+    card.insertAdjacentHTML('beforeend', pdCollapsible('eval_sp', '🏆', 'Spell-a-thon', 'Words mastered, by world', n + '/' + t, pdRowsHtml(sp)));
+    pdWireCollapsibles(card); secEval.appendChild(card);
+  })();
+
+  // ── Home: four tiles + what to look at ──
+  (function () {
+    const g = pdGameStats(), ev = pdEvalTotals();
+    const doneAll = LEVELS.reduce((a, lv) => a + lv.lessons.filter(l => !!p[l.id]).length, 0), totAll = LEVELS.reduce((a, lv) => a + lv.lessons.length, 0);
+    const tiles = document.createElement('div'); tiles.className = 'pd-tiles';
+    tiles.innerHTML = pdTile('#7aa2ff', '📚 Learn', doneAll + '/' + totAll, 'lessons completed', 'learn') +
+      pdTile('#f08ac0', '🎮 Play', (g.wlDone + g.gmDone), 'game levels cleared · ' + ppCaughtStats(p).all.c + ' words caught', 'play') +
+      pdTile('#f5b74a', '🎯 Evaluate', ev.pct === null ? '–' : ev.pct + '%', ev.total ? ev.cleared + ' of ' + ev.total + ' checks cleared' : 'no checks yet', 'evaluate') +
+      pdTile('#5b6b82', '🌟 Apply', 'Soon', 'not available yet', null);
+    tiles.querySelectorAll('[data-view]').forEach(t => t.addEventListener('click', () => pdGo(t.dataset.view)));
+    secHome.insertBefore(tiles, secHome.firstChild);
+    const att = document.createElement('div'); renderSkillsCheck(att, p, 'attention');
+    tiles.insertAdjacentElement('afterend', att);
+  })();
+
+  const V = window.pdView;
+  if (V === 'learn') { pageBody.appendChild(pdBackBar('📚 Learn')); pageBody.appendChild(secLearn); }
+  else if (V === 'play') { pageBody.appendChild(pdBackBar('🎮 Play')); pageBody.appendChild(secPlay); }
+  else if (V === 'evaluate') { pageBody.appendChild(pdBackBar('🎯 Evaluate')); pageBody.appendChild(secEval); pdWireCollapsibles(secEval); }
+  else { pageBody.appendChild(secHome); }
 }
 
 /* ════════════════════════════════════════════
