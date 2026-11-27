@@ -8769,7 +8769,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 108;
+const APP_VERSION = 109;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -9156,9 +9156,9 @@ function buildParentDashboard() {
     card.insertAdjacentHTML('beforeend', pdCollapsible('play_pp', '🪐', 'Planet Patrol', 'Words caught, by world', ppN + '/' + ppT, pdRowsHtml(pp)));
     const one = (key, icon, name, done, total) => card.insertAdjacentHTML('beforeend', pdCollapsible(key, icon, name, 'Levels cleared', done + '/' + total, pdRowsHtml([{ name: 'Levels', v: done + ' / ' + total, pct: Math.round(done * 100 / total), col: 'var(--gold)' }])));
     card.insertAdjacentHTML('beforeend', pdCollapsible('play_wl', '🔗', 'Word Link', 'Levels cleared, by game', g.wlDone + '/' + g.wlTotal, pdRowsHtml([
-      { name: 'Star Swap', v: g.wl.chain + ' / 39', pct: Math.round(g.wl.chain * 100 / 39), col: 'var(--gold)' },
-      { name: 'Comet Trail', v: g.wl.trail + ' / 10', pct: Math.round(g.wl.trail * 100 / 10), col: 'var(--teal)' },
-      { name: 'Planet Hop', v: g.wl.connect + ' / 29', pct: Math.round(g.wl.connect * 100 / 29), col: 'var(--coral)' }])));
+      { name: 'Word Chain', v: g.wl.chain + ' / 39', pct: Math.round(g.wl.chain * 100 / 39), col: 'var(--gold)' },
+      { name: 'Word Trail', v: g.wl.trail + ' / 10', pct: Math.round(g.wl.trail * 100 / 10), col: 'var(--teal)' },
+      { name: 'Word Connect', v: g.wl.connect + ' / 29', pct: Math.round(g.wl.connect * 100 / 29), col: 'var(--coral)' }])));
     const gm = n => g.gm.find(m => m.name === n) || { done: 0, total: 1 };
     const rq = { done: gm('Root Observatory').done + gm('Root Station').done, total: gm('Root Observatory').total + gm('Root Station').total };
     one('play_sound', '🚀', 'Sound Launch', gm('Sound Launch').done, gm('Sound Launch').total);
@@ -9342,7 +9342,7 @@ function chRenderLevelList() {
   body.appendChild(ppCard);
 
 
-  [['🔗','Word Link','Star Swap, Comet Trail and Planet Hop','games/word_link.html'],
+  [['🔗','Word Link','Word Chain, Word Trail and Word Connect','games/word_link.html'],
    ['🚀','Sound Launch','Pick the missing sound to build a rocket','games/word_galaxy.html?m=sound'],
    ['🔭','Root Quest','Build words around Greek and Latin roots','games/word_galaxy.html?m=root'],
    ['☀️','Word Solar System','Add beginnings and endings to a base word','games/word_galaxy.html?m=solar'],
