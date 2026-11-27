@@ -767,7 +767,8 @@ function finish(all) {
 }
 $('skinb').onclick = () => { skin = skin === 'solar' ? 'stars' : 'solar'; store.set('skin', skin); $('skinb').textContent = skin === 'solar' ? '⭐' : '🪐'; if (LV[lv].kind === 'tail' && !over) drawTether(); };
 $('skinb').textContent = skin === 'solar' ? '⭐' : '🪐';
-$('home').onclick = () => { if ($('cele').classList.contains('on')) return; showHub(); };
+const DIRECT = (['chain', 'trail', 'connect'].indexOf(new URLSearchParams(location.search).get('g')) >= 0) ? new URLSearchParams(location.search).get('g') : null;
+$('home').onclick = () => { if ($('cele').classList.contains('on')) return; if (DIRECT) { try { parent.postMessage('wg-exit', '*'); } catch (e) {} return; } showHub(); };
 /* ===== CBAR: completion bar ===== */
 function cbarInit(fn) {
   const st = document.createElement('style');
@@ -973,6 +974,6 @@ const _tfn = finish; finish = function (a) { coach.stop(); clearInterval(tutTick
 const _tlh = loseHeart; loseHeart = function (m) { if (tutMode === 2) { say("Good try! Let's look again.", ''); return; } _tlh(m); };
 const _tsh = showHub; showHub = function () { coach.stop(); clearInterval(tutTick); tutMode = 0; _tsh(); };
 
-showHub();
+if (DIRECT) openGame(DIRECT); else showHub();
 
 </script>

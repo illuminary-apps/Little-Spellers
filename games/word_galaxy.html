@@ -1,5 +1,4 @@
 <script>(function(){try{var q=new URLSearchParams(location.search).get('c');var c=q||(parent!==window&&parent.__cid)||'';window.__cid=c;if(!c)return;var P='c'+c+'::',S=Storage.prototype,g=S.getItem,s=S.setItem,r=S.removeItem;S.getItem=function(k){return g.call(this,P+k)};S.setItem=function(k,v){return s.call(this,P+k,v)};S.removeItem=function(k){return r.call(this,P+k)}}catch(e){}})();</script>
-<script>var SHIM="(function(){try{var q=new URLSearchParams(location.search).get('c');var c=q||(parent!==window&&parent.__cid)||'';window.__cid=c;if(!c)return;var P='c'+c+'::',S=Storage.prototype,g=S.getItem,s=S.setItem,r=S.removeItem;S.getItem=function(k){return g.call(this,P+k)};S.setItem=function(k,v){return s.call(this,P+k,v)};S.removeItem=function(k){return r.call(this,P+k)}}catch(e){}})();";</script>
 <title>Word Galaxy</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -186,12 +185,13 @@ const G={"sound": "<title>Sound Launch<\/title>\n<meta name=\"claude:viewport-fi
 const META=[["sound", "sound_blocks.html", "\ud83d\ude80", "Sound Launch", "Pick the missing sound to build a rocket", 8], ["rootobs", "root_observatory.html", "\ud83d\udd2d", "Root Observatory", "Build words around a root", 6], ["rootstn", "root_station.html", "\ud83d\udef0\ufe0f", "Root Station", "Dock word parts from Greek and Latin roots", 4], ["solar", "solar_system.html", "\u2600\ufe0f", "Word Solar System", "Add beginnings and endings to a base word", 8], ["dock", "compound_docking.html", "\ud83d\udd17", "Compound Docking", "Dock two words to make a new one", 7], ["lineup", "cosmic_lineup.html", "\ud83e\ude90", "Cosmic Lineup", "Line up planets: big, bigger, biggest", 4]];
 function prog(id,total){let d=[];try{d=JSON.parse(localStorage.getItem('wce_'+id+'_full')||'[]')||[]}catch(e){}return Array.isArray(d)?d.length:0}
 function tot(){let t=0;try{const v=localStorage.getItem('wg_pts');if(v===null){['sound','rootobs','rootstn','solar','dock','lineup'].forEach(id=>{t+=+JSON.parse(localStorage.getItem('wce_'+id+'_pts')||'0')||0});localStorage.setItem('wg_pts',JSON.stringify(t))}else t=+JSON.parse(v)||0}catch(e){}document.getElementById('tot').textContent='★ '+t+' points'}
-function draw(){tot();document.getElementById('gl').innerHTML=META.map(m=>{const n=prog(m[0]);return '<button type="button" class="gc'+(n>=m[5]?' done':'')+'" data-g="'+m[0]+'"><span class="em">'+m[2]+'</span><span class="tx"><b>'+m[3]+'</b><i>'+m[4]+'</i><u>'+n+' of '+m[5]+' levels done</u></span></button>'}).join('');
+const MQ=new URLSearchParams(location.search).get('m')||'';const SEL=MQ==='root'?['rootobs','rootstn']:MQ?[MQ]:null;const ML=SEL?META.filter(m=>SEL.includes(m[0])):META;if(MQ==='root')document.querySelector('#gal h1').textContent='Root Quest';
+function draw(){tot();document.getElementById('gl').innerHTML=ML.map(m=>{const n=prog(m[0]);return '<button type="button" class="gc'+(n>=m[5]?' done':'')+'" data-g="'+m[0]+'"><span class="em">'+m[2]+'</span><span class="tx"><b>'+m[3]+'</b><i>'+m[4]+'</i><u>'+n+' of '+m[5]+' levels done</u></span></button>'}).join('');
  document.querySelectorAll('.gc').forEach(b=>b.onclick=()=>openG(b.dataset.g));}
-function openG(id){const f=document.getElementById('gf');f.srcdoc='<script>'+SHIM+'<\/script>\n'+G[id];f.style.display='block';document.getElementById('gal').classList.add('off');}
-function closeG(){const f=document.getElementById('gf');f.style.display='none';f.srcdoc='';document.getElementById('gal').classList.remove('off');draw();try{speechSynthesis.cancel()}catch(e){}}
+function openG(id){const f=document.getElementById('gf');f.srcdoc='<script>'+"(function(){try{var q=new URLSearchParams(location.search).get('c');var c=q||(parent!==window&&parent.__cid)||'';window.__cid=c;if(!c)return;var P='c'+c+'::',S=Storage.prototype,g=S.getItem,s=S.setItem,r=S.removeItem;S.getItem=function(k){return g.call(this,P+k)};S.setItem=function(k,v){return s.call(this,P+k,v)};S.removeItem=function(k){return r.call(this,P+k)}}catch(e){}})();"+'<\/script>\n'+G[id];f.style.display='block';document.getElementById('gal').classList.add('off');}
+function closeG(){if(SEL&&SEL.length===1){try{parent.postMessage('wg-exit','*')}catch(e){}return}const f=document.getElementById('gf');f.style.display='none';f.srcdoc='';document.getElementById('gal').classList.remove('off');draw();try{speechSynthesis.cancel()}catch(e){}}
 window.addEventListener('message',e=>{if(e.data==='wg-home')closeG()});
-draw();
+draw();if(SEL&&SEL.length===1)openG(SEL[0]);
 </script>
 </body>
 </html>

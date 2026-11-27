@@ -7318,6 +7318,14 @@ function ppExitGame() {
   openChallenges();
 }
 
+/* Planet Patrol starts straight away: pick the world the child is working in. */
+function ppAutoLevel() {
+  const p = getProgress(), bw = (p.planetPatrol && p.planetPatrol.byWorld) || {};
+  const started = LEVELS.filter(lv => lv.lessons.some(l => p[l.id]));
+  if (!started.length) return LEVELS[0];
+  const open = started.find(lv => !((bw[lv.id] || {}).perfect > 0));
+  return open || started[started.length - 1];
+}
 function openPlanetPatrolLevels() {
   showScreen('planetpatrol-screen');
   const body = document.getElementById('pp-body');
@@ -7736,27 +7744,11 @@ function ppShowResults() {
   // of just replaying the same one.
   const ppDidWell = ppCaught === PP_TARGET_COUNT && ppLives > 0;
   const ppLevelIdx = ppCurrentLevel ? LEVELS.findIndex(lv => lv.id === ppCurrentLevel.id) : -1;
-  const ppNextLevel = (ppDidWell && ppLevelIdx > -1 && ppLevelIdx < LEVELS.length - 1) ? LEVELS[ppLevelIdx + 1] : null;
-
   const againBtn = document.createElement('button');
   againBtn.className = 'action-btn primary';
-  if (ppNextLevel) {
-    againBtn.textContent = 'Next world: ' + ppNextLevel.name + ' →';
-    againBtn.addEventListener('click', () => openPlanetPatrol(ppNextLevel));
-  } else {
-    againBtn.textContent = 'Play again →';
-    againBtn.addEventListener('click', () => openPlanetPatrol(ppCurrentLevel));
-  }
+  againBtn.textContent = 'Play again →';
+  againBtn.addEventListener('click', () => openPlanetPatrol(ppAutoLevel()));
   body.appendChild(againBtn);
-
-  if (ppNextLevel) {
-    const replayBtn = document.createElement('button');
-    replayBtn.className = 'action-btn secondary';
-    replayBtn.textContent = 'Play this world again';
-    replayBtn.style.marginTop = '10px';
-    replayBtn.addEventListener('click', () => openPlanetPatrol(ppCurrentLevel));
-    body.appendChild(replayBtn);
-  }
   // No separate "Back to Games"/"My Achievements" buttons — the header's own
   // back arrow already exits to Games, and badges are just a passing
   // celebration now, not somewhere a kid navigates to from here.
@@ -8779,7 +8771,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 105;
+const APP_VERSION = 106;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -9164,11 +9156,15 @@ function buildParentDashboard() {
     card.innerHTML = '<div class="pd-section-title">🎮 Games</div><div class="pd-sr-sub" style="margin-bottom:8px">How much your child plays. Tap a game to open it.</div>';
     const pp = pdWorldRows(p, 'pp'), ppN = pp.reduce((a, r) => a + r.n, 0), ppT = pp.reduce((a, r) => a + r.t, 0);
     card.insertAdjacentHTML('beforeend', pdCollapsible('play_pp', '🪐', 'Planet Patrol', 'Words caught, by world', ppN + '/' + ppT, pdRowsHtml(pp)));
-    card.insertAdjacentHTML('beforeend', pdCollapsible('play_wl', '🔗', 'Word Link', 'Levels cleared, by game', g.wlDone + '/' + g.wlTotal, pdRowsHtml([
-      { name: 'Word Chain', v: g.wl.chain + ' / 39', pct: Math.round(g.wl.chain * 100 / 39), col: 'var(--gold)' },
-      { name: 'Word Trail', v: g.wl.trail + ' / 10', pct: Math.round(g.wl.trail * 100 / 10), col: 'var(--teal)' },
-      { name: 'Word Connect', v: g.wl.connect + ' / 29', pct: Math.round(g.wl.connect * 100 / 29), col: 'var(--coral)' }])));
-    card.insertAdjacentHTML('beforeend', pdCollapsible('play_wg', '🌌', 'Word Galaxy', 'Missions, with levels cleared' + (g.pts ? ' · ' + g.pts + ' points' : ''), g.gmDone + '/' + g.gmTotal, pdRowsHtml(g.gm.map(m => ({ name: m.name, v: m.done + ' / ' + m.total, pct: Math.round(m.done * 100 / m.total), col: 'var(--lavender)' })))));
+    const one = (key, icon, name, done, total) => card.insertAdjacentHTML('beforeend', pdCollapsible(key, icon, name, 'Levels cleared', done + '/' + total, pdRowsHtml([{ name: 'Levels', v: done + ' / ' + total, pct: Math.round(done * 100 / total), col: 'var(--gold)' }])));
+    one('play_chain', '🔗', 'Word Chain', g.wl.chain, 39); one('play_trail', '🌠', 'Word Trail', g.wl.trail, 10); one('play_connect', '🚀', 'Word Connect', g.wl.connect, 29);
+    const gm = n => g.gm.find(m => m.name === n) || { done: 0, total: 1 };
+    const rq = { done: gm('Root Observatory').done + gm('Root Station').done, total: gm('Root Observatory').total + gm('Root Station').total };
+    one('play_sound', '🚀', 'Sound Launch', gm('Sound Launch').done, gm('Sound Launch').total);
+    one('play_root', '🔭', 'Root Quest', rq.done, rq.total);
+    one('play_solar', '☀️', 'Word Solar System', gm('Word Solar System').done, gm('Word Solar System').total);
+    one('play_dock', '🛰️', 'Compound Docking', gm('Compound Docking').done, gm('Compound Docking').total);
+    one('play_line', '🪐', 'Cosmic Lineup', gm('Cosmic Lineup').done, gm('Cosmic Lineup').total);
     pdWireCollapsibles(card); secPlay.appendChild(card);
   })();
 
@@ -9341,12 +9337,18 @@ function chRenderLevelList() {
       <div class="ch-level-sub">Catch the floating words before they escape!</div>
     </div>
     <span class="ch-level-arrow">›</span>`;
-  ppCard.addEventListener('click', openPlanetPatrolLevels);
+  ppCard.addEventListener('click', () => openPlanetPatrol(ppAutoLevel()));
   body.appendChild(ppCard);
 
 
-  [['🔗','Word Link','Link words into chains, trails and bridges','games/word_link.html'],
-   ['🌌','Word Galaxy','Six missions through the word galaxy','games/word_galaxy.html']].forEach(g => {
+  [['🔗','Word Chain','Change letters to light up a constellation','games/word_link.html?g=chain'],
+   ['🌠','Word Trail','Link the stars: each word starts with the last letter','games/word_link.html?g=trail'],
+   ['🚀','Word Connect','Fly a rocket to a planet, one letter at a time','games/word_link.html?g=connect'],
+   ['🚀','Sound Launch','Pick the missing sound to build a rocket','games/word_galaxy.html?m=sound'],
+   ['🔭','Root Quest','Build words around Greek and Latin roots','games/word_galaxy.html?m=root'],
+   ['☀️','Word Solar System','Add beginnings and endings to a base word','games/word_galaxy.html?m=solar'],
+   ['🛰️','Compound Docking','Dock two words to make a new one','games/word_galaxy.html?m=dock'],
+   ['🪐','Cosmic Lineup','Line up planets: big, bigger, biggest','games/word_galaxy.html?m=lineup']].forEach(g => {
     const c = document.createElement('div');
     c.className = 'ch-level-card';
     c.innerHTML = `<span class="ch-level-icon">${g[0]}</span><div class="ch-level-info"><div class="ch-level-name">${g[1]}</div><div class="ch-level-sub">${g[2]}</div></div><span class="ch-level-arrow">›</span>`;
@@ -9524,9 +9526,10 @@ function evalRenderQ(q, idx, total) {
 
 function wgOpen(src, title) {
   document.getElementById('wgame-title').textContent = title;
-  document.getElementById('wgame-frame').src = src + '?c=' + encodeURIComponent(getActiveProfileId());
+  document.getElementById('wgame-frame').src = src + (src.indexOf('?') >= 0 ? '&' : '?') + 'c=' + encodeURIComponent(getActiveProfileId());
   showScreen('wgame-screen');
 }
+window.addEventListener('message', e => { if (e.data === 'wg-exit') { const sc = document.getElementById('wgame-screen'); if (sc && sc.classList.contains('active')) wgExit(); } });
 function wgExit() {
   const f = document.getElementById('wgame-frame');
   try { f.contentWindow.speechSynthesis.cancel(); } catch (e) {}
