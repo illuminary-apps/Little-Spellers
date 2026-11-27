@@ -703,7 +703,7 @@ function goRoute() {
   if (w === last) { say('Change one letter.', ''); return; }
   if (ham(w, last) > 1) { say('One letter at a time.', ''); shake($('entry')); return; }
   if (chain.includes(w)) { say('Already used on this trip.', ''); letters = last.split(''); sel = -1; drawEntry(); return; }
-  if (!SWS[L.len].has(w)) { shake($('entry')); letters = last.split(''); sel = -1; drawEntry(); if (tried.has(w)) { say('You tried that one.', '', true); return; } tried.add(w); loseHeart('Oops! That is not a word. You lost a heart.'); return; }
+  if (!SWS[L.len].has(w) && !(FULL && FULL.has(w) && w.length === L.len)) { shake($('entry')); letters = last.split(''); sel = -1; drawEntry(); if (tried.has(w)) { say('You tried that one.', '', true); return; } tried.add(w); loseHeart('Oops! That is not a word. You lost a heart.'); return; }
   const isNew = !discovered.has(w); if (isNew) { rNew++; discovered.add(w); store.set('disc', [...discovered]); }
   const before = dOf(last) === undefined ? 99 : dOf(last), after = dOf(w) === undefined ? 99 : dOf(w);
   chain.push(w); moves++; base = w; letters = w.split(''); sel = -1; hintStage = 0; hintWord = ''; drawEntry(); speak(w);
@@ -719,7 +719,7 @@ function go() {
     if (w === base) { say('Change a letter first.', ''); return; }
     if (ham(w, base) > L.k) { say('That changes too many letters. Change up to ' + L.k + '.', ''); return; }
     if (chain.includes(w)) { say('That word is already in this constellation.', ''); letters = base.split(''); sel = -1; drawEntry(); return; }
-    if (!SWS[L.len].has(w)) { shake($('entry')); const key = w; letters = base.split(''); sel = -1; drawEntry(); if (tried.has(key)) { say('You tried that one.', '', true); return; } tried.add(key); loseHeart('Oops! That is not a word. You lost a heart.'); return; }
+    if (!SWS[L.len].has(w) && !(FULL && FULL.has(w) && w.length === L.len)) { shake($('entry')); const key = w; letters = base.split(''); sel = -1; drawEntry(); if (tried.has(key)) { say('You tried that one.', '', true); return; } tried.add(key); loseHeart('Oops! That is not a word. You lost a heart.'); return; }
     const isNew = !discovered.has(w); if (isNew) { discovered.add(w); store.set('disc', [...discovered]); }
     accept(w, 10 + (isNew ? 5 : 0), isNew); return;
   }
