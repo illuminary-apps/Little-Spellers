@@ -7318,13 +7318,11 @@ function ppExitGame() {
   openChallenges();
 }
 
-/* Planet Patrol starts straight away: pick the world the child is working in. */
+/* Planet Patrol starts at the basic world and moves up after each perfect round, whatever lessons are done. */
 function ppAutoLevel() {
   const p = getProgress(), bw = (p.planetPatrol && p.planetPatrol.byWorld) || {};
-  const started = LEVELS.filter(lv => lv.lessons.some(l => p[l.id]));
-  if (!started.length) return LEVELS[0];
-  const open = started.find(lv => !((bw[lv.id] || {}).perfect > 0));
-  return open || started[started.length - 1];
+  const open = LEVELS.find(lv => !((bw[lv.id] || {}).perfect > 0));
+  return open || LEVELS[LEVELS.length - 1];
 }
 function openPlanetPatrolLevels() {
   showScreen('planetpatrol-screen');
@@ -8771,7 +8769,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 107;
+const APP_VERSION = 108;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -9157,7 +9155,10 @@ function buildParentDashboard() {
     const pp = pdWorldRows(p, 'pp'), ppN = pp.reduce((a, r) => a + r.n, 0), ppT = pp.reduce((a, r) => a + r.t, 0);
     card.insertAdjacentHTML('beforeend', pdCollapsible('play_pp', '🪐', 'Planet Patrol', 'Words caught, by world', ppN + '/' + ppT, pdRowsHtml(pp)));
     const one = (key, icon, name, done, total) => card.insertAdjacentHTML('beforeend', pdCollapsible(key, icon, name, 'Levels cleared', done + '/' + total, pdRowsHtml([{ name: 'Levels', v: done + ' / ' + total, pct: Math.round(done * 100 / total), col: 'var(--gold)' }])));
-    one('play_chain', '🔗', 'Star Swap', g.wl.chain, 39); one('play_trail', '🌠', 'Comet Trail', g.wl.trail, 10); one('play_connect', '🚀', 'Planet Hop', g.wl.connect, 29);
+    card.insertAdjacentHTML('beforeend', pdCollapsible('play_wl', '🔗', 'Word Link', 'Levels cleared, by game', g.wlDone + '/' + g.wlTotal, pdRowsHtml([
+      { name: 'Star Swap', v: g.wl.chain + ' / 39', pct: Math.round(g.wl.chain * 100 / 39), col: 'var(--gold)' },
+      { name: 'Comet Trail', v: g.wl.trail + ' / 10', pct: Math.round(g.wl.trail * 100 / 10), col: 'var(--teal)' },
+      { name: 'Planet Hop', v: g.wl.connect + ' / 29', pct: Math.round(g.wl.connect * 100 / 29), col: 'var(--coral)' }])));
     const gm = n => g.gm.find(m => m.name === n) || { done: 0, total: 1 };
     const rq = { done: gm('Root Observatory').done + gm('Root Station').done, total: gm('Root Observatory').total + gm('Root Station').total };
     one('play_sound', '🚀', 'Sound Launch', gm('Sound Launch').done, gm('Sound Launch').total);
@@ -9341,9 +9342,7 @@ function chRenderLevelList() {
   body.appendChild(ppCard);
 
 
-  [['🔗','Star Swap','Change letters to light up a constellation','games/word_link.html?g=chain'],
-   ['🌠','Comet Trail','Link the stars: each word starts with the last letter','games/word_link.html?g=trail'],
-   ['🚀','Planet Hop','Fly a rocket to a planet, one letter at a time','games/word_link.html?g=connect'],
+  [['🔗','Word Link','Star Swap, Comet Trail and Planet Hop','games/word_link.html'],
    ['🚀','Sound Launch','Pick the missing sound to build a rocket','games/word_galaxy.html?m=sound'],
    ['🔭','Root Quest','Build words around Greek and Latin roots','games/word_galaxy.html?m=root'],
    ['☀️','Word Solar System','Add beginnings and endings to a base word','games/word_galaxy.html?m=solar'],
