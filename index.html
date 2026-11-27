@@ -8769,7 +8769,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 109;
+const APP_VERSION = 110;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -8874,6 +8874,17 @@ function pdGo(v) { window.pdView = v; buildParentDashboard(); try { document.get
 function pdGameStore(key) {
   try { const id = (getProfilesMeta() || {}).activeId; const v = localStorage.getItem('c' + id + '::' + key.replace(/^/, '')); return v ? JSON.parse(v) : null; } catch (e) { return null; }
 }
+function pdShared(kind) {
+  try {
+    const pre = (getProfilesMeta() || {}).activeId; const P = 'c' + pre + '::';
+    const v = localStorage.getItem(P + 'wce_all_' + kind);
+    if (v !== null) return +JSON.parse(v) || 0;
+    const re = new RegExp('^' + P.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + 'wce_(?:[a-z]+_)?' + kind + '$');
+    let n = 0, max = 0;
+    for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && re.test(k) && k.indexOf(P + 'wce_all_') !== 0) { const x = +JSON.parse(localStorage.getItem(k) || '0') || 0; n += x; if (x > max) max = x; } }
+    return kind === 'clean' ? max : n;
+  } catch (e) { return 0; }
+}
 function pdGameStats() {
   // Word Link level indexes: 0-28 Connect, 29-67 Chain, 68-77 Trail. Galaxy keeps one list per mission.
   const full = pdGameStore('wce_full'); const arr = Array.isArray(full) ? full : [];
@@ -8881,7 +8892,7 @@ function pdGameStats() {
   arr.forEach(i => { if (i < 29) wl.connect++; else if (i < 68) wl.chain++; else if (i < 78) wl.trail++; });
   const gm = [['sound', 'Sound Launch', 8], ['rootobs', 'Root Observatory', 6], ['rootstn', 'Root Station', 4], ['solar', 'Word Solar System', 8], ['dock', 'Compound Docking', 7], ['lineup', 'Cosmic Lineup', 4]]
     .map(m => { const a = pdGameStore('wce_' + m[0] + '_full'); return { name: m[1], done: Array.isArray(a) ? a.length : 0, total: m[2] }; });
-  const pts = pdGameStore('wg_pts');
+  const pts = pdShared('pts');
   return { wl, wlDone: wl.connect + wl.chain + wl.trail, wlTotal: 78, gm, gmDone: gm.reduce((a, g) => a + g.done, 0), gmTotal: gm.reduce((a, g) => a + g.total, 0), pts: +pts || 0 };
 }
 function pdBar(pct, col) { return '<div class="plc-bar-wrap"><div class="plc-bar" style="width:' + pct + '%;background:' + col + ';"></div></div>'; }
@@ -9151,7 +9162,7 @@ function buildParentDashboard() {
   // ── Play: each game, expandable ──
   (function () {
     const g = pdGameStats(); const card = document.createElement('div'); card.className = 'pd-section-card';
-    card.innerHTML = '<div class="pd-section-title">🎮 Games</div><div class="pd-sr-sub" style="margin-bottom:8px">How much your child plays. Tap a game to open it.</div>';
+    card.innerHTML = '<div class="pd-section-title">🎮 Games</div><div class="pd-sr-sub" style="margin-bottom:8px">How much your child plays. Tap a game to open it.</div><div class="pd-sr-sub" style="margin-bottom:8px;color:#ffd166;font-weight:800">⭐ ' + g.pts + ' points shared across all games · ❤️ ' + pdShared('bank') + ' spare heart' + (pdShared('bank') === 1 ? '' : 's') + '</div>';
     const pp = pdWorldRows(p, 'pp'), ppN = pp.reduce((a, r) => a + r.n, 0), ppT = pp.reduce((a, r) => a + r.t, 0);
     card.insertAdjacentHTML('beforeend', pdCollapsible('play_pp', '🪐', 'Planet Patrol', 'Words caught, by world', ppN + '/' + ppT, pdRowsHtml(pp)));
     const one = (key, icon, name, done, total) => card.insertAdjacentHTML('beforeend', pdCollapsible(key, icon, name, 'Levels cleared', done + '/' + total, pdRowsHtml([{ name: 'Levels', v: done + ' / ' + total, pct: Math.round(done * 100 / total), col: 'var(--gold)' }])));
@@ -9328,6 +9339,12 @@ function chRenderLevelList() {
   body.innerHTML = '';
   document.getElementById('ch-title').textContent = '🎮 Play';
   document.getElementById('ch-back-btn').onclick = goHome;
+
+  const tot = document.createElement('div');
+  tot.style.cssText = 'grid-column:1/-1;text-align:center;font-weight:800;color:#ffd166;margin:2px 0 6px';
+  const spare = pdShared('bank');
+  tot.textContent = '⭐ ' + pdShared('pts') + ' points' + (spare ? ' · ❤️ ' + spare + ' spare heart' + (spare === 1 ? '' : 's') : '');
+  body.appendChild(tot);
 
   const ppCard = document.createElement('div');
   ppCard.className = 'ch-level-card';
