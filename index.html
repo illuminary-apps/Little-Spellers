@@ -8771,7 +8771,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 106;
+const APP_VERSION = 107;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -9157,7 +9157,7 @@ function buildParentDashboard() {
     const pp = pdWorldRows(p, 'pp'), ppN = pp.reduce((a, r) => a + r.n, 0), ppT = pp.reduce((a, r) => a + r.t, 0);
     card.insertAdjacentHTML('beforeend', pdCollapsible('play_pp', '🪐', 'Planet Patrol', 'Words caught, by world', ppN + '/' + ppT, pdRowsHtml(pp)));
     const one = (key, icon, name, done, total) => card.insertAdjacentHTML('beforeend', pdCollapsible(key, icon, name, 'Levels cleared', done + '/' + total, pdRowsHtml([{ name: 'Levels', v: done + ' / ' + total, pct: Math.round(done * 100 / total), col: 'var(--gold)' }])));
-    one('play_chain', '🔗', 'Word Chain', g.wl.chain, 39); one('play_trail', '🌠', 'Word Trail', g.wl.trail, 10); one('play_connect', '🚀', 'Word Connect', g.wl.connect, 29);
+    one('play_chain', '🔗', 'Star Swap', g.wl.chain, 39); one('play_trail', '🌠', 'Comet Trail', g.wl.trail, 10); one('play_connect', '🚀', 'Planet Hop', g.wl.connect, 29);
     const gm = n => g.gm.find(m => m.name === n) || { done: 0, total: 1 };
     const rq = { done: gm('Root Observatory').done + gm('Root Station').done, total: gm('Root Observatory').total + gm('Root Station').total };
     one('play_sound', '🚀', 'Sound Launch', gm('Sound Launch').done, gm('Sound Launch').total);
@@ -9341,9 +9341,9 @@ function chRenderLevelList() {
   body.appendChild(ppCard);
 
 
-  [['🔗','Word Chain','Change letters to light up a constellation','games/word_link.html?g=chain'],
-   ['🌠','Word Trail','Link the stars: each word starts with the last letter','games/word_link.html?g=trail'],
-   ['🚀','Word Connect','Fly a rocket to a planet, one letter at a time','games/word_link.html?g=connect'],
+  [['🔗','Star Swap','Change letters to light up a constellation','games/word_link.html?g=chain'],
+   ['🌠','Comet Trail','Link the stars: each word starts with the last letter','games/word_link.html?g=trail'],
+   ['🚀','Planet Hop','Fly a rocket to a planet, one letter at a time','games/word_link.html?g=connect'],
    ['🚀','Sound Launch','Pick the missing sound to build a rocket','games/word_galaxy.html?m=sound'],
    ['🔭','Root Quest','Build words around Greek and Latin roots','games/word_galaxy.html?m=root'],
    ['☀️','Word Solar System','Add beginnings and endings to a base word','games/word_galaxy.html?m=solar'],
