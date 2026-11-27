@@ -129,7 +129,7 @@ button:focus-visible{outline:3px solid var(--teal2);outline-offset:2px}
 .bank{width:100%;min-height:78px;max-height:112px;overflow:auto;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-content:flex-start;padding:10px;border-radius:18px;background:linear-gradient(#0d1b2a99,#0d1b2a55);border:2px solid #3d5a80;box-shadow:inset 0 0 22px #4cc9f022}
 .ghost{color:#6f86ad;font:700 .9rem var(--ff-body);align-self:center}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:3px 12px;border-radius:14px;background:var(--navy3);border:2px solid #6f86ad;font:400 1.25rem var(--ff-head);color:var(--white)}
-.chip.goal{border-color:var(--teal2);color:var(--teal2)}.chip i{font-style:normal;font-size:.55rem;color:var(--gold);letter-spacing:1px}.chip.pop{animation:pop .7s ease-out}
+.chip.big{border-color:var(--teal2);color:var(--teal2)}.chip i{font-style:normal;font-size:.55rem;color:var(--gold);letter-spacing:1px}.chip.pop{animation:pop .7s ease-out}
 .typed{display:flex;gap:6px;justify-content:center;min-height:52px}
 .tl{width:calc(var(--gw,50px)*.75);height:52px;border-radius:12px;border:2px dashed #4a6080;display:grid;place-items:center;font:400 1.9rem var(--ff-head);color:var(--gold2)}
 .tl.on{border:2px solid var(--gold);background:#ffd16622}
@@ -158,6 +158,31 @@ button:focus-visible{outline:3px solid var(--teal2);outline-offset:2px}
 .chips span{padding:6px 14px;border-radius:14px;background:var(--navy3);border:2px solid var(--gold);font:400 1.3rem var(--ff-head)}
 @media (max-height:700px){.lab{gap:5px}.bank{min-height:54px;max-height:70px}.typed{min-height:42px}.tl{height:42px}.goal{padding-bottom:22px}}
 :root{--ws:clamp(210px,min(78vw,36vh),300px)}
+
+/* ---- Word Galaxy look ---- */
+.ttl{text-align:center;margin:-2px 0 0}.ttl h1{margin:0;font:400 1.9rem/1 var(--ff-head);background:linear-gradient(#fff,#d9c6ff 60%,#a98bff);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 10px #a98bff99)}
+.ttl p{margin:2px 0 0;font:800 .62rem var(--ff-body);letter-spacing:.14em;text-transform:uppercase;color:#b9a6e8}
+.goal{background:linear-gradient(#2a1d5ccc,#150f38cc);border:2px solid #8a6cff;box-shadow:0 0 18px #7b4dff44,inset 0 0 14px #a98bff22}
+.rk-fill{background:linear-gradient(90deg,#a98bff,#7fd8ff,#ffd166);box-shadow:0 0 10px #a98bff}
+.bankbox{width:100%;border-radius:22px;border:2px solid #8a6cff;background:linear-gradient(#2a1d5ccc,#150f38cc);box-shadow:0 0 18px #7b4dff44,inset 0 0 14px #a98bff22;padding:6px 8px 8px}
+.bk-h{text-align:center;font:400 1.05rem var(--ff-head);color:#f3eaff;letter-spacing:.04em;text-shadow:0 0 8px #a98bff;border-bottom:1px solid #a98bff55;margin:0 22% 6px;padding-bottom:2px}
+.bank{background:none;border:0;box-shadow:none;padding:2px;min-height:60px}
+.chip{background:linear-gradient(#efe6ff,#c9b4ff);border:0;color:#2a1760;text-transform:uppercase;font:800 .95rem var(--ff-body);letter-spacing:.03em;padding:5px 12px;box-shadow:0 2px 0 #7b5bd6,0 0 10px #a98bff66}
+.chip.big{background:linear-gradient(#fff4c4,#ffd166);color:#4a2f00;box-shadow:0 2px 0 #c58a00,0 0 12px #ffd16688}
+.chip i{color:#7b4dff}.chip.big i{color:#b36b00}.ghost{color:#9a88cc}
+.tl{border-color:#8a6cff88;color:#fff;text-transform:uppercase}.tl.on{background:#a98bff33;border-color:#c9b4ff}
+.wheel{flex:0 0 auto;aspect-ratio:1;border:0;background:radial-gradient(circle,#1a1450 0,#0d0a2c 75%);box-shadow:0 0 0 3px #8a6cff66,0 0 34px #7b4dff77,inset 0 0 36px #000;overflow:hidden}
+.wheel::before{inset:-25%;border:0;border-radius:50%;background:conic-gradient(from 0deg,#7b2ff755,#4cc9f055,#ff6fa855,#ffd16644,#7b2ff755,#4cc9f055,#ff6fa855,#7b2ff755);-webkit-mask:radial-gradient(circle,#000 8%,transparent 62%);mask:radial-gradient(circle,#000 8%,transparent 62%);filter:blur(7px);animation:gspin 70s linear infinite}
+.wheel::after{content:'';position:absolute;inset:0;border-radius:50%;pointer-events:none;background:radial-gradient(1.5px 1.5px at 20% 30%,#fff,transparent),radial-gradient(1.5px 1.5px at 70% 20%,#fff,transparent),radial-gradient(1px 1px at 80% 65%,#fff,transparent),radial-gradient(1.5px 1.5px at 30% 78%,#fff,transparent),radial-gradient(1px 1px at 55% 52%,#fff,transparent),radial-gradient(1px 1px at 12% 58%,#fff,transparent),radial-gradient(circle,#ffd16666 0,transparent 30%);animation:gtw 4s ease-in-out infinite alternate}
+@keyframes gspin{to{transform:rotate(360deg)}}@keyframes gtw{from{opacity:.6}to{opacity:1}}
+.hub{border:0;width:64px;height:64px;margin:-32px 0 0 -32px;background:radial-gradient(circle at 38% 32%,#fffbe0,#ffd166 55%,#f29d00);color:#4a2f00;box-shadow:0 0 22px #ffd166aa,0 0 50px #ffb70055;z-index:2}
+.gem{clip-path:none;border-radius:50%;height:var(--gw,52px);background:radial-gradient(circle at 35% 28%,#fff 0,#efe6ff 30%,#b79cff 100%);box-shadow:0 0 0 2px #ffffff88,0 0 16px var(--gc),inset 0 -4px 8px #7b4dff66;filter:none;z-index:2}
+.gem::before{border-radius:50%;background:radial-gradient(circle at 30% 25%,#ffffffcc,transparent 45%)}
+.gem span{color:#2a1760;font-size:calc(var(--gw,52px)*.56)}
+.gem.used{opacity:.25}
+.dot svg{width:24px;height:24px}.dot{width:26px;height:26px;margin:0 2px}.strip{padding:6px 12px;margin:0 0 6px}.lab{padding-top:4px}
+@media (max-height:760px){.ttl h1{font-size:1.5rem}.bk-h{font-size:.9rem;margin-bottom:2px}.bank{min-height:46px;max-height:58px}}
+@media (max-height:700px){.strip{display:none}.ttl p{display:block;font-size:.7rem}.bk-h{display:none}.bank{min-height:48px;max-height:84px}.goal{padding-bottom:20px}.lab{gap:4px}:root{--ws:clamp(190px,min(76vw,31vh),300px)}.btnrow{margin-top:4px}}
 </style>
 </head>
 <body>
@@ -165,11 +190,12 @@ button:focus-visible{outline:3px solid var(--teal2);outline-offset:2px}
 <div class="game" id="game">
   <div class="top">
     <div class="toprow"><div class="hearts pts" id="pts" role="status"></div><div class="hearts" id="hearts" role="status"></div></div>
-    <div class="strip" id="strip" aria-label="Experiments"></div>
+    <div class="ttl"><h1>Word Galaxy</h1><p>Explore the galaxy of words</p></div>
+    <div class="strip" id="strip" aria-label="Missions"></div>
   </div>
   <div class="lab" id="sky">
     <div class="goal" id="goal"></div>
-    <div class="bank" id="bank" aria-live="polite"></div>
+    <div class="bankbox"><div class="bk-h">✦ Your Words ✦</div><div class="bank" id="bank" aria-live="polite"></div></div>
     <div class="typedrow"><div class="typed" id="typed" aria-live="polite"></div></div>
     <div class="wheel" id="wheel"><div class="gems" id="gems"></div><button class="hub" id="shuf" type="button" aria-label="Shuffle">🔀</button></div>
     <div class="tools"><button class="key" id="back" type="button" aria-label="Delete">⌫</button><button class="key ok" id="ok" type="button" aria-label="Check">✓</button></div>
@@ -410,8 +436,9 @@ let rk0 = 0, hintsLeft = 3, roundNew = 0, lv = 0, hearts, maxH = 5, spareOn, ove
 (function () { const first = LV.findIndex((_, i) => !doneSet.has(i)); lv = first < 0 ? 0 : first; })();
 function flask(i) { const c = col(i); return '<svg viewBox="0 0 40 40"><path d="M15 4 H25 M17 4 V15 L7 33 Q5 37 9 37 H31 Q35 37 33 33 L23 15 V4" fill="none" stroke="' + c + '" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M12 27 H28 L32 34 Q33 36 31 36 H9 Q7 36 8 34 Z" fill="' + c + '"/><circle cx="17" cy="31" r="1.6" fill="#fff" fill-opacity=".7"/><circle cx="23" cy="29" r="1.2" fill="#fff" fill-opacity=".7"/></svg>'; }
 function drawStrip(scroll) {
+  try { document.querySelector('.ttl p').textContent = 'Mission ' + (lv + 1) + ' of ' + LV.length; } catch (e) { }
   const strip = $('strip'); strip.innerHTML = '';
-  LV.forEach((L, i) => { const d = document.createElement('div'); d.className = 'dot' + (fullSet.has(i) ? ' done' : '') + (i === lv && !doneSet.has(i) ? ' now' : ''); d.innerHTML = flask(i) + (RK[i] ? '<b class="mk">' + ['', '🥉', '🥈', '🥇'][RK[i]] + '</b>' : ''); d.setAttribute('aria-label', 'Experiment ' + (i + 1) + (doneSet.has(i) ? ', finished' : '')); strip.appendChild(d); });
+  LV.forEach((L, i) => { const d = document.createElement('div'); d.className = 'dot' + (fullSet.has(i) ? ' done' : '') + (i === lv && !doneSet.has(i) ? ' now' : ''); d.innerHTML = flask(i) + (RK[i] ? '<b class="mk">' + ['', '🥉', '🥈', '🥇'][RK[i]] + '</b>' : ''); d.setAttribute('aria-label', 'Mission ' + (i + 1) + (doneSet.has(i) ? ', finished' : '')); strip.appendChild(d); });
   if (scroll) { const cur = strip.children[lv]; if (cur) strip.scrollTo({ left: cur.offsetLeft - strip.clientWidth / 2 + cur.clientWidth / 2, behavior: 'smooth' }); }
 }
 const score = () => found.reduce((a, w) => a + wpts(w), 0);
@@ -426,7 +453,7 @@ function drawGoal() {
 }
 function drawBank(pop) {
   const b = $('bank'); b.innerHTML = '';
-  found.forEach((w, i) => { const e = document.createElement('span'); e.className = 'chip' + (w.length >= 5 ? ' goal' : '') + (pop && i === found.length - 1 ? ' pop' : ''); e.innerHTML = w + '<i>' + '★'.repeat(wstars(w)) + '</i>'; b.appendChild(e); });
+  found.forEach((w, i) => { const e = document.createElement('span'); e.className = 'chip' + (w.length >= 5 ? ' big' : '') + (pop && i === found.length - 1 ? ' pop' : ''); e.innerHTML = w + '<i>' + '★'.repeat(wstars(w)) + '</i>'; b.appendChild(e); });
   if (!found.length) b.innerHTML = '<span class="ghost">your words go here</span>';
   b.scrollTop = b.scrollHeight;
 }
@@ -517,7 +544,7 @@ function tutAfter() {
 }
 function winCele(sc, earned, all, L, miss) {
   alsoShow(miss);
-  const cap = all ? 'Amazing! Every experiment is done!' : (['', 'Hooray! Beginner rank!', 'Hooray! Good rank!', 'Master! You are a word scientist!'][rankOf(score())] || 'Hooray! Experiment complete!');
+  const cap = all ? 'Amazing! Every mission is done!' : (['', 'Hooray! Beginner rank!', 'Hooray! Good rank!', 'Master! You are a word scientist!'][rankOf(score())] || 'Hooray! Mission complete!');
   speak(cap + ' You earned ' + sc + ' points!' + (earned ? ' You also earned a spare heart!' : '') + (miss.length ? ' ' + alsoTxt(miss) : ''));
   carrier(earned ? -64 : 0, '<b>+' + sc + '</b><br>points', $('pts'), () => updPts(true));
   if (earned) carrier(64, '💛<br>spare heart', $('hearts'), () => { $('hearts').animate([{ transform: 'scale(1)' }, { transform: 'scale(1.25)' }, { transform: 'scale(1)' }], { duration: 500 }); });
