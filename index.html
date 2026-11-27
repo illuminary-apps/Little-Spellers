@@ -7280,8 +7280,10 @@ speak = function(text, el, rate) {
 const PP_TARGET_COUNT = 10;
 const PP_DECOY_COUNT = 10;
 const PP_TOTAL = PP_TARGET_COUNT + PP_DECOY_COUNT;
-const PP_FLOAT_MS = 11500;
-const PP_SPAWN_GAP_MS = 2100;
+let PP_FLOAT_MS = 11500;
+let PP_SPAWN_GAP_MS = 2100;
+const PP_LEVELS = 36, PP_PASS = 8;
+let ppLvlIdx = 0;
 const PP_LEAD_IN_COUNT = 3; // silent decoys already floating before the first word is spoken
 let ppSpawnIndex = 0;
 let ppCaught = 0;
@@ -7318,12 +7320,36 @@ function ppExitGame() {
   openChallenges();
 }
 
-/* Planet Patrol starts at the basic world and moves up after each perfect round, whatever lessons are done. */
-function ppAutoLevel() {
-  const p = getProgress(), bw = (p.planetPatrol && p.planetPatrol.byWorld) || {};
-  const open = LEVELS.find(lv => !((bw[lv.id] || {}).perfect > 0));
-  return open || LEVELS[LEVELS.length - 1];
+/* Planet Patrol has 36 levels. All words are ordered from easiest (basic world, early lessons) to hardest, then cut into 36 slices. */
+let _ppSorted = null;
+function ppSortedWords() {
+  if (_ppSorted) return _ppSorted;
+  const seen = new Set(), out = [];
+  LEVELS.forEach(lv => chWordsFor(lv.id, null).forEach(w => { const k = w.word.toLowerCase(); if (!seen.has(k)) { seen.add(k); out.push(Object.assign({ wid: lv.id }, w)); } }));
+  const wi = id => LEVELS.findIndex(l => l.id === id);
+  out.forEach((w, i) => w._i = i);
+  out.sort((a, b) => wi(a.wid) - wi(b.wid) || a.word.length - b.word.length || a._i - b._i);
+  return (_ppSorted = out);
 }
+function ppSlice(i) {
+  const all = ppSortedWords(), size = Math.ceil(all.length / PP_LEVELS);
+  let cur = all.slice(i * size, (i + 1) * size);
+  const prev = i > 0 ? all.slice(Math.max(0, (i - 1) * size), i * size) : all.slice(size, size * 2);
+  return { cur, prev, size };
+}
+function ppWorldOfLevel(i) {
+  const c = ppSlice(i).cur, n = {}; c.forEach(w => n[w.wid] = (n[w.wid] || 0) + 1);
+  const best = Object.keys(n).sort((a, b) => n[b] - n[a])[0];
+  return LEVELS.find(l => l.id === best) || LEVELS[0];
+}
+function ppCurIdx() {
+  const p = getProgress(), pp = p.planetPatrol || {};
+  if (typeof pp.lvl === 'number') return Math.min(PP_LEVELS - 1, pp.lvl);
+  const bw = pp.byWorld || {}; const w = LEVELS.find(lv => !((bw[lv.id] || {}).perfect > 0));
+  if (!w) return 0;
+  const first = ppSortedWords().findIndex(x => x.wid === w.id); return Math.max(0, Math.floor(first / ppSlice(0).size));
+}
+function ppAutoLevel() { ppLvlIdx = ppCurIdx(); return ppWorldOfLevel(ppLvlIdx); }
 function openPlanetPatrolLevels() {
   showScreen('planetpatrol-screen');
   const body = document.getElementById('pp-body');
@@ -7345,7 +7371,7 @@ function openPlanetPatrolLevels() {
 }
 
 function ppBuildRoundWords(level) {
-  const pool = ppWordPool;
+  const sl = ppSlice(ppLvlIdx); const pool = sl.cur;
   const missed = ppLoadMissed(level.id);
   const usedWords = new Set();
   const targets = [];
@@ -7363,7 +7389,8 @@ function ppBuildRoundWords(level) {
   }
 
   const decoys = [];
-  for (const w of shuffledPool) {
+  const decoyPool = sl.cur.concat(sl.prev).sort(() => Math.random() - 0.5);
+  for (const w of decoyPool) {
     if (decoys.length >= PP_DECOY_COUNT) break;
     if (!usedWords.has(w.word)) { decoys.push(w); usedWords.add(w.word); }
   }
@@ -7383,6 +7410,7 @@ function ppBuildRoundWords(level) {
 
 function openPlanetPatrol(level) {
   ppCurrentLevel = level;
+  const _f = ppLvlIdx / (PP_LEVELS - 1); PP_FLOAT_MS = Math.round(11500 - _f * 3200); PP_SPAWN_GAP_MS = Math.round(2100 - _f * 450);
   ppWordPool = chWordsFor(level.id, null);
   if (!ppWordPool.length) ppWordPool = CHALLENGE_WORDS;
 
@@ -7424,7 +7452,7 @@ function ppRunIntro(myGame, done) {
   const card = document.createElement('div');
   card.className = 'pp-intro';
   card.innerHTML = `
-    <div class="pp-intro-title">How to play</div>
+    <div class="pp-intro-title">Level ${ppLvlIdx + 1} · How to play</div>
     <div class="pp-intro-row" data-i="0"><span class="pp-intro-ico">👆</span><span>Tap the planets with the words you hear<br><b>⭐ Collect points!</b></span></div>
     <div class="pp-intro-row" data-i="1"><span class="pp-intro-ico">🪐</span><span>Watch out for the sneaky planets!</span></div>
     <div class="pp-intro-row" data-i="2"><span class="pp-intro-ico">🩷</span><span>A wrong tap costs a life<br><b>${hearts}${'<span class="pp-spare-mini">🩷✨</span>'.repeat(ppSpare)}</b></span></div>`;
@@ -7717,6 +7745,10 @@ function ppShowResults() {
   const prevBest = worldId ? (p.planetPatrol.bestByWorld[worldId] || 0) : 0;
   const isNewBest = worldId && ppCaught > prevBest;
   if (worldId && isNewBest) p.planetPatrol.bestByWorld[worldId] = ppCaught;
+  const ppPassed = ppCaught >= PP_PASS && ppLives > 0;
+  if (ppPassed && ppLvlIdx === ppCurIdx() && ppLvlIdx < PP_LEVELS - 1) p.planetPatrol.lvl = ppLvlIdx + 1;
+  else if (typeof p.planetPatrol.lvl !== 'number') p.planetPatrol.lvl = ppCurIdx();
+  p.planetPatrol.lvlBest = Math.max(p.planetPatrol.lvlBest || 0, ppPassed ? ppLvlIdx + 1 : 0);
   saveProgress(p);
 
   const body = document.getElementById('pp-body');
@@ -7726,6 +7758,7 @@ function ppShowResults() {
   wrap.className = 'pp-results';
   const star = ppCaught === PP_TARGET_COUNT ? '⭐⭐⭐' : ppCaught >= PP_TARGET_COUNT * 0.6 ? '⭐⭐' : '⭐';
   wrap.innerHTML = `
+    <div class="pp-results-label" style="margin-bottom:4px">Level ${ppLvlIdx + 1} of ${PP_LEVELS}${ppPassed ? ' · cleared! 🚀' : ''}</div>
     ${isNewBest && prevBest > 0 ? '<div class="pp-best-banner">🎉 New Best!</div>' : ''}
     <div class="pp-results-score">${ppCaught} / ${PP_TARGET_COUNT}</div>
     <div class="pp-results-label">${star}</div>
@@ -7740,11 +7773,11 @@ function ppShowResults() {
 
   // Did well and there's another world to patrol? Offer "Next World" instead
   // of just replaying the same one.
-  const ppDidWell = ppCaught === PP_TARGET_COUNT && ppLives > 0;
+  const ppDidWell = ppCaught >= PP_PASS && ppLives > 0;
   const ppLevelIdx = ppCurrentLevel ? LEVELS.findIndex(lv => lv.id === ppCurrentLevel.id) : -1;
   const againBtn = document.createElement('button');
   againBtn.className = 'action-btn primary';
-  againBtn.textContent = 'Play again →';
+  againBtn.textContent = ppPassed && ppLvlIdx < PP_LEVELS - 1 ? 'Next level →' : 'Play again →';
   againBtn.addEventListener('click', () => openPlanetPatrol(ppAutoLevel()));
   body.appendChild(againBtn);
   // No separate "Back to Games"/"My Achievements" buttons — the header's own
@@ -8769,7 +8802,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 111;
+const APP_VERSION = 112;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -9164,7 +9197,7 @@ function buildParentDashboard() {
     const g = pdGameStats(); const card = document.createElement('div'); card.className = 'pd-section-card';
     card.innerHTML = '<div class="pd-section-title">🎮 Games</div><div class="pd-sr-sub" style="margin-bottom:8px">How much your child plays. Tap a game to open it.</div><div class="pd-sr-sub" style="margin-bottom:8px;color:#ffd166;font-weight:800">⭐ ' + g.pts + ' points shared across all games · ❤️ ' + pdShared('bank') + ' spare heart' + (pdShared('bank') === 1 ? '' : 's') + '</div>';
     const pp = pdWorldRows(p, 'pp'), ppN = pp.reduce((a, r) => a + r.n, 0), ppT = pp.reduce((a, r) => a + r.t, 0);
-    card.insertAdjacentHTML('beforeend', pdCollapsible('play_pp', '🪐', 'Planet Patrol', 'Words caught, by world', ppN + '/' + ppT, pdRowsHtml(pp)));
+    card.insertAdjacentHTML('beforeend', pdCollapsible('play_pp', '🪐', 'Planet Patrol', 'Level ' + (ppCurIdx() + 1) + ' of ' + PP_LEVELS + ' · words caught, by world', ppN + '/' + ppT, pdRowsHtml(pp)));
     const one = (key, icon, name, done, total) => card.insertAdjacentHTML('beforeend', pdCollapsible(key, icon, name, 'Levels cleared', done + '/' + total, pdRowsHtml([{ name: 'Levels', v: done + ' / ' + total, pct: Math.round(done * 100 / total), col: 'var(--gold)' }])));
     card.insertAdjacentHTML('beforeend', pdCollapsible('play_wl', '🔗', 'Word Link', 'Levels cleared, by game', g.wlDone + '/' + g.wlTotal, pdRowsHtml([
       { name: 'Word Chain', v: g.wl.chain + ' / 39', pct: Math.round(g.wl.chain * 100 / 39), col: 'var(--gold)' },
@@ -9353,7 +9386,7 @@ function chRenderLevelList() {
     <span class="ch-level-icon">🪐</span>
     <div class="ch-level-info">
       <div class="ch-level-name">Planet Patrol</div>
-      <div class="ch-level-sub">Catch the floating words before they escape!</div>
+      <div class="ch-level-sub">Level ${ppCurIdx() + 1} of ${PP_LEVELS} · Catch the floating words!</div>
     </div>
     <span class="ch-level-arrow">›</span>`;
   ppCard.addEventListener('click', () => openPlanetPatrol(ppAutoLevel()));
