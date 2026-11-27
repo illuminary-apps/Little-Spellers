@@ -8769,7 +8769,7 @@ function openParentHub() {
   });
 }
 
-const APP_VERSION = 110;
+const APP_VERSION = 111;
 function buildParentHub() {
   const body = document.getElementById('parent-hub-body');
   body.innerHTML = '<div class="install-slot"></div>';
@@ -8890,7 +8890,7 @@ function pdGameStats() {
   const full = pdGameStore('wce_full'); const arr = Array.isArray(full) ? full : [];
   const wl = { connect: 0, chain: 0, trail: 0 };
   arr.forEach(i => { if (i < 29) wl.connect++; else if (i < 68) wl.chain++; else if (i < 78) wl.trail++; });
-  const gm = [['sound', 'Sound Launch', 8], ['rootobs', 'Root Observatory', 6], ['rootstn', 'Root Station', 4], ['solar', 'Word Solar System', 8], ['dock', 'Compound Docking', 7], ['lineup', 'Cosmic Lineup', 4]]
+  const gm = [['sound', 'Sound Launch', 8], ['rootobs', 'Root Observatory', 6], ['rootstn', 'Root Station', 4], ['solar', 'Word Solar System', 8], ['dock', 'Compound Docking', 7], ['lineup', 'Cosmic Lineup', 4], ['lab', 'Letter Lab', 15]]
     .map(m => { const a = pdGameStore('wce_' + m[0] + '_full'); return { name: m[1], done: Array.isArray(a) ? a.length : 0, total: m[2] }; });
   const pts = pdShared('pts');
   return { wl, wlDone: wl.connect + wl.chain + wl.trail, wlTotal: 78, gm, gmDone: gm.reduce((a, g) => a + g.done, 0), gmTotal: gm.reduce((a, g) => a + g.total, 0), pts: +pts || 0 };
@@ -9177,6 +9177,7 @@ function buildParentDashboard() {
     one('play_solar', '☀️', 'Word Solar System', gm('Word Solar System').done, gm('Word Solar System').total);
     one('play_dock', '🛰️', 'Compound Docking', gm('Compound Docking').done, gm('Compound Docking').total);
     one('play_line', '🪐', 'Cosmic Lineup', gm('Cosmic Lineup').done, gm('Cosmic Lineup').total);
+    one('play_lab', '🧪', 'Letter Lab', gm('Letter Lab').done, gm('Letter Lab').total);
     pdWireCollapsibles(card); secPlay.appendChild(card);
   })();
 
@@ -9364,7 +9365,8 @@ function chRenderLevelList() {
    ['🔭','Root Quest','Build words around Greek and Latin roots','games/word_galaxy.html?m=root'],
    ['☀️','Word Solar System','Add beginnings and endings to a base word','games/word_galaxy.html?m=solar'],
    ['🛰️','Compound Docking','Dock two words to make a new one','games/word_galaxy.html?m=dock'],
-   ['🪐','Cosmic Lineup','Line up planets: big, bigger, biggest','games/word_galaxy.html?m=lineup']].forEach(g => {
+   ['🪐','Cosmic Lineup','Line up planets: big, bigger, biggest','games/word_galaxy.html?m=lineup'],
+   ['🧪','Letter Lab','Make as many words as you can from letter crystals','games/letter_lab.html']].forEach(g => {
     const c = document.createElement('div');
     c.className = 'ch-level-card';
     c.innerHTML = `<span class="ch-level-icon">${g[0]}</span><div class="ch-level-info"><div class="ch-level-name">${g[1]}</div><div class="ch-level-sub">${g[2]}</div></div><span class="ch-level-arrow">›</span>`;
